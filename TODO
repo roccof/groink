@@ -1,0 +1,37 @@
+
+* GroinK 0.1BETA1
+ - write man page
+ - protocols:
+    - IEEE 802.11
+    - PPP
+    - PPPoE tags
+    - IPv4 options
+    - TCP options
+    - IPv6
+ - script engine:
+    - finish core SELIB
+    - capture SELIB is useful?
+ - core:
+    - IPv6 support
+ - SE script:
+    - alice
+    - detect_firesheep
+
+* GroinK 0.1BETA2
+ - database of script
+ - demonize desniff
+ - MiTM attacks: DHCP spoofing, ICMP redirect, DNS spoofing
+ - [SE-LIB]: ssl, socket
+
+* GroinK 0.1
+ - porting on *BSD
+ - layer 2 proto: linux sll, BSD loopback
+ - IPv6 MiTM attacks
+ - [SE-LIB]: stats, crypto
+
+* GroinK future releases
+ - IEEE 802.11 radiotap: multiple present bitmap
+ - heuristic dissectors
+ - tcp/ip session
+ - layer 2 proto: bluetooth
+
