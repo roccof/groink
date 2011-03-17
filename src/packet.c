@@ -22,7 +22,6 @@
 #include "debug.h"
 #include "packet.h"
 #include "globals.h"
-#include "netutil.h"
 
 static void merge_header_data(Packet *p, Header *h)
 {

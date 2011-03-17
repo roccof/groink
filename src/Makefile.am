@@ -6,6 +6,8 @@ groink_SOURCES =				\
 		globals.c			\
 		list.c				\
 		main.c				\
+		packet.c			\
+		rp_queue.c			\
 		threads.c
 
 noinst_HEADERS =				\
@@ -13,6 +15,8 @@ noinst_HEADERS =				\
 		debug.h				\
 		globals.h			\
 		list.h				\
+		packet.h			\
+		rp_queue.h			\
 		threads.h
 
 groink_CFLAGS = $(LUA_CFLAGS)
