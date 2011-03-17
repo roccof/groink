@@ -31,6 +31,8 @@
 #include "debug.h"
 #include "globals.h"
 #include "threads.h"
+#include "rp_queue.h"
+#include "capture.h"
 
 static struct termios saved_term;
 
@@ -42,6 +44,10 @@ static void cleanup()
   tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
   debug("terminal restored");
 
+  stop_sniffing();
+
+  destroy_rp_queue();
+  capture_engine_destroy();
   threads_manager_destroy();
   globals_destroy();
 }
@@ -78,9 +84,14 @@ static void groink_main()
 {
   /* Initialization phase */
   threads_manager_init();
+  capture_engine_init();
+  init_rp_queue();
 
   message(COLOR_BOLD"%s %s"COLOR_NORMAL" started, type "COLOR_BOLD"Q"
 	  COLOR_NORMAL" or "COLOR_BOLD"q"COLOR_NORMAL" to quit...", PACKAGE_NAME, VERSION);
+
+  /* Start capturing process */
+  start_sniffing();
 }
 
 int main(int argc, char **argv)
@@ -106,7 +117,7 @@ int main(int argc, char **argv)
  
   tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
-  /* parse_options(argc, argv); */
+  parse_options(argc, argv);
   
   /* Register signals */
   signal(SIGINT, &signal_handler_cb);
