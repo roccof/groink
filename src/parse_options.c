@@ -26,7 +26,7 @@
 #include "base.h"
 #include "debug.h"
 #include "globals.h"
-/* #include "netutil.h" */
+#include "netutil.h"
 #include "parse_options.h"
 /* #include "script_engine.h" */
 
@@ -34,7 +34,6 @@ static const struct option long_options[] = {
   {"help", no_argument, NULL, 'h'},
   {"version", no_argument, NULL, 'v'},
   {"iface", required_argument, NULL, 'i'},
-  {"daemon", no_argument, NULL, 'D'},
   {"mitm", required_argument, NULL, 'M'},
   {"no-promisc", no_argument, NULL, 0},
   {"rfmon", no_argument, NULL, 0},
@@ -56,7 +55,6 @@ static void print_usage(int status)
   printf("  -h, --help                              print this help\n");
   printf("  -v, --version                           print version\n");
   printf("  -i, --iface <iface>                     network interface\n");
-  printf("  -D, --daemon                            demonize desniff\n");
   printf("  -M, --mitm <method:options>             perform MiTM attack\n");
   printf("  --rfmon                                 enable monitor mode\n");
   printf("  --no-promisc                            don't set iface in promisc mode\n");

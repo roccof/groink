@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) Denatured Ethyl Crew
+ *
+ * This file is part of GroinK.
+ *
+ * GroinK is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GroinK is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#ifndef GROINK_HOOK_H
+#define GROINK_HOOK_H
+
+typedef enum {
+  HOOKDATA_NONE,
+  HOOKDATA_PACKET
+} HookDataType;
+
+typedef enum {
+  HOOK_PRE_START_SNIFF,     /* Pre start sniffing */
+  HOOK_AT_EXIT,             /* Called at desniff exit */
+  HOOK_ON_ERROR,            /* Called on error */
+  HOOK_RECEIVED,            /* Packet received */
+  HOOK_ARP,                 /* Arp packet received */
+  HOOK_TCP,                 /* Tcp packet received */
+  HOOK_UDP,                 /* Udp packet received */
+  HOOK_ICMP                 /* Icmp packet received */
+} HookEvent;
+
+typedef struct _hook_data {
+  HookDataType type;
+  void *data;
+} HookData;
+
+/* Hook callback function */
+typedef void(*hook_callback)(HookData *data);
+
+void hook_init();
+void hook_destroy();
+void hook_register(HookEvent event, hook_callback callback);
+void hook_unregister(HookEvent event, hook_callback callback);
+void hook_event(HookEvent event, HookData *data);
+
+#endif /* GROINK_HOOK_H */
+
