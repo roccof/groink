@@ -33,6 +33,7 @@
 #include "threads.h"
 #include "rp_queue.h"
 #include "capture.h"
+#include "parse_options.h"
 
 static struct termios saved_term;
 
@@ -85,6 +86,7 @@ static void groink_main()
   /* Initialization phase */
   threads_manager_init();
   capture_engine_init();
+  load_iface_info();
   init_rp_queue();
 
   message(COLOR_BOLD"%s %s"COLOR_NORMAL" started, type "COLOR_BOLD"Q"

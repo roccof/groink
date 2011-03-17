@@ -98,7 +98,7 @@ void parse_options(int argc, char **argv)
       if (strcmp(long_options[opt_index].name, "no-promisc") == 0)
 	gbls->promisc = 0;
       else if (strcmp(long_options[opt_index].name, "show-scripts") == 0)
-	bug("parse_options", "--show-scripts option not implemented yet");
+	bug(__func__, "--show-scripts option not implemented yet");
       else if (strcmp(long_options[opt_index].name, "debug-mode") == 0)
 	gbls->script_debug_mode = 1;
       else if (strcmp(long_options[opt_index].name, "rfmon") == 0)
