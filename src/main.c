@@ -29,6 +29,7 @@
 #include "config.h"
 #include "base.h"
 #include "debug.h"
+#include "globals.h"
 
 static struct termios saved_term;
 
@@ -43,8 +44,7 @@ static void cleanup()
 
 static void signal_handler_cb(int signal)
 {
-  if(signal == SIGSEGV)
-  {
+  if(signal == SIGSEGV) {
 #ifdef GROINK_DEBUG    /* Print backtrace */
     void *buffer[10];
     size_t size;
@@ -53,7 +53,7 @@ static void signal_handler_cb(int signal)
     
     size = backtrace(buffer, 10);
     strings = backtrace_symbols(buffer, size);
-
+    
     printf("[!!] Segmentation fault, please report this to %s\n", PACKAGE_BUGREPORT);    
     printf("Backtrace:\n");
     for(i=0; i<size; i++)
@@ -65,9 +65,9 @@ static void signal_handler_cb(int signal)
 #endif /* GROINK_DEBUG */
     
     exit(EXIT_FAILURE);
-  }
-  else
+  } else {
     exit(EXIT_SUCCESS);
+  }
 }
 
 static void groink_main()
@@ -80,12 +80,14 @@ int main(int argc, char **argv)
 {
   struct termios term;
 
-  /* globals_init(); */
+  globals_init();
 
   atexit(&cleanup);
 
-  /* Set up a terminal device to read single characters 
-     in noncanonical input mode */
+  /* 
+   * Set up a terminal device to read single 
+   * characters in noncanonical input mode
+   */
 
   tcgetattr(STDIN_FILENO, &saved_term);
   term = saved_term;
@@ -106,20 +108,17 @@ int main(int argc, char **argv)
 
   groink_main();
 
-  while(1)
-    {
-      char c = getchar();
-
-      switch(c)
-	{
-	case 'q':   // Quit DESniff
-	case 'Q':
-	  goto end;
-	  break;
-	}
+  while(1) {
+    char c = getchar();
+    
+    switch(c) {
+    case 'q':   /* Quit GroinK */
+    case 'Q':
+      goto end;
+      break;
     }
-
- end:
-
+  }
+  
+ end: 
   return EXIT_SUCCESS;
 }
