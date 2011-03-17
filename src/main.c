@@ -30,6 +30,7 @@
 #include "base.h"
 #include "debug.h"
 #include "globals.h"
+#include "threads.h"
 
 static struct termios saved_term;
 
@@ -40,6 +41,9 @@ static void cleanup()
   /* Restore terminal settings */
   tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
   debug("terminal restored");
+
+  threads_manager_destroy();
+  globals_destroy();
 }
 
 static void signal_handler_cb(int signal)
@@ -72,6 +76,9 @@ static void signal_handler_cb(int signal)
 
 static void groink_main()
 {
+  /* Initialization phase */
+  threads_manager_init();
+
   message(COLOR_BOLD"%s %s"COLOR_NORMAL" started, type "COLOR_BOLD"Q"
 	  COLOR_NORMAL" or "COLOR_BOLD"q"COLOR_NORMAL" to quit...", PACKAGE_NAME, VERSION);
 }

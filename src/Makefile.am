@@ -5,13 +5,15 @@ groink_SOURCES =				\
 		debug.c				\
 		globals.c			\
 		list.c				\
-		main.c
+		main.c				\
+		threads.c
 
 noinst_HEADERS =				\
 		base.h				\
 		debug.h				\
 		globals.h			\
-		list.h
+		list.h				\
+		threads.h
 
 groink_CFLAGS = $(LUA_CFLAGS)
 groink_LDADD = $(LUA_LIBS)

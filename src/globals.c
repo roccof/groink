@@ -74,24 +74,24 @@ void globals_init()
 
 void globals_destroy()
 {
-  if(gbls == NULL)
+  if (gbls == NULL)
     return;
 
-  list_free(&(gbls->hosts), &remove_host_cb);
+  /* list_free(&(gbls->hosts), &remove_host_cb); */
   
-  if(gbls->link_addr != NULL)
+  if (gbls->link_addr != NULL)
     free(gbls->link_addr);
   
-  if(gbls->net_addr != NULL)
+  if (gbls->net_addr != NULL)
     free(gbls->net_addr);
   
-  if(gbls->netmask != NULL)
+  if (gbls->netmask != NULL)
     free(gbls->netmask);
   
-  if(gbls->mitm != NULL)
+  if (gbls->mitm != NULL)
     free(gbls->mitm);
   
-  if(gbls->script != NULL)
+  if (gbls->script != NULL)
     free(gbls->script);
   
   free(gbls);

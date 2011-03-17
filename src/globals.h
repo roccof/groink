@@ -23,12 +23,11 @@
 #include <pcap.h>
 
 /* #include "capture.h" */
-/* #include "list.h" */
+#include "list.h"
 /* #include "mitm.h" */
 /* #include "script_engine.h" */
 
-struct globals_t
-{
+struct globals_t {
   /* General */
   char *iface;                            /* Network interface */
   int promisc;                            /* Promisc mode */
