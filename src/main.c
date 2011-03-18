@@ -17,7 +17,6 @@
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <execinfo.h>
-#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

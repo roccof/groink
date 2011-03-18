@@ -12,6 +12,7 @@ groink_SOURCES =				\
 		netutil.c			\
 		packet.c			\
 		parse_options.c			\
+		rp_processor.c			\
 		rp_queue.c			\
 		threads.c
 
@@ -25,6 +26,7 @@ noinst_HEADERS =				\
 		netutil.h			\
 		packet.h			\
 		parse_options.h			\
+		rp_processor.h			\
 		rp_queue.h			\
 		threads.h
 
