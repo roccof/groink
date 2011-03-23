@@ -12,6 +12,8 @@ groink_SOURCES =				\
 		netutil.c			\
 		packet.c			\
 		parse_options.c			\
+		protos.c			\
+		protocols/ethernet.c		\
 		rp_processor.c			\
 		rp_queue.c			\
 		threads.c
@@ -21,14 +23,18 @@ noinst_HEADERS =				\
 		capture.h			\
 		debug.h				\
 		globals.h			\
+		hashtable.h			\
 		hook.h				\
 		list.h				\
 		netutil.h			\
 		packet.h			\
 		parse_options.h			\
+		protos.h			\
+		protocols/ethernet.h		\
 		rp_processor.h			\
 		rp_queue.h			\
-		threads.h
+		threads.h			\
+		uthash.h
 
 groink_CFLAGS = $(LUA_CFLAGS)
 groink_LDADD = $(LUA_LIBS)

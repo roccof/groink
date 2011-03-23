@@ -34,6 +34,7 @@
 #include "capture.h"
 #include "parse_options.h"
 #include "hook.h"
+#include "protos.h"
 
 static struct termios saved_term;
 
@@ -47,6 +48,7 @@ static void cleanup()
 
   stop_sniffing();
 
+  protos_destroy();
   destroy_rp_queue();
   capture_engine_destroy();
   threads_manager_destroy();
@@ -90,6 +92,7 @@ static void groink_main()
   capture_engine_init();
   load_iface_info();
   init_rp_queue();
+  protos_init();
 
   message(COLOR_BOLD"%s %s"COLOR_NORMAL" started, type "COLOR_BOLD"Q"
 	  COLOR_NORMAL" or "COLOR_BOLD"q"COLOR_NORMAL" to quit...", PACKAGE_NAME, VERSION);

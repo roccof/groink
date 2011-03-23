@@ -95,7 +95,7 @@ void stop_rp_processor()
 
   thread = thread_id_from_name(RP_PROCESSOR_THREAD_NAME);
 
-  if(thread == 0)
+  if (thread == 0)
     return;
 
   thread_stop(thread);
