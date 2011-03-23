@@ -5,7 +5,6 @@ depcomp
 *.log
 *.la
 *.in
-ChangeLog
 Makefile
 config.*
 configure
