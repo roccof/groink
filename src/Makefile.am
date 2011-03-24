@@ -4,6 +4,7 @@ groink_SOURCES =				\
 		base.c				\
 		capture.c			\
 		debug.c				\
+		decoder.c			\
 		globals.c			\
 		hook.c				\
 		iface.c				\
@@ -22,6 +23,7 @@ noinst_HEADERS =				\
 		base.h				\
 		capture.h			\
 		debug.h				\
+		decoder.h			\
 		globals.h			\
 		hashtable.h			\
 		hook.h				\
@@ -30,6 +32,7 @@ noinst_HEADERS =				\
 		packet.h			\
 		parse_options.h			\
 		protos.h			\
+		protos_name.h
 		protocols/ethernet.h		\
 		rp_processor.h			\
 		rp_queue.h			\

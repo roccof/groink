@@ -29,8 +29,21 @@ static const proto_cb protos[] = {
   NULL
 };
 
-/* Protocols hashtable */
-static Protocol *protos_table = NULL;
+struct _pname_table {
+  char *name;
+  Protocol *p;
+  UT_hash_handle hh;
+};
+
+struct _pport_table {
+  int port;
+  Protocol *p;
+  UT_hash_handle hh;
+};
+
+/* Protocols hashtables */
+static struct _pname_table *name_ptable = NULL;
+static struct _pport_table *port_ptable = NULL;
 
 /* Load all suported protocols */
 void protos_init()
@@ -42,36 +55,104 @@ void protos_init()
   debug("loaded %d protocol%c", i, (i > 1)? 's' : ' ');
 }
 
-void protos_destroy()
+static void cleanup_protos_name_table()
 {
-  Protocol *curr = NULL, *tmp = NULL;
+  struct _pname_table *curr = NULL, *tmp = NULL;
 
-  HASH_ITER(hh, protos_table, curr, tmp) {
-    HASH_DEL(protos_table, curr);
+  HASH_ITER(hh, name_ptable, curr, tmp) {
+    HASH_DEL(name_ptable, curr);
+    
+    curr->p->refcount--;
+    if (curr->p->refcount == 0) {
+      free(curr->p);
+      curr->p = NULL;
+    }
+
     free(curr);
     curr = NULL;
   }
-  HASH_CLEAR(hh, protos_table);
+  name_ptable = NULL;
 }
 
-Protocol *proto_register(char *name)
+static void cleanup_protos_port_table()
 {
-  Protocol *p = (Protocol *)safe_alloc(sizeof(Protocol));
-  p->name = name;
-  HASH_ADD_KEYPTR(hh, protos_table, p->name, strlen(p->name), p);
-  return p;
+  struct _pport_table *curr = NULL, *tmp = NULL;
+
+  HASH_ITER(hh, port_ptable, curr, tmp) {
+    HASH_DEL(port_ptable, curr);
+    
+    curr->p->refcount--;
+    if (curr->p->refcount == 0) {
+      free(curr->p);
+      curr->p = NULL;
+    }
+
+    free(curr);
+    curr = NULL;
+  }
+  port_ptable = NULL;
 }
 
-void proto_unregister(char *name)
+void protos_destroy()
 {
-  Protocol *p = NULL;
-  HASH_DEL(protos_table, p);
-  free(p);
+  debug("cleanup loaded protocols...");
+  cleanup_protos_port_table();
+  cleanup_protos_name_table();
 }
 
-Protocol *proto_get(char *name)
+void proto_register_byname(char *name, Protocol *p)
 {
-  Protocol *p = NULL;
-  HASH_FIND_STR(protos_table, name, p);
-  return p;
+  struct _pname_table *e = (struct _pname_table *)safe_alloc(sizeof(struct _pname_table));
+  e->name = name;
+  e->p = p;
+
+  /* Increment refcount of the protocol struct */
+  p->refcount++;
+
+  HASH_ADD_KEYPTR(hh, name_ptable, e->name, strlen(e->name), e);
+}
+
+void proto_register_byport(int port, Protocol *p)
+{
+  struct _pport_table *e = (struct _pport_table *)safe_alloc(sizeof(struct _pport_table));
+  e->port = port;
+  e->p = p;
+
+  /* Increment refcount of the protocol struct */
+  p->refcount++;
+
+  HASH_ADD_INT(port_ptable, port, e);
+}
+
+
+void proto_unregister_byname(char *name)
+{
+  /* TODO */
+}
+
+void proto_unregister_byport(int port)
+{
+  /* TODO */
+}
+
+Protocol *proto_get_byname(char *name)
+{
+  struct _pname_table *e = NULL;
+
+  HASH_FIND_STR(name_ptable, name, e);
+
+  if (e != NULL)
+    return e->p;
+  return NULL;
+}
+
+Protocol *proto_get_byport(int port)
+{
+  struct _pport_table *e = NULL;
+  
+  HASH_FIND_INT(port_ptable, &port, e);
+  
+  if (e != NULL)
+    return e->p;
+  return NULL;
 }

@@ -35,6 +35,7 @@
 #include "parse_options.h"
 #include "hook.h"
 #include "protos.h"
+#include "rp_processor.h"
 
 static struct termios saved_term;
 
@@ -47,6 +48,7 @@ static void cleanup()
   debug("terminal restored");
 
   stop_sniffing();
+  stop_rp_processor();
 
   protos_destroy();
   destroy_rp_queue();
@@ -93,6 +95,9 @@ static void groink_main()
   load_iface_info();
   init_rp_queue();
   protos_init();
+
+  /* Start raw packet processor */
+  start_rp_processor();
 
   message(COLOR_BOLD"%s %s"COLOR_NORMAL" started, type "COLOR_BOLD"Q"
 	  COLOR_NORMAL" or "COLOR_BOLD"q"COLOR_NORMAL" to quit...", PACKAGE_NAME, VERSION);

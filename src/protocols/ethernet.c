@@ -25,6 +25,7 @@
 #include "packet.h"
 #include "base.h"
 #include "protos.h"
+#include "protos_name.h"
 
 /* Builder */
 ETHERNET *build_ethernet(char *src, char *dst, _uint16 type)
@@ -48,52 +49,54 @@ ETHERNET *build_ethernet(char *src, char *dst, _uint16 type)
 }
 
 /* Decoder */
-/* static int decode_ether(Packet *p, const unsigned char *bytes, unsigned int len) */
-/* { */
-/*   ETHERNET *eth = NULL; */
-/*   Header *header = NULL; */
+static int decode_ether(Packet *p, const unsigned char *bytes, unsigned int len)
+{
+  ETHERNET *eth = NULL;
+  Header *header = NULL;
 
-/*   if(ETHER_HDR_LEN > len) */
-/*   { */
-/*     debug("malformed ETHERNET header: invalid length"); */
-/*     return call_decoder(PROTO_RAW, p, bytes, len); */
-/*   } */
+  /* if (ETHER_HDR_LEN > len) { */
+  /*   debug("malformed ETHERNET header: invalid length"); */
+  /*   return call_decoder(PROTO_RAW, p, bytes, len); */
+  /* } */
 
-/*   eth = (ETHERNET *)bytes; */
+  eth = (ETHERNET *)bytes;
 
-/*   header = packet_add_header(p, PROTO_ETHER, (void *)eth, ETHER_HDR_LEN); */
+  header = packet_add_header(p, PROTO_ETHER, (void *)eth, ETHER_HDR_LEN);
+
+  return 0;
   
-/*   p->hw_srcaddr = ether_addr_ntoa(eth->src_addr); */
-/*   p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr); */
+  /* p->hw_srcaddr = ether_addr_ntoa(eth->src_addr); */
+  /* p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr); */
 
-/*   switch(ntohs(eth->type)) */
-/*     { */
-/*     case ETHER_TYPE_IP: */
-/*       return call_decoder(PROTO_IPV4, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
-      
-/*     case ETHER_TYPE_ARP: */
-/*     case ETHER_TYPE_REVARP: */
-/*       return call_decoder(PROTO_ARP, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
-
-/*     case ETHER_TYPE_PPPOED: */
-/*       return call_decoder(PROTO_PPPOE, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
-
-/*     case ETHER_TYPE_PPPOES: */
-/*       return call_decoder(PROTO_PPPOE, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
-      
-/*     default: */
-/*       /\* Insert error *\/ */
-/*       ADD_ERROR(header, UNKNOWN_ETHER_TYPE); */
-/*       return call_decoder(PROTO_RAW, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
-/*     } */
-/* } */
+  /* switch (ntohs(eth->type)) { */
+  /* case ETHER_TYPE_IP: */
+  /*   return call_decoder(PROTO_IPV4, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+    
+  /* case ETHER_TYPE_ARP: */
+  /* case ETHER_TYPE_REVARP: */
+  /*   return call_decoder(PROTO_ARP, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+    
+  /* case ETHER_TYPE_PPPOED: */
+  /*   return call_decoder(PROTO_PPPOE, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+    
+  /* case ETHER_TYPE_PPPOES: */
+  /*   return call_decoder(PROTO_PPPOE, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+    
+  /* default: */
+  /*   /\* Insert error *\/ */
+  /*   ADD_ERROR(header, UNKNOWN_ETHER_TYPE); */
+  /*   return call_decoder(PROTO_RAW, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+  /* } */
+}
 
 void register_ether()
 {
-  Protocol *p = proto_register("ether");
+  Protocol *p = (Protocol *)safe_alloc(sizeof(Protocol));
+  p->name = PROTO_NAME_ETHER;
   p->longname = "Ethernet";
   p->layer = L2;
   p->fields = NULL;
-
-  /* decoder_register(p); */
+  p->decoder = decode_ether;
+  
+  proto_register_byname(PROTO_NAME_ETHER, p);
 }

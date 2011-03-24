@@ -27,7 +27,7 @@
 #include "list.h"
 /* #include "mitm.h" */
 /* #include "script_engine.h" */
-/* #include "capture.h" */
+#include "capture.h"
 
 void globals_init()
 {
@@ -52,13 +52,13 @@ void globals_init()
   gbls->sockfd = -1;
   gbls->sockfd6 = -1;
 
-  /* gbls->pcap = NULL; */
-  /* gbls->dlt = 0; */
-  /* gbls->cap_packets = 0; */
-  /* gbls->cs = CAP_STATE_NONE; */
-  /* gbls->snaplen = CAPTURE_SNAPLEN; */
-  /* gbls->decode = 1; */
-  /* gbls->cap_timeout = CAPTURE_TIMEOUT; */
+  gbls->pcap = NULL;
+  gbls->dlt = 0;
+  gbls->cap_packets = 0;
+  gbls->cs = CAP_STATE_NONE;
+  gbls->snaplen = CAPTURE_SNAPLEN;
+  gbls->decode = 1;
+  gbls->cap_timeout = CAPTURE_TIMEOUT;
 
   /* gbls->L = NULL; */
   /* gbls->script = NULL; */

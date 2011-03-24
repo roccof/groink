@@ -23,6 +23,7 @@
 
 #include "hashtable.h"
 #include "packet.h"
+#include "decoder.h"
 
 typedef enum _layer {
   L2,
@@ -35,24 +36,27 @@ typedef enum _layer {
 #define FIELD_OP_EDIT 1  /* Edit operation */
 
 typedef struct _proto_fields {
-  char *name;                    /* Field name*/
-  void (*cb)(lua_State *L,       /* Field callback function */
-	     Header *h, short op);
+  char *name;
+  void (*cb)(lua_State *L, Header *h, short op);
 } ProtoFields;
 
 typedef struct _protocol {
-  char *name;             /* Short protocol name */
-  char *longname;         /* Long protocol name */
-  Layer layer;            /* Protocol layer */
-  ProtoFields **fields;   /* Table that contains callback functions to
-			     get and edit the fields of the protocol */
-  UT_hash_handle hh;
+  char *name;                /* Short protocol name */
+  char *longname;            /* Long protocol name */
+  Layer layer;               /* Protocol layer */
+  ProtoFields **fields;      /* Table that contains callback functions to
+				get and edit the fields of the protocol */
+  decoder_callback decoder;  /* Protocol decoder callback */
+  int refcount;              /* Used from hashtables, indicates if the struct can be feed */
 } Protocol;
 
 void protos_init();
 void protos_destroy();
-Protocol *proto_register(char *name);
-void proto_unregister(char *name);
-Protocol *proto_get(char *name);
+void proto_register_byname(char *name, Protocol *p);
+void proto_register_byport(int port, Protocol *p);
+void proto_unregister_byname(char *name);
+void proto_unregister_byport(int port);
+Protocol *proto_get_byname(char *name);
+Protocol *proto_get_byport(int port);
 
 #endif /* GROINK_PROTOS_H */

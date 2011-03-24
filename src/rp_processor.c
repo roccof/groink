@@ -28,7 +28,7 @@
 #include "rp_processor.h"
 #include "rp_queue.h"
 #include "threads.h"
-/* #include "decoder.h" */
+#include "decoder.h"
 /* #include "forward.h" */
 
 static void *processor_thread_cb(void *arg)
@@ -53,8 +53,13 @@ static void *processor_thread_cb(void *arg)
     
     p = (Packet *)safe_alloc(sizeof(Packet));
     packet_init(p);
+
+    p->rawdata = (unsigned char *)safe_alloc(rp->len);
+    memcpy(p->rawdata, rp->data, rp->len);
+    p->len = rp->len;
     
-    /* start_decoding(p, rp); */
+    if (gbls->decode)
+      start_decoding(p, rp);
     
     ADD_FLAG(p, PACKET_FLAG_CAPTURED);
     

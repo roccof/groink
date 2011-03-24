@@ -40,15 +40,9 @@ typedef enum {
   PROTO_HTTP                /* HTTP */
 } Proto;
 
-typedef enum {
-  PTYPE_ARP,
-  PTYPE_IPV4,
-  PTYPE_IPV6
-} PacketType;
-
 /* Header structure */
 typedef struct _header {
-  Proto proto;              /* Protocol */
+  Proto proto;           /* Protocol */
   int len;                  /* Lenght */
   _uchar *data;             /* Raw header data */
   _uint8 decoding_errors;   /* Decoding errors bitmap */
@@ -61,29 +55,26 @@ typedef struct _header {
 #define HAS_FLAG(p, f) (((p)->flags & (f)) == (f))
 
 #define PACKET_FLAG_DROP 0x80            /* Drop the packet */
-#define PACKET_FLAG_MODIFIED 0x40        /* The packet was modified, recalculate the cksum */
+#define PACKET_FLAG_MODIFIED 0x40        /* The packet was modified */
 #define PACKET_FLAG_UNMODIFICABLE 0x20   /* The packet is unmodificable */
 #define PACKET_FLAG_CAPTURED 0x10        /* Captured packet */
 #define PACKET_FLAG_DECODED 0x08         /* Indicates that the packet was decoded */
-#define PACKET_FLAG_DISSECTED 0x04       /* Indicates that the packet was dissected */
-#define PACKET_FLAG_DECODE_ERR 0x03      /* Indicates that there is an error while packet decoding */
-#define PACKET_FLAG_DISSECT_ERR 0x01     /* Indicates that there is an error while packet dissecting */
+#define PACKET_FLAG_DECODE_ERR 0x04      /* Indicates that there is an error while packet decoding */
 
 /* Packet object structure */
 typedef struct _packet {
   _uchar *rawdata;               /* Raw data */
-  _uint32 len;                   /* Packet length*/
-  _uchar *edit_rawdata;          /* This buffer contains the packet raw data of the packet 
+  _uint32 len;                   /* Packet length */
+  _uchar *edit_rawdata;          /* This buffer contains the raw data of the packet 
 				    only if it was modified */
   _uint32 edit_len;              /* Length of the modified packet data */
   struct _header *headers;       /* Headers list */
   int num_headers;               /* Number of headers */
   _uint8 flags;                  /* Flags bit mask */
-  PacketType type;               /* Packet type: IPv4 or IPv6 */
   char *hw_dstaddr;              /* Destination hw address */
   char *hw_srcaddr;              /* Source hw address */
   char *net_srcaddr;             /* Source net address */
-  char *net_dstaddr;             /* Destination net address*/
+  char *net_dstaddr;             /* Destination net address */
 } Packet;
 
 /*
