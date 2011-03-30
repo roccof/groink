@@ -17,10 +17,12 @@
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "protos.h"
+#include "packet.h"
 #include "protocols/ethernet.h"
 #include "debug.h"
 #include "base.h"
 #include "hashtable.h"
+#include "threads.h"
 
 typedef void(*proto_cb)();
 
@@ -44,6 +46,12 @@ struct _pport_table {
 /* Protocols hashtables */
 static struct _pname_table *name_ptable = NULL;
 static struct _pport_table *port_ptable = NULL;
+
+/* Mutex for hashtable that contains protos by name */
+static pthread_mutex_t mutex_ht1 = PTHREAD_MUTEX_INITIALIZER;
+
+/* Mutex for hashtable that contains protos by port */
+static pthread_mutex_t mutex_ht2 = PTHREAD_MUTEX_INITIALIZER;
 
 /* Load all suported protocols */
 void protos_init()
@@ -71,6 +79,7 @@ static void cleanup_protos_name_table()
     free(curr);
     curr = NULL;
   }
+
   name_ptable = NULL;
 }
 
@@ -109,7 +118,9 @@ void proto_register_byname(char *name, Protocol *p)
   /* Increment refcount of the protocol struct */
   p->refcount++;
 
+  MUTEX_LOCK(&mutex_ht1);
   HASH_ADD_KEYPTR(hh, name_ptable, e->name, strlen(e->name), e);
+  MUTEX_UNLOCK(&mutex_ht1);
 }
 
 void proto_register_byport(int port, Protocol *p)
@@ -121,7 +132,9 @@ void proto_register_byport(int port, Protocol *p)
   /* Increment refcount of the protocol struct */
   p->refcount++;
 
+  MUTEX_LOCK(&mutex_ht2);
   HASH_ADD_INT(port_ptable, port, e);
+  MUTEX_LOCK(&mutex_ht2);
 }
 
 
@@ -139,7 +152,9 @@ Protocol *proto_get_byname(char *name)
 {
   struct _pname_table *e = NULL;
 
+  MUTEX_LOCK(&mutex_ht1);
   HASH_FIND_STR(name_ptable, name, e);
+  MUTEX_LOCK(&mutex_ht1);
 
   if (e != NULL)
     return e->p;
@@ -149,9 +164,11 @@ Protocol *proto_get_byname(char *name)
 Protocol *proto_get_byport(int port)
 {
   struct _pport_table *e = NULL;
-  
+
+  MUTEX_LOCK(&mutex_ht2);  
   HASH_FIND_INT(port_ptable, &port, e);
-  
+  MUTEX_LOCK(&mutex_ht2);
+
   if (e != NULL)
     return e->p;
   return NULL;

@@ -22,7 +22,6 @@
 #include <lua.h>
 
 #include "hashtable.h"
-#include "packet.h"
 #include "decoder.h"
 
 typedef enum _layer {
@@ -37,7 +36,7 @@ typedef enum _layer {
 
 typedef struct _proto_fields {
   char *name;
-  void (*cb)(lua_State *L, Header *h, short op);
+  void (*cb)(lua_State *L, void *data, short op);
 } ProtoFields;
 
 typedef struct _protocol {
@@ -47,7 +46,8 @@ typedef struct _protocol {
   ProtoFields **fields;      /* Table that contains callback functions to
 				get and edit the fields of the protocol */
   decoder_callback decoder;  /* Protocol decoder callback */
-  int refcount;              /* Used from hashtables, indicates if the struct can be feed */
+  int refcount;              /* Used from hashtables, iit ndicates if the struct 
+				can be freed */
 } Protocol;
 
 void protos_init();
