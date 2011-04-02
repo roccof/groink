@@ -43,8 +43,7 @@ typedef struct _grk_hook_data {
 /* Hook callback function */
 typedef void(*hook_cb_t)(hookdata_t *data);
 
-void hook_init();
-void hook_destroy();
+void hook_cleanup();
 void hook_register(hookevent_t event, hook_cb_t callback);
 void hook_unregister(hookevent_t event, hook_cb_t callback);
 void hook_event(hookevent_t event, hookdata_t *data);

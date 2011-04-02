@@ -19,73 +19,58 @@
 #include <pthread.h>
 
 #include "debug.h"
-#include "list.h"
 #include "packet.h"
 #include "rp_queue.h"
 #include "threads.h"
+#include "utlist.h"
+
+struct _grk_rp_elem {
+  rawpacket_t *rp;
+  struct _grk_rp_elem *next;
+};
 
 /* Queue */
-static List queue; /* TODO: real queue */
-
-static int _rpq_init = 0;
+static struct _grk_rp_elem *queue = NULL;
 
 /* Mutex */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void init_rp_queue()
+void cleanup_rp_queue()
 {
-  if (_rpq_init == 1)
-    return;
+  rawpacket_t *rp = NULL;
+  struct _grk_rp_elem *curr = NULL, *tmp = NULL;
 
-  list_init(&queue);
-
-  _rpq_init = 1;
-
-  debug("raw packet queue initialized");
-}
-
-void destroy_rp_queue()
-{
-  Element *curr, *del;
-  rawpacket_t *rp;
-
-  if (_rpq_init == 0)
-    return;
-
-  _rpq_init = 0;
-  
   MUTEX_LOCK(&mutex);
+  LL_FOREACH_SAFE(queue, curr, tmp) {
+    LL_DELETE(queue, curr);
+    rp = curr->rp;
 
-  curr = queue.head;
-  while (list_has_next(curr)) {
-    rp = (rawpacket_t *)list_elem_content(curr);
-    
-    if (rp == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__,"list element content is NULL");
-    }
-    
-    del = curr;
-    curr = list_next(curr);
-    list_del_element(&queue, del);
-    
+    free(curr);
+    curr = NULL;
+
     free(rp->data);
     free(rp);
     rp = NULL;
   }
   MUTEX_UNLOCK(&mutex);
   
-  debug("raw packet queue destroyed");
+  debug("cleanup raw packet queue");
 }
 
 /* Add a raw packet in the queue */
 void add_raw_packet(rawpacket_t *rp)
 {
+  struct _grk_rp_elem *elem = NULL;
+
   if (rp == NULL)
     bug(__func__, "invalid raw packet");
 
   MUTEX_LOCK(&mutex);
-  list_add_element(&queue, rp);
+
+  elem = (struct _grk_rp_elem *)safe_alloc(sizeof(struct _grk_rp_elem));
+  elem->rp = rp;
+  LL_PREPEND(queue, elem);
+
   MUTEX_UNLOCK(&mutex);
 }
 
@@ -93,30 +78,24 @@ void add_raw_packet(rawpacket_t *rp)
 rawpacket_t *get_raw_packet()
 {
   rawpacket_t *rp = NULL;
+  struct _grk_rp_elem *elem = NULL;
 
   MUTEX_LOCK(&mutex);
 
-  /* No raw packet */
-  if (queue.head == NULL) {
+  /* No raw packets */
+  if (queue == NULL) {
     MUTEX_UNLOCK(&mutex);
     return NULL;
   }
 
-  rp = (rawpacket_t *)list_elem_content(queue.head);
-  list_del_element(&queue, queue.head);
+  elem = queue;
+  LL_DELETE(queue, elem);
 
   MUTEX_UNLOCK(&mutex);
+
+  rp = elem->rp;
+  free(elem);
+  elem = NULL;
 
   return rp;
-}
-
-int rp_queue_size()
-{
-  int size;
-
-  MUTEX_LOCK(&mutex);
-  size = queue.size;
-  MUTEX_UNLOCK(&mutex);
-
-  return size;
 }

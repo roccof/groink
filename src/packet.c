@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "packet.h"
 #include "globals.h"
+#include "utlist.h"
 
 static void merge_header_data(packet_t *p, header_t *h)
 {
@@ -47,29 +48,18 @@ static void merge_header_data(packet_t *p, header_t *h)
 header_t *packet_add_header(packet_t *p, char *proto, _uint8 *data, size_t len)
 {
   header_t *h = NULL;
-  header_t *last = NULL;
 
   h = (header_t *)safe_alloc(sizeof(header_t));
   h->proto = proto;
   h->data = data;
   h->len = len;
   h->next = NULL;
+  h->prev = NULL;
   h->decoding_errors = 0;
   h->packet = p;
 
-  /* Insert the header into the packet */
-
-  if (p->headers == NULL) {
-    /* Is the first header */
-    p->headers = h;
-  } else {
-    /* Get last header */
-    for(last=p->headers; last->next!=NULL; last=last->next);
-    
-    /* Append the header */
-    last->next = h;
-  }
-
+  /* Append the header into the packet */
+  DL_APPEND(p->headers, h);
   p->num_headers++;
 
   if (!PKT_HAS_FLAG(p, PACKET_FLAG_DECODED))
@@ -96,20 +86,16 @@ packet_t *packet_new(_uint8 *data, size_t len)
 }
 
 /* Free packet memory */
-void packet_free(packet_t *p) // XXX FIXME
+void packet_free(packet_t *p)
 {
   header_t *h = NULL;
   header_t *t = NULL;
 
-  h = p->headers;
-
   /* Free all headers memory */
-  while (h != NULL) {
-    t = h;
-    h = h->next;
-    
-    free(t); /* Free header memory */
-    t = NULL;
+  DL_FOREACH_SAFE (p->headers, h, t) {
+    DL_DELETE(p->headers, h);
+    free(h);
+    h = NULL;
   }
 
   /* Free packet data */
@@ -143,24 +129,22 @@ void packet_free(packet_t *p) // XXX FIXME
 /* Control if the packet contains a specific header */
 int packet_contains_header(packet_t *p, char *proto)
 {
-  header_t *h = p->headers;
+  header_t *h = NULL;
 
-  while (h != NULL) {
-    if(h->proto == proto) // XXX: use strncmp
+  DL_FOREACH (p->headers, h) {
+    if (h->proto == proto) // XXX: use strncmp
       return 1;
-    h = h->next;
   }
   return 0;
 }
 
 header_t *packet_get_header(packet_t *p, char *proto)
 {
-  header_t *h = p->headers;
+  header_t *h = NULL;
 
-  while (h != NULL) {
-    if(h->proto == proto) // XXX: use strncmp
+  DL_FOREACH (p->headers, h) {
+    if (h->proto == proto) // XXX: use strncmp
       return h;
-    h = h->next;
   }
   return NULL;
 }

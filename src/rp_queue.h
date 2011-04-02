@@ -21,10 +21,8 @@
 
 #include "packet.h"
 
-void init_rp_queue();
-void destroy_rp_queue();
+void cleanup_rp_queue();
 void add_raw_packet(rawpacket_t *);
 rawpacket_t *get_raw_packet();
-int rp_queue_size();
 
 #endif /* GROINK_RP_QUEUE_H */

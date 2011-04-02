@@ -23,17 +23,18 @@
 #include "base.h"
 #include "globals.h"
 #include "debug.h"
-#include "list.h"
 #include "threads.h"
+#include "utlist.h"
 
-struct _thread_elem {
-  pthread_t id;          /* Thread id*/
-  char *name;            /* Thread name */
-  thread_cb callback;    /* Thread callback function */
+struct _grk_thread_elem {
+  pthread_t id;                  /* Thread id*/
+  char *name;                    /* Thread name */
+  thread_cb callback;            /* Thread callback function */
+  struct _grk_thread_elem *next;
 };
 
 /* List that contain all threads */
-static List list;
+static struct _grk_thread_elem *list = NULL;
 
 /* Mutex */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -43,8 +44,6 @@ static pthread_attr_t attr;
 
 void threads_manager_init()
 {
-  list_init(&list);
-
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
@@ -61,7 +60,7 @@ void threads_manager_destroy()
 
 pthread_t thread_new(char *name, thread_cb callback, void *data)
 {
-  struct _thread_elem *new = NULL;
+  struct _grk_thread_elem *new = NULL;
   pthread_t id;
 
   if (pthread_create(&id, &attr, callback, data) != 0) {
@@ -69,13 +68,13 @@ pthread_t thread_new(char *name, thread_cb callback, void *data)
     fatal("thread_new","thread '%s' not created!!!", name);
   }
 
-  new = (struct _thread_elem *)safe_alloc(sizeof(struct _thread_elem));
+  new = (struct _grk_thread_elem *)safe_alloc(sizeof(struct _grk_thread_elem));
   new->id = id;
   new->name = name;
   new->callback = callback;
   
   MUTEX_LOCK(&mutex);
-  list_add_element(&list, new);
+  LL_APPEND(list, new);
   MUTEX_UNLOCK(&mutex);
 
   debug("started thread [0x%x] with name '%s'", id, name);
@@ -85,16 +84,16 @@ pthread_t thread_new(char *name, thread_cb callback, void *data)
 
 void thread_register(pthread_t id, char *name)
 {
-  struct _thread_elem *new = NULL;
+  struct _grk_thread_elem *new = NULL;
 
   // Register thread in the list
-  new = (struct _thread_elem *)safe_alloc(sizeof(struct _thread_elem));
+  new = (struct _grk_thread_elem *)safe_alloc(sizeof(struct _grk_thread_elem));
   new->id = id;
   new->name = name;
   new->callback = NULL;
 
   MUTEX_LOCK(&mutex);
-  list_add_element(&list, new);
+  LL_APPEND(list, new);
   MUTEX_UNLOCK(&mutex);
 
   debug("register thread [0x%x] with name '%s'", id, name);
@@ -110,54 +109,37 @@ void thread_stop(pthread_t id)
 
 void thread_unregister(pthread_t id)
 {
-  Element *curr = NULL;
-  struct _thread_elem *t = NULL;
+  struct _grk_thread_elem *t = NULL;
+  struct _grk_thread_elem *tmp = NULL;
   
   MUTEX_LOCK(&mutex);
-  
-  curr = list.head;
-  while (list_has_next(curr)) {
-    t = (struct _thread_elem *)list_elem_content(curr);
-    
-    if (t == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__, "list element content is NULL");
-    }
-    
+
+  LL_FOREACH_SAFE (list, t, tmp) {
     if (pthread_equal(t->id, id)) {
       debug("thread '%s' terminated", t->name);
       
-      list_del_element(&list, curr);
+      LL_DELETE(list, t);
       MUTEX_UNLOCK(&mutex);
       
       free(t);
       
       return;
     }
-    curr = list_next(curr);
   }
-
   MUTEX_UNLOCK(&mutex);
 }
 
 pthread_t thread_id_from_name(char *name)
 {
-  Element *curr;
-  struct _thread_elem *t;
+  struct _grk_thread_elem *t = NULL;
 
   MUTEX_LOCK(&mutex);
 
-  LIST_FOREACH(curr, &list) {
-    t = (struct _thread_elem *)list_elem_content(curr);
-    
-    if (t == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__, "list element content is NULL");
-    }
-
+  LL_FOREACH (list, t) {
     if (strcmp(name, t->name) == 0) {
+      pthread_t id = t->id;
       MUTEX_UNLOCK(&mutex);
-      return t->id;
+      return id;
     }
   }
   MUTEX_UNLOCK(&mutex);
@@ -167,19 +149,11 @@ pthread_t thread_id_from_name(char *name)
 
 int thread_is_occupated_name(char *name)
 {
-  Element *curr;
-  struct _thread_elem *t;
+  struct _grk_thread_elem *t = NULL;
 
   MUTEX_LOCK(&mutex);
 
-  LIST_FOREACH(curr, &list) {
-    t = (struct _thread_elem *)list_elem_content(curr);
-
-    if (t == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__, "list element content is NULL");
-    }
-    
+  LL_FOREACH (list, t) {
     if (strcmp(name, t->name) == 0) {
       MUTEX_UNLOCK(&mutex);
       return 1;
@@ -192,52 +166,39 @@ int thread_is_occupated_name(char *name)
 
 void thread_kill_all()
 {
-  Element *curr = NULL;
-  Element *del = NULL;
-  struct _thread_elem *t = NULL;
+  struct _grk_thread_elem *t = NULL;
+  struct _grk_thread_elem *tmp = NULL;
   pthread_t self_id = 0;
 
   self_id = pthread_self();
   
   MUTEX_LOCK(&mutex);
 
-  curr = list.head;
-  while (list_has_next(curr)) {
-    t = (struct _thread_elem *)list_elem_content(curr);
-
-    if (t == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__, "list element content is NULL");
-    }
-    
+  LL_FOREACH_SAFE (list, t, tmp) {
     // Skip ourself
-    if(!pthread_equal(t->id, self_id)) {
-      del = curr;
-      
+    if (!pthread_equal(t->id, self_id)) {
       pthread_cancel(t->id);
       /* pthread_join(t->id, NULL); */
       /* pthread_detach(t->id); */
       
       debug("thread '%s' destroyed", t->name);
       
-      curr = list_next(curr);
-      list_del_element(&list, del);
-      
+      LL_DELETE(list, t);      
       free(t);
-
-      continue;
     }
-    curr = list_next(curr);
   }
   MUTEX_UNLOCK(&mutex);
 }
 
 int thread_exec_num()
 {
-  int size;
+  int size = 0;
+  struct _grk_thread_elem *t = NULL;
   
   MUTEX_LOCK(&mutex);
-  size = list.size;
+  LL_FOREACH(list, t) {
+    size++;
+  }
   MUTEX_UNLOCK(&mutex);
 
   return size;

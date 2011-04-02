@@ -23,7 +23,6 @@
 #include "debug.h"
 #include "globals.h"
 #include "hook.h"
-#include "list.h"
 #include "packet.h"
 #include "rp_processor.h"
 #include "rp_queue.h"

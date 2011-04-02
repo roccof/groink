@@ -24,7 +24,6 @@
 #include "debug.h"
 #include "globals.h"
 /* #include "host.h" */
-#include "list.h"
 /* #include "mitm.h" */
 /* #include "script_engine.h" */
 #include "capture.h"
@@ -41,7 +40,7 @@ void globals_init()
   gbls->daemon = 0;
   gbls->scan = 1;
 
-  list_init(&(gbls->hosts));
+  /* gbls->hosts = NULL */
 
   gbls->mtu = 0;
   gbls->link_addr = NULL;

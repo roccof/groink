@@ -22,7 +22,6 @@
 #include <netinet/in.h>
 
 #include "base.h"
-#include "list.h"
 
 #define ETHER_BROADCAST "ff:ff:ff:ff:ff:ff"
 
@@ -37,8 +36,8 @@ char *addr_stoa(struct sockaddr *addr);
 int is_ip_addr(char *addr);
 int is_ether_addr(char *addr);
 int is_ip_range_addr_notation(char *addr);
-void convert_ip_range_addr_notation(char *addr, List *list);
+void convert_ip_range_addr_notation(char *addr, void *list);
 int is_ip_cidr_addr_notation(char *addr);
-void convert_ip_cidr_addr_notation(char *addr, List *list);
+void convert_ip_cidr_addr_notation(char *addr, void *list);
 
 #endif /* GROINK_NETUTIL_H */

@@ -51,10 +51,10 @@ static void cleanup()
   stop_rp_processor();
 
   protos_destroy();
-  destroy_rp_queue();
+  cleanup_rp_queue();
   capture_engine_destroy();
   threads_manager_destroy();
-  hook_destroy();
+  hook_cleanup();
   globals_destroy();
 }
 
@@ -90,10 +90,8 @@ static void groink_main()
 {
   /* Initialization phase */
   threads_manager_init();
-  hook_init();
   capture_engine_init();
   load_iface_info();
-  init_rp_queue();
   protos_init();
 
   /* Start raw packet processor */

@@ -23,7 +23,6 @@
 #include <pcap.h>
 
 /* #include "capture.h" */
-#include "list.h"
 /* #include "mitm.h" */
 /* #include "script_engine.h" */
 
@@ -35,7 +34,7 @@ struct _grk_globals {
   int daemon;                             /* Is daemon mode? */
   int scan;                               /* Host scanning */
 
-  List hosts;                             /* List of all hosts present in the same network */
+  /* List hosts; */                             /* List of all hosts present in the same network */
 
   /* Iface info */
   int mtu;                                /* Maximum transfer unit */

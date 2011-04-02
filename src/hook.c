@@ -19,77 +19,48 @@
 #include <pthread.h>
 
 #include "hook.h"
-#include "list.h"
 #include "debug.h"
 #include "base.h"
 #include "threads.h"
-
-static List list;
-
-static int _hook_init = 0;
+#include "utlist.h"
 
 /* Mutex */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* Hook list element */
 struct _grk_hook_elem {
-  hookevent_t event;      /* Hook event */
-  hook_cb_t callback;     /* Callback function */
+  hookevent_t event;            /* Hook event */
+  hook_cb_t callback;           /* Callback function */
+  struct _grk_hook_elem *next;
 };
 
-void hook_init()
+static struct _grk_hook_elem *list = NULL;
+
+void hook_cleanup()
 {
-  if (_hook_init == 1)
-    return;
-
-  list_init(&list);
-
-  _hook_init = 1;
-
-  debug("hook module initialized");
-}
-
-void hook_destroy()
-{
-  Element *curr = list.head;
-  Element *del = NULL;
-
-  if (_hook_init == 0)
-    return;
-
-  _hook_init = 0;
+  struct _grk_hook_elem *curr = NULL, *tmp = NULL;
 
   MUTEX_LOCK(&mutex);
 
-  while (list_has_next(curr)) {
-    struct _grk_hook_elem *elem = (struct _grk_hook_elem *)list_elem_content(curr);
-    
-    if (elem == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__, "invalid list content element");
-    }
-    
-    del = curr;
-    curr = list_next(curr);
-    
-    list_del_element(&list, del);
-    
-    free(elem);
-    elem = NULL;
+  LL_FOREACH_SAFE (list, curr, tmp) {
+    LL_DELETE(list, curr);
+    free(curr);
+    curr = NULL;
   }
-  
   MUTEX_UNLOCK(&mutex);
-  debug("hook module destroyed");
+
+  debug("cleanup hook module");
 }
 
 void hook_register(hookevent_t event, hook_cb_t callback)
 {
-  struct _grk_hook_elem *hook = (struct _grk_hook_elem *)safe_alloc(sizeof(struct _grk_hook_elem));
+  struct _grk_hook_elem *hook = (struct _grk_hook_elem *)
+    safe_alloc(sizeof(struct _grk_hook_elem));
   hook->event = event;
   hook->callback = callback;
 
   MUTEX_LOCK(&mutex);
-  list_add_element(&list, hook);
+  LL_APPEND(list, hook);
   MUTEX_UNLOCK(&mutex);
 
   debug("hook registered");
@@ -97,59 +68,41 @@ void hook_register(hookevent_t event, hook_cb_t callback)
 
 void hook_unregister(hookevent_t event, hook_cb_t callback)
 {
-  Element *curr = list.head;
+  struct _grk_hook_elem *curr = NULL, *tmp = NULL;
 
   MUTEX_LOCK(&mutex);
 
-  while (list_has_next(curr)) {
-    struct _grk_hook_elem *elem = (struct _grk_hook_elem *)list_elem_content(curr);
-    
-    if (elem == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__, "invalid list content element");
-    }
-    
-    if (elem->event == event && elem->callback == callback) {
-      list_del_element(&list, curr);
+  LL_FOREACH_SAFE (list, curr, tmp) {
+    if (curr->event == event && curr->callback == callback) {
+      LL_DELETE(list, curr);
       
       MUTEX_UNLOCK(&mutex);
       
-      free(elem);
-      elem = NULL;
+      free(curr);
+      curr = NULL;
       
       debug("hook unregistered");
       return;
     }
-    
-    curr = list_next(curr);
   }
-  
   MUTEX_UNLOCK(&mutex);
 }
 
 void hook_event(hookevent_t event, hookdata_t *data)
 {
-  Element *curr = NULL;
+  struct _grk_hook_elem *hook = NULL;
 
   if (data == NULL)
     bug(__func__, "invalid hook data");
 
   MUTEX_LOCK(&mutex);
 
-  LIST_FOREACH(curr, &list) {
-    struct _grk_hook_elem *hook = (struct _grk_hook_elem *)list_elem_content(curr);
-    
-    if (hook == NULL) {
-      MUTEX_UNLOCK(&mutex);
-      bug(__func__, "invalid list content element");
-    }
-    
-    if (hook->event == event) {
+  LL_FOREACH (list, hook) {
+    if (hook->event == event && hook->callback != NULL) {
       MUTEX_UNLOCK(&mutex);
       hook->callback(data);
       MUTEX_LOCK(&mutex);
     }
   }
-  
   MUTEX_UNLOCK(&mutex);
 }

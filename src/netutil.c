@@ -23,16 +23,13 @@
 
 #include "base.h"
 #include "debug.h"
-#include "list.h"
 #include "netutil.h"
-/* #include "protocols/ethernet.h" */
+#include "protocols/ethernet.h"
 
 /* TODO: IPv6 support */
 
 #define STR_ADDR_LEN 18
 #define ETHER_ADDR 1
-
-#define ETHER_ADDR_LEN 6
 
 /* Example: 192.168.0.1 */
 #define IP_ADDR_REGEX							\
@@ -204,12 +201,12 @@ int is_ether_addr(char *addr)
   return 0;
 }
 
-void convert_ip_range_addr_notation(char *addr, List *list)
+void convert_ip_range_addr_notation(char *addr, void *list)
 {
   
 }
 
-void convert_ip_cidr_addr_notation(char *addr, List *list)
+void convert_ip_cidr_addr_notation(char *addr, void *list)
 {
 
 }
