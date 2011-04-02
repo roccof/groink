@@ -32,9 +32,9 @@ static int _hook_init = 0;
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* Hook list element */
-struct _hook_elem {
-  HookEvent event;         /* Hook event */
-  hook_callback callback;  /* Callback function */
+struct _grk_hook_elem {
+  hookevent_t event;      /* Hook event */
+  hook_cb_t callback;     /* Callback function */
 };
 
 void hook_init()
@@ -62,11 +62,11 @@ void hook_destroy()
   MUTEX_LOCK(&mutex);
 
   while (list_has_next(curr)) {
-    struct _hook_elem *elem = (struct _hook_elem *)list_elem_content(curr);
+    struct _grk_hook_elem *elem = (struct _grk_hook_elem *)list_elem_content(curr);
     
     if (elem == NULL) {
       MUTEX_UNLOCK(&mutex);
-      bug("hook_destroy", "invalid list content element");
+      bug(__func__, "invalid list content element");
     }
     
     del = curr;
@@ -82,9 +82,9 @@ void hook_destroy()
   debug("hook module destroyed");
 }
 
-void hook_register(HookEvent event, hook_callback callback)
+void hook_register(hookevent_t event, hook_cb_t callback)
 {
-  struct _hook_elem *hook = (struct _hook_elem *)safe_alloc(sizeof(struct _hook_elem));
+  struct _grk_hook_elem *hook = (struct _grk_hook_elem *)safe_alloc(sizeof(struct _grk_hook_elem));
   hook->event = event;
   hook->callback = callback;
 
@@ -95,18 +95,18 @@ void hook_register(HookEvent event, hook_callback callback)
   debug("hook registered");
 }
 
-void hook_unregister(HookEvent event, hook_callback callback)
+void hook_unregister(hookevent_t event, hook_cb_t callback)
 {
   Element *curr = list.head;
 
   MUTEX_LOCK(&mutex);
 
   while (list_has_next(curr)) {
-    struct _hook_elem *elem = (struct _hook_elem *)list_elem_content(curr);
+    struct _grk_hook_elem *elem = (struct _grk_hook_elem *)list_elem_content(curr);
     
     if (elem == NULL) {
       MUTEX_UNLOCK(&mutex);
-      bug("hook_unregister", "invalid list content element");
+      bug(__func__, "invalid list content element");
     }
     
     if (elem->event == event && elem->callback == callback) {
@@ -127,7 +127,7 @@ void hook_unregister(HookEvent event, hook_callback callback)
   MUTEX_UNLOCK(&mutex);
 }
 
-void hook_event(HookEvent event, HookData *data)
+void hook_event(hookevent_t event, hookdata_t *data)
 {
   Element *curr = NULL;
 
@@ -137,7 +137,7 @@ void hook_event(HookEvent event, HookData *data)
   MUTEX_LOCK(&mutex);
 
   LIST_FOREACH(curr, &list) {
-    struct _hook_elem *hook = (struct _hook_elem *)list_elem_content(curr);
+    struct _grk_hook_elem *hook = (struct _grk_hook_elem *)list_elem_content(curr);
     
     if (hook == NULL) {
       MUTEX_UNLOCK(&mutex);

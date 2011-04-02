@@ -33,7 +33,7 @@ void *safe_alloc(size_t size)
   p = malloc(size);
 
   if(p == NULL)
-    fatal("safe_alloc", "error while allocating memory, your mem sucks!!!!!");
+    fatal(__func__, "error while allocating memory, your mem sucks!!!!!");
 
   bzero(p, size);
 
@@ -45,12 +45,12 @@ void *safe_realloc(void *ptr, size_t size)
   void *p = NULL;
 
   if(ptr == NULL)
-    bug("safe-realloc", "null pointer");
+    bug(__func__, "null pointer");
 
   p = realloc(ptr, size);
 
   if(p == NULL)
-    fatal("safe_realloc", "error while reallocating memory");
+    fatal(__func__, "error while reallocating memory");
 
   return p;
 }
@@ -66,7 +66,7 @@ char *fake_unicode(unsigned char *bytes, int len)
   /* bzero(str, len + 1); */
 
   if(bytes == NULL)
-    bug("fake_unicode", "the bytes are NULL");
+    bug(__func__, "the bytes are NULL");
 
   /* This buffer MUST be freed after */
   str = (char *)safe_alloc(len + 1);
@@ -92,7 +92,7 @@ char *hex_string(unsigned char *bytes, int len)
   char *buffer = NULL;
 
   if(bytes == NULL)
-    bug("hex_string", "the bytes are NULL");
+    bug(__func__, "the bytes are NULL");
 
   /* This buffer MUST be freed after */
   str = (char *)safe_alloc((len * 2) + 1);
@@ -115,7 +115,7 @@ char *hex_string(unsigned char *bytes, int len)
 
 /* 
  * This function concatenates arbitrarily many strings.
- * The last  parameter must be NULL.
+ * The last parameter must be NULL.
  */
 char *str_concat(char *str, ...)
 {

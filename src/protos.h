@@ -24,28 +24,28 @@
 #include "hashtable.h"
 #include "decoder.h"
 
-typedef enum _layer {
+typedef enum _grk_layer {
   L2,
   L3,
   L4,
   L5
-} Layer;
+} layer_t;
 
 #define FIELD_OP_GET 0   /* Get operation */
 #define FIELD_OP_EDIT 1  /* Edit operation */
 
-typedef struct _proto_fields {
+typedef struct _grk_proto_fields {
   char *name;
   void (*cb)(lua_State *L, void *data, short op);
-} ProtoFields;
+} protofields_t;
 
-typedef struct _protocol {
+typedef struct _grk_protocol {
   char *name;                /* Short protocol name */
   char *longname;            /* Long protocol name */
-  Layer layer;               /* Protocol layer */
-  ProtoFields **fields;      /* Table that contains callback functions to
+  layer_t layer;             /* Protocol layer */
+  protofields_t **fields;    /* Table that contains callback functions to
 				get and edit the fields of the protocol */
-  decoder_callback decoder;  /* Protocol decoder callback */
+  decoder_cb_t decoder;      /* Protocol decoder callback */
   int refcount;              /* Used from hashtables, iit ndicates if the struct 
 				can be freed */
 } Protocol;

@@ -22,42 +22,43 @@
 #include "debug.h"
 #include "globals.h"
 
-int start_decoding(Packet *p, const RawPacket *rp)
+int start_decoding(packet_t *p, const rawpacket_t *rp)
 {
   unsigned int status = 0;
 
-  ADD_FLAG(p, PACKET_FLAG_DECODED);
+  PKT_ADD_FLAG(p, PACKET_FLAG_DECODED);
 
   switch (gbls->dlt) {
       /* Raw IP */
     /* case DLT_RAW: */
-    /*   status = call_decoder("asd", p, p->rawdata, p->len); */
+    /*   status = call_decoder("asd", p, p->data, p->len); */
     /*   break; */
 
       /* Ethernet 10/100/1000 header */
     case DLT_EN10MB:
-      status = call_decoder(PROTO_NAME_ETHER, p, p->rawdata, p->len);
+      status = call_decoder(PROTO_NAME_ETHER, p, p->data, p->len);
       break;
 
       /* IEEE 802.11 wireless lan header */
     /* case DLT_IEEE802_11: */
-    /*   status = call_decoder("asd", p, p->rawdata, p->len); */
+    /*   status = call_decoder("asd", p, p->data, p->len); */
     /*   break; */
 
       /* IEEE 802.11 radiotap header */
     /* case DLT_IEEE802_11_RADIO: */
-    /*   status = call_decoder("asd", p, p->rawdata, p->len); */
+    /*   status = call_decoder("asd", p, p->data, p->len); */
     /*   break; */
       
     default:
-      debug("data link protocol '%s' not supported", pcap_datalink_val_to_name(gbls->dlt));
-      /* status = call_decoder(PROTO_RAW, p, p->rawdata, p->len); */
+      debug("data link protocol '%s' not supported", 
+	    pcap_datalink_val_to_name(gbls->dlt));
+      /* status = call_decoder(PROTO_RAW, p, p->data, p->len); */
     }
 
   return status;
 }
 
-int call_decoder(char *proto_name, Packet *p, const unsigned char *bytes, unsigned int len)
+int call_decoder(char *proto_name, packet_t *p, const _uint8 *bytes, size_t len)
 {
   Protocol *proto = proto_get_byname(proto_name);
 
@@ -65,11 +66,10 @@ int call_decoder(char *proto_name, Packet *p, const unsigned char *bytes, unsign
     myassert(proto->decoder != NULL);
     return (*proto->decoder)(p, bytes, len);
   }
-  debug("NO");
   return DECODER_NOT_FOUND;
 }
 
-int call_decoder_byport(int port, Packet *p, const unsigned char *bytes, unsigned int len)
+int call_decoder_byport(int port, packet_t *p, const _uint8 *bytes, size_t len)
 {
   Protocol *proto = proto_get_byport(port);
 

@@ -33,9 +33,9 @@
 
 static void *processor_thread_cb(void *arg)
 {
-  RawPacket *rp = NULL;
-  Packet *p = NULL;
-  HookData *hookdata = NULL;
+  rawpacket_t *rp = NULL;
+  packet_t *p = NULL;
+  hookdata_t *hookdata = NULL;
 
   THREAD_DEFAULT_INIT;
  
@@ -44,35 +44,28 @@ static void *processor_thread_cb(void *arg)
     
     rp = get_raw_packet();
     
-    /* If there aren't packets */
+    /* If there aren't packets wait 1000 microseconds */
     if (rp == NULL) {
-      /* Wait 1000 microseconds */
-      usleep(1000);
+      usleep(2000);
       continue;
     }
-    
-    p = (Packet *)safe_alloc(sizeof(Packet));
-    packet_init(p);
 
-    p->rawdata = (unsigned char *)safe_alloc(rp->len);
-    memcpy(p->rawdata, rp->data, rp->len);
-    p->len = rp->len;
-    
+    p = packet_new(rp->data, rp->len);
+    PKT_ADD_FLAG(p, PACKET_FLAG_CAPTURED);
+
     if (gbls->decode)
       start_decoding(p, rp);
-    
-    ADD_FLAG(p, PACKET_FLAG_CAPTURED);
-    
+
     free(rp->data);
     free(rp);
     
-    hookdata = (HookData *)safe_alloc(sizeof(HookData));
+    hookdata = (hookdata_t *)safe_alloc(sizeof(hookdata_t));
     hookdata->type = HOOKDATA_PACKET;
     hookdata->data = (void *)p;
     
     /* Raise event */
     hook_event(HOOK_RECEIVED, hookdata);
-    
+
     free(hookdata);
     
     /* /\* If MiTM is active, do packet forwarding *\/ */
@@ -80,9 +73,9 @@ static void *processor_thread_cb(void *arg)
     /* 	packet_forward(p); */
     
     packet_free(p);
-    free(p);
   }
   
+  /* Never reached */
   return NULL;
 }
 
@@ -104,6 +97,7 @@ void stop_rp_processor()
     return;
 
   thread_stop(thread);
+
   /* destroy_packet_forward_module(); */
   debug("packet processor stopped");
 }

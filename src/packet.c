@@ -23,33 +23,33 @@
 #include "packet.h"
 #include "globals.h"
 
-static void merge_header_data(Packet *p, Header *h)
+static void merge_header_data(packet_t *p, header_t *h)
 {
   unsigned char *new = NULL;
 
   /* Merge packet raw data and header data */
   if (p->num_headers == 1) {
-    p->rawdata = (unsigned char *)safe_alloc(h->len);
-    memcpy(p->rawdata, h->data, h->len);
+    p->data = (unsigned char *)safe_alloc(h->len);
+    memcpy(p->data, h->data, h->len);
     p->len = h->len;
-    h->data = p->rawdata;
+    h->data = p->data;
     } else {
     new = (unsigned char *)safe_alloc(p->len + h->len);
-    memcpy(new, p->rawdata, p->len);
+    memcpy(new, p->data, p->len);
     memcpy((new + p->len), h->data, h->len);
-    free(p->rawdata);
-    p->rawdata = new;
+    free(p->data);
+    p->data = new;
     p->len = p->len + h->len;
-    h->data = ((p->rawdata + p->len) - h->len);
+    h->data = ((p->data + p->len) - h->len);
   }
 }
 
-Header *packet_add_header(Packet *p, Proto proto, void *data, size_t len)
+header_t *packet_add_header(packet_t *p, char *proto, _uint8 *data, size_t len)
 {
-  Header *h = NULL;
-  Header *last = NULL;
+  header_t *h = NULL;
+  header_t *last = NULL;
 
-  h = (Header *)safe_alloc(sizeof(Header));
+  h = (header_t *)safe_alloc(sizeof(header_t));
   h->proto = proto;
   h->data = data;
   h->len = len;
@@ -72,20 +72,18 @@ Header *packet_add_header(Packet *p, Proto proto, void *data, size_t len)
 
   p->num_headers++;
 
-  if (!HAS_FLAG(p, PACKET_FLAG_DECODED))
+  if (!PKT_HAS_FLAG(p, PACKET_FLAG_DECODED))
     merge_header_data(p, h);
 
   return h;
 }
 
-void packet_init(Packet *p)
+packet_t *packet_new(_uint8 *data, size_t len)
 {
-  myassert(p != NULL);
-
-  p->rawdata = NULL;
-  p->len = 0;
-  p->edit_rawdata = NULL;
-  p->edit_len = 0;
+  packet_t *p = (packet_t *)safe_alloc(sizeof(packet_t));
+  p->data = (_uint8 *)safe_alloc(len);
+  memcpy(p->data, data, len);
+  p->len = len;
   p->headers = NULL;
   p->num_headers = 0;
   p->flags = 0;
@@ -93,13 +91,15 @@ void packet_init(Packet *p)
   p->hw_dstaddr = NULL;
   p->net_srcaddr = NULL;
   p->net_dstaddr = NULL;
+
+  return p;
 }
 
 /* Free packet memory */
-void packet_free(Packet *p) // XXX FIXME
+void packet_free(packet_t *p) // XXX FIXME
 {
-  Header *h = NULL;
-  Header *t = NULL;
+  header_t *h = NULL;
+  header_t *t = NULL;
 
   h = p->headers;
 
@@ -112,43 +112,53 @@ void packet_free(Packet *p) // XXX FIXME
     t = NULL;
   }
 
-  free(p->rawdata);
+  /* Free packet data */
+  free(p->data);
+  p->data = NULL;
 
-  if (p->edit_rawdata != NULL)
-    free(p->edit_rawdata);
-
-  if (p->hw_srcaddr != NULL)
+  if (p->hw_srcaddr != NULL) {
     free(p->hw_srcaddr);
+    p->hw_srcaddr = NULL;
+  }
 
-  if (p->hw_dstaddr != NULL)
+  if (p->hw_dstaddr != NULL) {
     free(p->hw_dstaddr);
+    p->hw_dstaddr = NULL;
+  }
 
-  if (p->net_srcaddr != NULL)
+  if (p->net_srcaddr != NULL) {
     free(p->net_srcaddr);
-
-  if (p->net_dstaddr != NULL)
+    p->net_srcaddr = NULL;
+  }
+    
+  if (p->net_dstaddr != NULL) {
     free(p->net_dstaddr);
+    p->net_dstaddr = NULL;
+  }
+
+  /* Fee packet memory */
+  free(p);
 }
 
 /* Control if the packet contains a specific header */
-int packet_contains_header(Packet *p, Proto proto)
+int packet_contains_header(packet_t *p, char *proto)
 {
-  Header *h = p->headers;
+  header_t *h = p->headers;
 
   while (h != NULL) {
-    if(h->proto == proto)
+    if(h->proto == proto) // XXX: use strncmp
       return 1;
     h = h->next;
   }
   return 0;
 }
 
-Header *packet_get_header(Packet *p, Proto proto)
+header_t *packet_get_header(packet_t *p, char *proto)
 {
-  Header *h = p->headers;
+  header_t *h = p->headers;
 
   while (h != NULL) {
-    if(h->proto == proto)
+    if(h->proto == proto) // XXX: use strncmp
       return h;
     h = h->next;
   }

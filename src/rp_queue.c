@@ -47,7 +47,7 @@ void init_rp_queue()
 void destroy_rp_queue()
 {
   Element *curr, *del;
-  RawPacket *rp;
+  rawpacket_t *rp;
 
   if (_rpq_init == 0)
     return;
@@ -58,7 +58,7 @@ void destroy_rp_queue()
 
   curr = queue.head;
   while (list_has_next(curr)) {
-    rp = (RawPacket *)list_elem_content(curr);
+    rp = (rawpacket_t *)list_elem_content(curr);
     
     if (rp == NULL) {
       MUTEX_UNLOCK(&mutex);
@@ -79,7 +79,7 @@ void destroy_rp_queue()
 }
 
 /* Add a raw packet in the queue */
-void add_raw_packet(RawPacket *rp)
+void add_raw_packet(rawpacket_t *rp)
 {
   if (rp == NULL)
     bug(__func__, "invalid raw packet");
@@ -90,9 +90,9 @@ void add_raw_packet(RawPacket *rp)
 }
 
 /* Get raw packet from the queue */
-RawPacket *get_raw_packet()
+rawpacket_t *get_raw_packet()
 {
-  RawPacket *rp = NULL;
+  rawpacket_t *rp = NULL;
 
   MUTEX_LOCK(&mutex);
 
@@ -102,7 +102,7 @@ RawPacket *get_raw_packet()
     return NULL;
   }
 
-  rp = (RawPacket *)list_elem_content(queue.head);
+  rp = (rawpacket_t *)list_elem_content(queue.head);
   list_del_element(&queue, queue.head);
 
   MUTEX_UNLOCK(&mutex);

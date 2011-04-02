@@ -134,7 +134,7 @@ void proto_register_byport(int port, Protocol *p)
 
   MUTEX_LOCK(&mutex_ht2);
   HASH_ADD_INT(port_ptable, port, e);
-  MUTEX_LOCK(&mutex_ht2);
+  MUTEX_UNLOCK(&mutex_ht2);
 }
 
 
@@ -154,7 +154,7 @@ Protocol *proto_get_byname(char *name)
 
   MUTEX_LOCK(&mutex_ht1);
   HASH_FIND_STR(name_ptable, name, e);
-  MUTEX_LOCK(&mutex_ht1);
+  MUTEX_UNLOCK(&mutex_ht1);
 
   if (e != NULL)
     return e->p;
@@ -167,7 +167,7 @@ Protocol *proto_get_byport(int port)
 
   MUTEX_LOCK(&mutex_ht2);  
   HASH_FIND_INT(port_ptable, &port, e);
-  MUTEX_LOCK(&mutex_ht2);
+  MUTEX_UNLOCK(&mutex_ht2);
 
   if (e != NULL)
     return e->p;

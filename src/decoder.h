@@ -31,10 +31,10 @@
 #define DECODER_NOT_FOUND 2
 
 /* Decoder callback function */
-typedef int(*decoder_callback)(Packet *p, const unsigned char *bytes, unsigned int len);
+typedef int(*decoder_cb_t)(packet_t *p, const _uint8 *bytes, size_t len);
 
-int start_decoding(Packet *p, const RawPacket *rp);
-int call_decoder(char *proto_name, Packet *p, const unsigned char *bytes, unsigned int len);
-int call_decoder_byport(int port, Packet *p, const unsigned char *bytes, unsigned int len);
+int start_decoding(packet_t *p, const rawpacket_t *rp);
+int call_decoder(char *proto_name, packet_t *p, const _uint8 *bytes, size_t len);
+int call_decoder_byport(int port, packet_t *p, const _uint8 *bytes, size_t len);
 
 #endif /* GROINK_DECODER_H */

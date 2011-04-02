@@ -22,7 +22,7 @@
 typedef enum {
   HOOKDATA_NONE,
   HOOKDATA_PACKET
-} HookDataType;
+} hookdata_type_t;
 
 typedef enum {
   HOOK_PRE_START_SNIFF,     /* Pre start sniffing */
@@ -33,21 +33,21 @@ typedef enum {
   HOOK_TCP,                 /* Tcp packet received */
   HOOK_UDP,                 /* Udp packet received */
   HOOK_ICMP                 /* Icmp packet received */
-} HookEvent;
+} hookevent_t;
 
-typedef struct _hook_data {
-  HookDataType type;
+typedef struct _grk_hook_data {
+  hookdata_type_t type;
   void *data;
-} HookData;
+} hookdata_t;
 
 /* Hook callback function */
-typedef void(*hook_callback)(HookData *data);
+typedef void(*hook_cb_t)(hookdata_t *data);
 
 void hook_init();
 void hook_destroy();
-void hook_register(HookEvent event, hook_callback callback);
-void hook_unregister(HookEvent event, hook_callback callback);
-void hook_event(HookEvent event, HookData *data);
+void hook_register(hookevent_t event, hook_cb_t callback);
+void hook_unregister(hookevent_t event, hook_cb_t callback);
+void hook_event(hookevent_t event, hookdata_t *data);
 
 #endif /* GROINK_HOOK_H */
 

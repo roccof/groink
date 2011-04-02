@@ -33,7 +33,7 @@
 
 static void process_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *bytes)
 {
-  RawPacket *p = NULL;
+  rawpacket_t *p = NULL;
   unsigned char *data = NULL;
 
   if (header->len == 0 || bytes == NULL) {
@@ -45,7 +45,7 @@ static void process_packet(u_char *user, const struct pcap_pkthdr *header, const
       return;
     }
 
-  /* Skip truncated packet */
+  /* Skip truncated packets */
   if (header->len > gbls->snaplen) {
     debug("captured truncated packet [pkt-len: %d, snaplen: %d], skipping...",
 	  header->len, gbls->snaplen);
@@ -59,7 +59,7 @@ static void process_packet(u_char *user, const struct pcap_pkthdr *header, const
   memcpy(data, bytes, header->len);
 
   /* Alloc raw packet */
-  p = (RawPacket *)safe_alloc(sizeof(RawPacket));
+  p = (rawpacket_t *)safe_alloc(sizeof(rawpacket_t));
   p->data = data;
   p->len = header->len;
 

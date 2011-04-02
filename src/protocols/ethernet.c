@@ -28,45 +28,46 @@
 #include "protos_name.h"
 
 /* Builder */
-ETHERNET *build_ethernet(char *src, char *dst, _uint16 type)
+ether_t *build_ethernet(char *src, char *dst, _uint16 type)
 {
-  ETHERNET *ether = NULL;
-  _uint8 *bytes;
+  /* ether_t *ether = NULL; */
+  /* _uint8 *bytes; */
 
-  ether = (ETHERNET *)safe_alloc(sizeof(ETHERNET));
+  /* ether = (ether_t *)safe_alloc(sizeof(ether_t)); */
 
-  bytes = ether_addr_aton(dst);
-  memcpy(ether->dest_addr, bytes, ETHER_ADDR_LEN);
-  free(bytes);
+  /* bytes = ether_addr_aton(dst); */
+  /* memcpy(ether->dest_addr, bytes, ETHER_ADDR_LEN); */
+  /* free(bytes); */
 
-  bytes = ether_addr_aton(src);
-  memcpy(ether->src_addr, bytes, ETHER_ADDR_LEN);
-  free(bytes);
+  /* bytes = ether_addr_aton(src); */
+  /* memcpy(ether->src_addr, bytes, ETHER_ADDR_LEN); */
+  /* free(bytes); */
 
-  ether->type = htons(type);
+  /* ether->type = htons(type); */
 
-  return ether;
+  /* return ether; */
+  return NULL;
 }
 
 /* Decoder */
-static int decode_ether(Packet *p, const unsigned char *bytes, unsigned int len)
+static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 {
-  ETHERNET *eth = NULL;
-  Header *header = NULL;
+  ether_t *eth = NULL;
+  header_t *header = NULL;
 
-  /* if (ETHER_HDR_LEN > len) { */
-  /*   debug("malformed ETHERNET header: invalid length"); */
-  /*   return call_decoder(PROTO_RAW, p, bytes, len); */
-  /* } */
+  if (ETHER_HDR_LEN > len) {
+    debug("malformed ethernet header: invalid length");
+    return call_decoder("raw", p, bytes, len);
+  }
 
-  eth = (ETHERNET *)bytes;
+  eth = (ether_t *)bytes;
 
-  header = packet_add_header(p, PROTO_ETHER, (void *)eth, ETHER_HDR_LEN);
+  header = packet_add_header(p, PROTO_NAME_ETHER, (void *)eth, ETHER_HDR_LEN);
 
-  return 0;
-  
-  /* p->hw_srcaddr = ether_addr_ntoa(eth->src_addr); */
-  /* p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr); */
+  p->hw_srcaddr = ether_addr_ntoa(eth->src_addr);
+  p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr);
+
+  return DECODE_OK;
 
   /* switch (ntohs(eth->type)) { */
   /* case ETHER_TYPE_IP: */
@@ -95,7 +96,6 @@ void register_ether()
   p->name = PROTO_NAME_ETHER;
   p->longname = "Ethernet";
   p->layer = L2;
-  p->fields = NULL;
   p->decoder = decode_ether;
   
   proto_register_byname(PROTO_NAME_ETHER, p);

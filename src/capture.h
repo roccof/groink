@@ -25,7 +25,7 @@
 #define CAPTURE_SNAPLEN 65535
 #define CAPTURE_TIMEOUT 0
 
-enum _capture_state {
+enum _grk_capture_state {
   CAP_STATE_NONE,        /* sniffing not started  */
   CAP_STATE_STARTED,     /* sniffing started */
 };

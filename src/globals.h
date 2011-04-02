@@ -27,7 +27,7 @@
 /* #include "mitm.h" */
 /* #include "script_engine.h" */
 
-struct globals_t {
+struct _grk_globals {
   /* General */
   char *iface;                            /* Network interface */
   int promisc;                            /* Promisc mode */
@@ -71,7 +71,7 @@ struct globals_t {
   char *mitm_options;
 };
 
-struct globals_t *gbls;
+struct _grk_globals *gbls;
 
 void globals_init();
 void globals_destroy();

@@ -31,7 +31,7 @@
 
 void globals_init()
 {
-  gbls = (struct globals_t *)safe_alloc(sizeof(struct globals_t));
+  gbls = (struct _grk_globals *)safe_alloc(sizeof(struct _grk_globals));
 
   /*** Set default values ***/
 

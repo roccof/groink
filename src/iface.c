@@ -29,7 +29,7 @@
 #include "globals.h"
 #include "netutil.h"
 
-void load_iface_info() // TODO: IPv6 support
+void load_iface_info() /* TODO: IPv6 support */
 {
   int fd = -1;
   /* int fd6 = -1; */
@@ -59,7 +59,7 @@ void load_iface_info() // TODO: IPv6 support
     warning("the iface %s has no mac address associated", gbls->iface);
   } else {
     gbls->link_addr = addr_stoa(&(ifr.ifr_hwaddr));
-    if(gbls->link_addr == NULL)
+    if (gbls->link_addr == NULL)
       warning("the iface %s has no mac address associated", gbls->iface);
     else
       debug("HW ADDR: %s", gbls->link_addr);
@@ -70,7 +70,7 @@ void load_iface_info() // TODO: IPv6 support
     warning("the iface %s has no ip address associated", gbls->iface);
   } else {
     gbls->net_addr = addr_stoa(&(ifr.ifr_addr));
-    if(gbls->net_addr == NULL)
+    if (gbls->net_addr == NULL)
       warning("the iface %s has no ip address associated", gbls->iface);
     else
       debug("IP ADDR: %s", gbls->net_addr);
@@ -81,7 +81,7 @@ void load_iface_info() // TODO: IPv6 support
     warning("the iface %s has no netmask of ip address associated", gbls->iface);
   } else {
     gbls->netmask = addr_stoa(&(ifr.ifr_netmask));
-    if(gbls->netmask == NULL)
+    if (gbls->netmask == NULL)
       warning("the iface %s has no netmask of ip address associated", gbls->iface);
     else
       debug("NETMASK: %s", gbls->netmask);

@@ -32,11 +32,12 @@ noinst_HEADERS =				\
 		packet.h			\
 		parse_options.h			\
 		protos.h			\
-		protos_name.h
+		protos_name.h			\
 		protocols/ethernet.h		\
 		rp_processor.h			\
 		rp_queue.h			\
 		threads.h			\
+		utlist.h			\
 		uthash.h
 
 groink_CFLAGS = $(LUA_CFLAGS)
