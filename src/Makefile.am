@@ -16,6 +16,7 @@ groink_SOURCES =				\
 		protocols/ethernet.c		\
 		rp_processor.c			\
 		rp_queue.c			\
+		script_engine.c			\
 		threads.c
 
 noinst_HEADERS =				\
@@ -34,6 +35,8 @@ noinst_HEADERS =				\
 		protocols/ethernet.h		\
 		rp_processor.h			\
 		rp_queue.h			\
+		selib.h				\
+		script_engine.h			\
 		threads.h			\
 		utlist.h			\
 		uthash.h

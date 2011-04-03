@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "debug.h"
+#include "globals.h"
 
 void fatal(const char *where, const char *message, ...)
 {
@@ -42,20 +43,20 @@ void fatal(const char *where, const char *message, ...)
   exit(-1);
 }
 
-/* void se_fatal(const char *message, ...) */
-/* { */
-/*   va_list ap; */
+void se_fatal(const char *message, ...)
+{
+  va_list ap;
 
-/*   fprintf(stderr, "[!!] SE FATAL: "); */
+  fprintf(stderr, "[!!] SE FATAL: ");
 
-/*   va_start(ap, message); */
-/*   vfprintf(stderr, message, ap); */
-/*   va_end(ap); */
+  va_start(ap, message);
+  vfprintf(stderr, message, ap);
+  va_end(ap);
 
-/*   fprintf(stderr, "\n"); */
+  fprintf(stderr, "\n");
 
-/*   exit(-1); */
-/* } */
+  exit(-1);
+}
 
 void debug(const char *message, ...)
 {
@@ -74,21 +75,21 @@ void debug(const char *message, ...)
 #endif
 }
 
-/* void se_debug(const char *message, ...) */
-/* { */
-/*   va_list ap; */
+void se_debug(const char *message, ...)
+{
+  va_list ap;
 
-/*   if(gbls->script_debug_mode) */
-/*     { */
-/*       fprintf(stderr, "[*] SE DEBUG: "); */
+  if(gbls->script_debug_mode)
+    {
+      fprintf(stderr, "[*] SE DEBUG: ");
       
-/*       va_start(ap, message); */
-/*       vfprintf(stderr, message, ap); */
-/*       va_end(ap); */
+      va_start(ap, message);
+      vfprintf(stderr, message, ap);
+      va_end(ap);
       
-/*       fprintf(stderr, "\n"); */
-/*     } */
-/* } */
+      fprintf(stderr, "\n");
+    }
+}
 
 void bug(const char *where, const char *message, ...)
 {
@@ -119,18 +120,18 @@ void warning(const char *message, ...)
   fprintf(stderr, "\n");
 }
 
-/* void se_warning(const char *message, ...) */
-/* { */
-/*   va_list ap; */
+void se_warning(const char *message, ...)
+{
+  va_list ap;
 
-/*   fprintf(stderr, "[*] SE WARNING: "); */
+  fprintf(stderr, "[*] SE WARNING: ");
 
-/*   va_start(ap, message); */
-/*   vfprintf(stderr, message, ap); */
-/*   va_end(ap); */
+  va_start(ap, message);
+  vfprintf(stderr, message, ap);
+  va_end(ap);
 
-/*   fprintf(stderr, "\n"); */
-/* } */
+  fprintf(stderr, "\n");
+}
 
 void message(const char *message, ...)
 {

@@ -104,9 +104,9 @@ static void cleanup_protos_port_table()
 
 void protos_destroy()
 {
-  debug("cleanup loaded protocols...");
   cleanup_protos_port_table();
   cleanup_protos_name_table();
+  debug("cleanup loaded protocols");
 }
 
 void proto_register_byname(char *name, Protocol *p)

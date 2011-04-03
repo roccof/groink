@@ -28,7 +28,7 @@
 #include "globals.h"
 #include "netutil.h"
 #include "parse_options.h"
-/* #include "script_engine.h" */
+#include "script_engine.h"
 
 static const struct option long_options[] = {
   {"help", no_argument, NULL, 'h'},
@@ -155,37 +155,37 @@ void parse_options(int argc, char **argv)
   }
 
   /* Non option ARGV elements */
-  /* if(optind < argc) { */
-  /*   /\* Get script *\/ */
-  /*   char *script = (char *)argv[optind++]; */
+  if(optind < argc) {
+    /* Get script */
+    char *script = (char *)argv[optind++];
     
-  /*   if(script[0] == '/') { */
-  /*     /\* Absolute path *\/ */
-  /*     gbls->script = strdup(script); */
-  /*   } else if (script[0] == '.' || index(script, '/') != NULL) { */
-  /*     /\* Non-absolute path *\/ */
-  /*     char *cwd = getcwd(NULL, 0); */
+    if(script[0] == '/') {
+      /* Absolute path */
+      gbls->script = strdup(script);
+    } else if (script[0] == '.' || index(script, '/') != NULL) {
+      /* Non-absolute path */
+      char *cwd = getcwd(NULL, 0);
       
-  /*     if (script[0] == '.' && script[1] == '/') */
-  /* 	gbls->script = str_concat(cwd, "/", (script + 2), NULL); */
-  /*     else */
-  /* 	gbls->script = str_concat(cwd, "/", script, NULL); */
+      if (script[0] == '.' && script[1] == '/')
+  	gbls->script = str_concat(cwd, "/", (script + 2), NULL);
+      else
+  	gbls->script = str_concat(cwd, "/", script, NULL);
       
-  /*     free(cwd); */
-  /*   } else { */
-  /*     /\* Only script name *\/ */
-  /*     gbls->script = append_script_dir(script); */
-  /*   } */
+      free(cwd);
+    } else {
+      /* Only script name */
+      gbls->script = append_script_dir(script);
+    }
 
-  /*   if (strlen(gbls->script) > MAX_SCRIPT_NAME) */
-  /*     fatal(__func__, "the script name is too big, max %d character", MAX_SCRIPT_NAME); */
+    if (strlen(gbls->script) > MAX_SCRIPT_NAME)
+      fatal(__func__, "the script name is too big, max %d character", MAX_SCRIPT_NAME);
     
-  /*   opt_index = 0; */
+    opt_index = 0;
 
-  /*   /\* Get possible script args *\/ */
-  /*   while (opt_index < MAX_SCRIPT_ARGS && optind < argc) */
-  /*     gbls->script_argv[opt_index++] = (char *)argv[optind++]; */
+    /* Get possible script args */
+    while (opt_index < MAX_SCRIPT_ARGS && optind < argc)
+      gbls->script_argv[opt_index++] = (char *)argv[optind++];
 
-  /*   gbls->script_argc = opt_index; */
-  /* } */
+    gbls->script_argc = opt_index;
+  }
 }

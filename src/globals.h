@@ -22,9 +22,8 @@
 #include <lua.h>
 #include <pcap.h>
 
-/* #include "capture.h" */
 /* #include "mitm.h" */
-/* #include "script_engine.h" */
+#include "script_engine.h"
 
 struct _grk_globals {
   /* General */
@@ -59,7 +58,7 @@ struct _grk_globals {
   /* Script engine */
   lua_State *L;                           /* Lua state */
   char *script;                           /* Script to run */
-  /* char *script_argv[MAX_SCRIPT_ARGS]; */     /* Arguments of script */
+  char *script_argv[MAX_SCRIPT_ARGS];     /* Arguments of script */
   int script_argc;                        /* Number of argument of script */
   int script_debug_mode;                  /* Script debug mode */
   char *scripts_dir;                      /* Scripts directory */

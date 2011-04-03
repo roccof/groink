@@ -26,7 +26,7 @@ typedef enum {
 
 typedef enum {
   HOOK_PRE_START_SNIFF,     /* Pre start sniffing */
-  HOOK_AT_EXIT,             /* Called at desniff exit */
+  HOOK_AT_EXIT,             /* Called at exit */
   HOOK_ON_ERROR,            /* Called on error */
   HOOK_RECEIVED,            /* Packet received */
   HOOK_ARP,                 /* Arp packet received */

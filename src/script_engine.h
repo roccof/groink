@@ -16,20 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_DEBUG_H
-#define GROINK_DEBUG_H
+#ifndef GROINK_SCRIPT_ENGINE_H
+#define GROINK_SCRIPT_ENGINE_H
 
-void fatal(const char *, const char *, ...);
-void se_fatal(const char *message, ...);
-void debug(const char *, ...);
-void se_debug(const char *, ...);
-void bug(const char *, const char *, ...);
-void warning(const char *, ...);
-void se_warning(const char *, ...);
-void message(const char *, ...);
+#define SCRIPT_DIR "scripts"
+#define SCRIPT_EXT ".lua"
+#define SCRIPT_DB "scripts.db"
 
-#define myassert(v)							\
-  if(!(v))								\
-    bug(__func__, "assertion failed at %s:%d", __FILE__, __LINE__);
+#define MAX_SCRIPT_NAME 4096
+#define MAX_SCRIPT_ARGS 50
 
-#endif /* GROINK_DEBUG_H */
+void se_open();
+void se_close();
+void se_run();
+char *append_script_dir(char *script_name);
+
+#endif /* GROINK_SCRIPT_ENGINE_H */

@@ -36,6 +36,7 @@
 #include "hook.h"
 #include "protos.h"
 #include "rp_processor.h"
+#include "script_engine.h"
 
 static struct termios saved_term;
 
@@ -49,6 +50,8 @@ static void cleanup()
 
   stop_sniffing();
   stop_rp_processor();
+
+  se_close();
 
   protos_destroy();
   cleanup_rp_queue();
@@ -100,8 +103,14 @@ static void groink_main()
   message(COLOR_BOLD"%s %s"COLOR_NORMAL" started, type "COLOR_BOLD"Q"
 	  COLOR_NORMAL" or "COLOR_BOLD"q"COLOR_NORMAL" to quit...", PACKAGE_NAME, VERSION);
 
+  /* Start script engine */
+  se_open();
+
   /* Start capturing process */
   start_sniffing();
+
+  /* Run script */
+  se_run();
 }
 
 int main(int argc, char **argv)
@@ -127,13 +136,13 @@ int main(int argc, char **argv)
  
   tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
-  parse_options(argc, argv);
-  
   /* Register signals */
   signal(SIGINT, &signal_handler_cb);
   signal(SIGTERM, &signal_handler_cb);
   signal(SIGSEGV, &signal_handler_cb);
-
+  
+  parse_options(argc, argv);
+  
   groink_main();
 
   while(1) {

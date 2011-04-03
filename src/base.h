@@ -22,6 +22,8 @@
 #include <endian.h>
 #include <stdlib.h>
 
+#include "config.h"
+
 /* Control big/little endian convention for current host */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #define LENDIAN
