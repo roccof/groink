@@ -71,7 +71,7 @@ static void *processor_thread_cb(void *arg)
     /* if(gbls->mitm_state == MITM_STATE_START) */
     /* 	packet_forward(p); */
     
-    packet_free(p);
+    /* packet_free(p); */
   }
   
   /* Never reached */

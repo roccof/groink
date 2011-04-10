@@ -18,6 +18,7 @@
  */
 #include <arpa/inet.h>
 #include <string.h>
+#include <lua.h>
 
 #include "ethernet.h"
 #include "debug.h"
@@ -30,23 +31,22 @@
 /* Builder */
 ether_t *build_ethernet(char *src, char *dst, _uint16 type)
 {
-  /* ether_t *ether = NULL; */
-  /* _uint8 *bytes; */
+  ether_t *ether = NULL;
+  _uint8 *bytes;
 
-  /* ether = (ether_t *)safe_alloc(sizeof(ether_t)); */
+  ether = (ether_t *)safe_alloc(sizeof(ether_t));
 
-  /* bytes = ether_addr_aton(dst); */
-  /* memcpy(ether->dest_addr, bytes, ETHER_ADDR_LEN); */
-  /* free(bytes); */
+  bytes = ether_addr_aton(dst);
+  memcpy(ether->dest_addr, bytes, ETHER_ADDR_LEN);
+  free(bytes);
 
-  /* bytes = ether_addr_aton(src); */
-  /* memcpy(ether->src_addr, bytes, ETHER_ADDR_LEN); */
-  /* free(bytes); */
+  bytes = ether_addr_aton(src);
+  memcpy(ether->src_addr, bytes, ETHER_ADDR_LEN);
+  free(bytes);
 
-  /* ether->type = htons(type); */
+  ether->type = htons(type);
 
-  /* return ether; */
-  return NULL;
+  return ether;
 }
 
 /* Decoder */
@@ -62,7 +62,7 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 
   eth = (ether_t *)bytes;
 
-  header = packet_add_header(p, PROTO_NAME_ETHER, (void *)eth, ETHER_HDR_LEN);
+  header = packet_append_header(p, PROTO_NAME_ETHER, (void *)eth, ETHER_HDR_LEN);
 
   p->hw_srcaddr = ether_addr_ntoa(eth->src_addr);
   p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr);
@@ -90,13 +90,26 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
   /* } */
 }
 
+static int l_name(lua_State *L)
+{
+  lua_pushstring(L, "asd");
+  return 1;
+}
+
+static const struct luaL_reg ether_methods[] =
+  {
+    {"name", l_name},
+    {NULL, NULL}
+  };
+
 void register_ether()
 {
-  Protocol *p = (Protocol *)safe_alloc(sizeof(Protocol));
+  proto_t *p = (proto_t *)safe_alloc(sizeof(proto_t));
   p->name = PROTO_NAME_ETHER;
   p->longname = "Ethernet";
   p->layer = L2;
   p->decoder = decode_ether;
+  p->methods = (luaL_reg *)ether_methods;
   
   proto_register_byname(PROTO_NAME_ETHER, p);
 }

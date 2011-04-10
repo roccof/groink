@@ -16,6 +16,9 @@ groink_SOURCES =				\
 		protocols/ethernet.c		\
 		rp_processor.c			\
 		rp_queue.c			\
+		selib.c				\
+		selib_header.c			\
+		selib_packet.c			\
 		script_engine.c			\
 		threads.c
 

@@ -19,6 +19,8 @@
 #ifndef GROINK_SELIB_H
 #define GROINK_SELIB_H
 
+#include <lua.h>
+
 /* Key in Lua registry */
 #define SE_TRACEBACK "SE_TRACEBACK"
 #define SE_ARGV "SE_ARGV"
@@ -30,6 +32,10 @@
 /* Libraries name */
 #define SELIB_BIT_NAME "bit"
 #define SELIB_CORE_NAME "core"
+
+/* Objects name */
+#define SE_OBJ_NAME_PACKET "Packet"
+#define SE_OBJ_NAME_HEADER "Header"
 
 /* Object type */
 typedef enum _grk_se_obj_type {
@@ -48,5 +54,15 @@ typedef struct _grk_se_obj_udata {
   se_objtype_t type;  /* Object type */
   void *object;       /* Object data */
 } se_obj_t;
+
+void *se_alloc_udata(lua_State *L, size_t len);
+void se_setro(lua_State *L);
+void *check_object(lua_State *L, int arg, se_objtype_t type, char *name);
+se_obj_t *se_pushobject(lua_State *L, void *object, se_objtype_t type, char *name);
+
+void se_open_packet(lua_State *L);
+void se_open_header(lua_State *L);
+
+void stackDump (lua_State *L);
 
 #endif /* GROINK_SELIB_H */

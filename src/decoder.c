@@ -60,7 +60,7 @@ int start_decoding(packet_t *p, const rawpacket_t *rp)
 
 int call_decoder(char *proto_name, packet_t *p, const _uint8 *bytes, size_t len)
 {
-  Protocol *proto = proto_get_byname(proto_name);
+  proto_t *proto = proto_get_byname(proto_name);
 
   if (proto != NULL) {
     myassert(proto->decoder != NULL);
@@ -71,7 +71,7 @@ int call_decoder(char *proto_name, packet_t *p, const _uint8 *bytes, size_t len)
 
 int call_decoder_byport(int port, packet_t *p, const _uint8 *bytes, size_t len)
 {
-  Protocol *proto = proto_get_byport(port);
+  proto_t *proto = proto_get_byport(port);
 
   if (proto != NULL) {
     myassert(proto->decoder != NULL);

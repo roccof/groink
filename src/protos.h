@@ -20,6 +20,7 @@
 #define GROINK_PROTOS_H
 
 #include <lua.h>
+#include <lauxlib.h>
 
 #include "hashtable.h"
 #include "decoder.h"
@@ -45,18 +46,19 @@ typedef struct _grk_protocol {
   layer_t layer;             /* Protocol layer */
   protofields_t **fields;    /* Table that contains callback functions to
 				get and edit the fields of the protocol */
+  luaL_reg *methods;
   decoder_cb_t decoder;      /* Protocol decoder callback */
   int refcount;              /* Used from hashtables, iit ndicates if the struct 
 				can be freed */
-} Protocol;
+} proto_t;
 
 void protos_init();
 void protos_destroy();
-void proto_register_byname(char *name, Protocol *p);
-void proto_register_byport(int port, Protocol *p);
+void proto_register_byname(char *name, proto_t *p);
+void proto_register_byport(int port, proto_t *p);
 void proto_unregister_byname(char *name);
 void proto_unregister_byport(int port);
-Protocol *proto_get_byname(char *name);
-Protocol *proto_get_byport(int port);
+proto_t *proto_get_byname(char *name);
+proto_t *proto_get_byport(int port);
 
 #endif /* GROINK_PROTOS_H */

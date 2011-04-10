@@ -33,13 +33,13 @@ static const proto_cb protos[] = {
 
 struct _pname_table {
   char *name;
-  Protocol *p;
+  proto_t *p;
   UT_hash_handle hh;
 };
 
 struct _pport_table {
   int port;
-  Protocol *p;
+  proto_t *p;
   UT_hash_handle hh;
 };
 
@@ -109,7 +109,7 @@ void protos_destroy()
   debug("cleanup loaded protocols");
 }
 
-void proto_register_byname(char *name, Protocol *p)
+void proto_register_byname(char *name, proto_t *p)
 {
   struct _pname_table *e = (struct _pname_table *)safe_alloc(sizeof(struct _pname_table));
   e->name = name;
@@ -123,7 +123,7 @@ void proto_register_byname(char *name, Protocol *p)
   MUTEX_UNLOCK(&mutex_ht1);
 }
 
-void proto_register_byport(int port, Protocol *p)
+void proto_register_byport(int port, proto_t *p)
 {
   struct _pport_table *e = (struct _pport_table *)safe_alloc(sizeof(struct _pport_table));
   e->port = port;
@@ -148,7 +148,7 @@ void proto_unregister_byport(int port)
   /* TODO */
 }
 
-Protocol *proto_get_byname(char *name)
+proto_t *proto_get_byname(char *name)
 {
   struct _pname_table *e = NULL;
 
@@ -161,7 +161,7 @@ Protocol *proto_get_byname(char *name)
   return NULL;
 }
 
-Protocol *proto_get_byport(int port)
+proto_t *proto_get_byport(int port)
 {
   struct _pport_table *e = NULL;
 

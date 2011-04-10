@@ -30,6 +30,7 @@
 #include "globals.h"
 #include "hook.h"
 #include "selib.h"
+#include "packet.h"
 
 #define INIT_SCRIPT GROINK_DATADIR"/selib/script_engine.lua"
 #define DEFAULT_SCRIPT "default"
@@ -42,53 +43,56 @@ static int se_panic(lua_State *L)
 
 static void open_clib(lua_State *L)
 {
-  
+  se_open_packet(L);
+  se_open_header(L);
 }
 
 char *append_script_dir(char *script_name)
 {
-  if(gbls->scripts_dir == NULL)
+  if (gbls->scripts_dir == NULL) {
+    
     return str_concat(GROINK_DATADIR"/"SCRIPT_DIR"/", script_name, SCRIPT_EXT, NULL);
-  else
-    {
-      if(gbls->scripts_dir[0] == '/')
-	{
-	  if((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
-	    return str_concat(gbls->scripts_dir, script_name, SCRIPT_EXT, NULL);
-	  else
-	    return str_concat(gbls->scripts_dir, "/", script_name, SCRIPT_EXT, NULL);
-	}
-      else if(gbls->scripts_dir[0] == '.' && gbls->scripts_dir[1] == '/')
-	{
-	  char *cwd = getcwd(NULL, 0);
-	  char *path = NULL;
-
-	  if((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
-	    path = str_concat(cwd, "/", (gbls->scripts_dir + 2), script_name, 
-			      SCRIPT_EXT, NULL);
-	  else
-	    path = str_concat(cwd, "/", (gbls->scripts_dir + 2), "/", script_name, 
-			      SCRIPT_EXT, NULL);
-	  
-	  free(cwd);
-	  return path;
-	}
+    
+  } else {
+    
+    if (gbls->scripts_dir[0] == '/') {
+      
+      if ((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
+	return str_concat(gbls->scripts_dir, script_name, SCRIPT_EXT, NULL);
       else
-	{
-	  char *cwd = getcwd(NULL, 0);
-	  char *path = NULL;
-	  
-	  if((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
-	    path = str_concat(cwd, "/", gbls->scripts_dir, script_name, 
-			      SCRIPT_EXT, NULL);
-	  else
-	    path = str_concat(cwd, "/", gbls->scripts_dir, "/", script_name, 
-			      SCRIPT_EXT, NULL);
-	  
-	  free(cwd);
-	  return path;
-	}
+	return str_concat(gbls->scripts_dir, "/", script_name, SCRIPT_EXT, NULL);
+      
+    } else if (gbls->scripts_dir[0] == '.' && gbls->scripts_dir[1] == '/') {
+      
+      char *cwd = getcwd(NULL, 0);
+      char *path = NULL;
+      
+      if ((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
+	path = str_concat(cwd, "/", (gbls->scripts_dir + 2), script_name, 
+			  SCRIPT_EXT, NULL);
+      else
+	path = str_concat(cwd, "/", (gbls->scripts_dir + 2), "/", script_name, 
+			  SCRIPT_EXT, NULL);
+      
+      free(cwd);
+      return path;
+      
+    } else {
+      
+      char *cwd = getcwd(NULL, 0);
+      char *path = NULL;
+      
+      if ((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
+	path = str_concat(cwd, "/", gbls->scripts_dir, script_name, 
+			  SCRIPT_EXT, NULL);
+      else
+	path = str_concat(cwd, "/", gbls->scripts_dir, "/", script_name, 
+			  SCRIPT_EXT, NULL);
+      
+      free(cwd);
+      return path;
     }
+  }
 }
 
 static void se_pushargs(lua_State *L)
@@ -98,23 +102,22 @@ static void se_pushargs(lua_State *L)
 
   lua_newtable(L);
 
-  while(i < gbls->script_argc)
-    {
-      char *arg_tok = NULL;
-      char *dup = strdup(gbls->script_argv[i++]);
+  while (i < gbls->script_argc) {
+    char *arg_tok = NULL;
+    char *dup = strdup(gbls->script_argv[i++]);
+    
+    /* Arg name */
+    arg_tok = strtok_r(dup, "=", &saveptr);
+    lua_pushstring(L, arg_tok);
+    
+    /* Arg value */
+    arg_tok = strtok_r(NULL, "=", &saveptr);
+    lua_pushstring(L, arg_tok);
 
-      /* Arg name */
-      arg_tok = strtok_r(dup, "=", &saveptr);
-      lua_pushstring(L, arg_tok);
-
-      /* Arg value */
-      arg_tok = strtok_r(NULL, "=", &saveptr);
-      lua_pushstring(L, arg_tok);
-
-      lua_settable(L, -3);
-
-      free(dup);
-    }
+    lua_settable(L, -3);
+    
+    free(dup);
+  }
 }
 
 static int se_init(lua_State *L)
@@ -142,10 +145,9 @@ static int se_init(lua_State *L)
   lua_setfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK);
 
   /* Stack pos 2: script_engine.lua code */
-  if(luaL_loadfile(L, INIT_SCRIPT) != 0)
-    {
-      luaL_error(L, "could not load script_engine.lua: %s", lua_tostring(L, -1));
-    }
+  if (luaL_loadfile(L, INIT_SCRIPT) != 0) {
+    luaL_error(L, "could not load script_engine.lua: %s", lua_tostring(L, -1));
+  }
 
   /* Stack pos 3: script that will be executed */
   lua_pushstring(L, script);
@@ -166,6 +168,7 @@ static int se_init(lua_State *L)
 static void proc_pkt_cb(hookdata_t *data)
 {
   myassert(gbls->L != NULL);
+  myassert(data != NULL && data->type == HOOKDATA_PACKET);
 
   /* Stack pos 1: traceback function */
   lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_TRACEBACK);
@@ -173,7 +176,8 @@ static void proc_pkt_cb(hookdata_t *data)
   /* Stack pos 2: proc_pkt function in the script */
   lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_PROC_PKT);
 
-  lua_pushstring(gbls->L, "packet");
+  se_pushobject(gbls->L, (packet_t *)data->data, SE_OBJ_TYPE_PACKET, 
+		SE_OBJ_NAME_PACKET);
 
   if (lua_pcall(gbls->L, 1, 0, 1) != 0)
       lua_error(gbls->L);

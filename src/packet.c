@@ -19,7 +19,6 @@
 #include <string.h>
 
 #include "base.h"
-#include "debug.h"
 #include "packet.h"
 #include "globals.h"
 #include "utlist.h"
@@ -45,7 +44,7 @@ static void merge_header_data(packet_t *p, header_t *h)
   }
 }
 
-header_t *packet_add_header(packet_t *p, char *proto, _uint8 *data, size_t len)
+header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t len)
 {
   header_t *h = NULL;
 
@@ -132,7 +131,7 @@ int packet_contains_header(packet_t *p, char *proto)
   header_t *h = NULL;
 
   DL_FOREACH (p->headers, h) {
-    if (h->proto == proto) // XXX: use strncmp
+    if (strncmp(h->proto, proto, strlen(h->proto)) == 0)
       return 1;
   }
   return 0;
@@ -143,7 +142,7 @@ header_t *packet_get_header(packet_t *p, char *proto)
   header_t *h = NULL;
 
   DL_FOREACH (p->headers, h) {
-    if (h->proto == proto) // XXX: use strncmp
+    if (strncmp(h->proto, proto, strlen(h->proto)) == 0)
       return h;
   }
   return NULL;
