@@ -1,37 +1,79 @@
 
-* GroinK 0.1BETA1
- - write man page
- - protocols:
-    - IEEE 802.11
-    - PPP
-    - PPPoE tags
-    - IPv4 options
-    - TCP options
-    - IPv6
- - script engine:
-    - finish core SELIB
-    - capture SELIB is useful?
- - core:
-    - IPv6 support
- - SE script:
-    - alice
-    - detect_firesheep
+* write man page
 
-* GroinK 0.1BETA2
- - database of script
- - demonize desniff
- - MiTM attacks: DHCP spoofing, ICMP redirect, DNS spoofing
- - [SE-LIB]: ssl, socket
+* Linux "cooked" capture encapsulation
+   the link-layer header contains, in order:
+ 
+     a 2-byte "packet type", in network byte order, which is one of:
+       0    packet was sent to us by somebody else
+       1    packet was broadcast by somebody else
+       2    packet was multicast, but not broadcast, by somebody else
+       3    packet was sent by somebody else to somebody else
+       4    packet was sent by us
 
-* GroinK 0.1
- - porting on *BSD
- - layer 2 proto: linux sll, BSD loopback
- - IPv6 MiTM attacks
- - [SE-LIB]: stats, crypto
+   a 2-byte field, in network byte order, containing a Linux ARPHRD_
+   value for the link-layer device type;
 
-* GroinK future releases
- - IEEE 802.11 radiotap: multiple present bitmap
- - heuristic dissectors
- - tcp/ip session
- - layer 2 proto: bluetooth
+   a 2-byte field, in network byte order, containing the length of the
+   link-layer address of the sender of the packet (which could be 0);
+
+   an 8-byte field containing that number of bytes of the link-layer
+   address of the sender (if there are more than 8 bytes, only the
+   first 8 are present,  and if there are fewer than 8 bytes, there
+   are padding bytes after the address to pad the field to 8 bytes);
+
+   a  2-byte  field  containing an Ethernet protocol type, in network
+   byte order, or containing 1 for Novell 802.3 frames without an
+   802.2 LLC header or 4 for frames beginning with an 802.2 LLC header.
+
+* OpenBSD  loopback encapsulation protocol
+   the link-layer header is a 4-byte field, in network byte order,
+   containing a PF_ value from OpenBSD's socket.h for the
+   network-layer protocol of the packet.
+
+* IEEE 802.11 protocol
+   http://standards.ieee.org/getieee802/download/802.11-2007.pdf
+
+* PPP protocol
+   rfc1661 - http://www.rfc-editor.org/rfc/rfc1661.txt
+
+* PPPoE tags
+   rfc2516 - http://www.rfc-editor.org/rfc/rfc2516.txt
+
+* IPv4 options
+   rfc791 - page 15 - http://www.rfc-editor.org/rfc/rfc791.txt
+   http://www.tcpipguide.com/free/t_IPDatagramOptionsandOptionFormat.htm
+
+* TCP options
+   rfc793 - page 17 - http://www.rfc-editor.org/rfc/rfc793.txt
+
+* into IEEE 802.11 radiotap support multiple present bitmap
+   http://linuxwireless.org/en/developers/Documentation/radiotap
+   http://www.radiotap.org/
+
+* IPv6 support
+   rfc2460 - http://www.rfc-editor.org/rfc/rfc2460.txt
+   rfc3513 - http://www.rfc-editor.org/rfc/rfc3513.txt
+
+* database of script
+
+* DHCP spoofing MiTM attack
+
+* ICMP redirect MiTM attack
+
+* DNS spoofing MiTM attack
+
+* IPv6 MiTM attacks
+
+* ssl SE library
+
+* ssl MiTM attack
+
+* socket SE library
+
+* crypto SE library
+
+* porting on *BSD
+
+* TCP/IP session management
 
