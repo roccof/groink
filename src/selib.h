@@ -21,6 +21,8 @@
 
 #include <lua.h>
 
+#include "packet.h"
+
 /* Key in Lua registry */
 #define SE_TRACEBACK "SE_TRACEBACK"
 #define SE_ARGV "SE_ARGV"
@@ -59,6 +61,8 @@ void *se_alloc_udata(lua_State *L, size_t len);
 void se_setro(lua_State *L);
 void *check_object(lua_State *L, int arg, se_objtype_t type, char *name);
 se_obj_t *se_pushobject(lua_State *L, void *object, se_objtype_t type, char *name);
+
+header_t *check_header(lua_State *L, int arg);
 
 void se_open_packet(lua_State *L);
 void se_open_header(lua_State *L);

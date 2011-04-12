@@ -59,6 +59,13 @@ static int l_packet_headers(lua_State *L)
   return 1;
 }
 
+static int l_packet_num_headers(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+  lua_pushnumber(L, p->num_headers);
+  return 1;
+}
+
 static int l_packet_get_header(lua_State *L)
 {
   header_t *h = NULL;
@@ -78,6 +85,18 @@ static int l_packet_get_header(lua_State *L)
   return 1;
 }
 
+static int l_packet_contains(lua_State *L)
+{
+  packet_t *p = NULL;
+  char *proto = NULL;
+
+  proto = (char *)luaL_checkstring(L, -1);
+  p = check_packet(L, -2);
+
+  lua_pushboolean(L, packet_contains_header(p, proto));
+  return 1;
+}
+
 static int l_packet_data(lua_State *L)
 {
   packet_t *p = check_packet(L, -1);
@@ -89,6 +108,82 @@ static int l_packet_len(lua_State *L)
 {
   packet_t *p = check_packet(L, -1);
   lua_pushnumber(L, p->len);
+  return 1;
+}
+
+static int l_packet_src_hwaddr(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+  lua_pushstring(L, p->hw_srcaddr);
+  return 1;
+}
+
+static int l_packet_dst_hwaddr(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+  lua_pushstring(L, p->hw_dstaddr);
+  return 1;
+}
+
+static int l_packet_dst_netaddr(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+  lua_pushstring(L, p->net_dstaddr);
+  return 1;
+}
+
+static int l_packet_src_netaddr(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+  lua_pushstring(L, p->net_srcaddr);
+  return 1;
+}
+
+static int l_packet_setdrop(lua_State *L)
+{
+  packet_t *p = NULL;
+  int drop = 0;
+
+  p = check_packet(L, 1);
+  luaL_checktype(L, 2, LUA_TBOOLEAN);
+  drop = lua_toboolean(L, -1);
+
+  if(drop)
+    PKT_ADD_FLAG(p, PACKET_FLAG_DROP);
+  else
+    PKT_REMOVE_FLAG(p, PACKET_FLAG_DROP);
+
+  return 0;
+}
+
+static int l_packet_isdrop(lua_State *L)
+{
+  packet_t *p = check_packet(L, 1);
+  lua_pushboolean(L, PKT_HAS_FLAG(p, PACKET_FLAG_DROP));
+  return 1;
+}
+
+static int l_packet_setunmod(lua_State *L)
+{
+  packet_t *p = NULL;
+  int mod = 0;
+
+  p = check_packet(L, 1);
+  luaL_checktype(L, 2, LUA_TBOOLEAN);
+  mod = lua_toboolean(L, -1);
+  
+  if(mod)
+    PKT_ADD_FLAG(p, PACKET_FLAG_UNMODIFICABLE);
+  else
+    PKT_REMOVE_FLAG(p, PACKET_FLAG_UNMODIFICABLE);
+
+  return 0;
+}
+
+static int l_packet_isunmod(lua_State *L)
+{
+  packet_t *p = check_packet(L, 1);
+  lua_pushboolean(L, PKT_HAS_FLAG(p, PACKET_FLAG_UNMODIFICABLE));
   return 1;
 }
 
@@ -121,26 +216,26 @@ static int l_packet_eq(lua_State *L)
   return 1;
 }
 
-static const struct luaL_reg packet_methods[] =
-  {
-    {"headers", l_packet_headers},
-    {"get_header", l_packet_get_header},
-    {"len", l_packet_len},
-    {"data", l_packet_data},
-    /* {"is_tcp_packet", l_packet_istcp}, */
-    /* {"is_udp_packet", l_packet_isudp}, */
-    /* {"contains_header", l_packet_contains}, */
-    /* {"num_headers", l_packet_num_headers}, */
-    /* {"src_hwaddr", l_packet_src_hwaddr}, */
-    /* {"dst_hwaddr", l_packet_dst_hwaddr}, */
-    /* {"src_netaddr", l_packet_src_netaddr}, */
-    /* {"dst_netaddr", l_packet_dst_netaddr}, */
-    /* {"set_drop", l_packet_setdrop}, */
-    /* {"is_drop", l_packet_isdrop}, */
-    /* {"set_unmodificable", l_packet_setunmod}, */
-    /* {"is_unmodificable", l_packet_isunmod}, */
-    {NULL, NULL}
-  };
+static const struct luaL_reg packet_methods[] = {
+  {"headers", l_packet_headers},
+  {"num_headers", l_packet_num_headers},
+  {"get_header", l_packet_get_header},
+  {"len", l_packet_len},
+  {"data", l_packet_data},
+  /* {"is_ip_packet", l_packet_isip}, */
+  /* {"is_tcp_packet", l_packet_istcp}, */
+  /* {"is_udp_packet", l_packet_isudp}, */
+  {"contains_header", l_packet_contains},
+  {"hw_srcaddr", l_packet_src_hwaddr},
+  {"hw_dstaddr", l_packet_dst_hwaddr},
+  {"net_srcaddr", l_packet_src_netaddr},
+  {"net_dstaddr", l_packet_dst_netaddr},
+  {"set_drop", l_packet_setdrop},
+  {"is_drop", l_packet_isdrop},
+  {"set_unmodificable", l_packet_setunmod},
+  {"is_unmodificable", l_packet_isunmod},
+  {NULL, NULL}
+};
 
 void se_open_packet(lua_State *L)
 {

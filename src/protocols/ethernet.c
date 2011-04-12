@@ -27,6 +27,7 @@
 #include "base.h"
 #include "protos.h"
 #include "protos_name.h"
+#include "selib.h"
 
 /* Builder */
 ether_t *build_ethernet(char *src, char *dst, _uint16 type)
@@ -90,17 +91,57 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
   /* } */
 }
 
-static int l_name(lua_State *L)
+static int l_src_addr(lua_State *L)
 {
-  lua_pushstring(L, "asd");
+  header_t *h = NULL;
+  ether_t *e = NULL;
+  char *addr = NULL;
+  
+  h = check_header(L, 1);
+  e = (ether_t *)h->data;
+
+  addr = ether_addr_ntoa(e->src_addr);
+  lua_pushstring(L, addr);
+  free(addr);
+
   return 1;
 }
 
-static const struct luaL_reg ether_methods[] =
-  {
-    {"name", l_name},
-    {NULL, NULL}
-  };
+static int l_dst_addr(lua_State *L)
+{
+  header_t *h = NULL;
+  ether_t *e = NULL;
+  char *addr = NULL;
+  
+  h = check_header(L, 1);
+  e = (ether_t *)h->data;
+
+  addr = ether_addr_ntoa(e->dest_addr);
+  lua_pushstring(L, addr);
+  free(addr);
+
+  return 1;
+}
+
+static int l_type(lua_State *L)
+{
+  header_t *h = NULL;
+  ether_t *e = NULL;
+  
+  h = check_header(L, 1);
+  e = (ether_t *)h->data;
+
+  lua_pushnumber(L, ntohs(e->type));
+
+  return 1;
+}
+
+static const struct luaL_reg ether_methods[] = {
+  {"src_addr", l_src_addr},
+  {"dst_addr", l_dst_addr},
+  {"type", l_type},
+  {NULL, NULL}
+};
 
 void register_ether()
 {

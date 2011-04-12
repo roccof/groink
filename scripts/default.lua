@@ -20,6 +20,9 @@
 -- This script dissect packet and show username and password.
 
 function proc_pkt(p)
-   -- local h = p:get_header("ether")
-   -- print(h:name())
+   local e = p:get_header("ether")
+   print(e:src_addr())
+   print(e:dst_addr())
+   print(e:type())
+   print("---------------")
 end

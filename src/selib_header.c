@@ -26,7 +26,7 @@
 #include "debug.h"
 #include "protos.h"
 
-static header_t *check_header(lua_State *L, int arg)
+header_t *check_header(lua_State *L, int arg)
 {
    return (header_t *)check_object(L, arg, SE_OBJ_TYPE_HEADER, SE_OBJ_NAME_HEADER);
 }
@@ -47,7 +47,13 @@ static int l_header_len(lua_State *L)
 
 static int l_header_tostring(lua_State *L)
 {
-  lua_pushfstring(L, "Header: %p", lua_touserdata(L, -1));
+  header_t *h = check_header(L, -1);
+  proto_t *p = proto_get_byname(h->proto);
+
+  if (p == NULL)
+    lua_pushfstring(L, "Header: %p", lua_touserdata(L, -1));
+  else
+    lua_pushfstring(L, "%s: %p", p->longname, lua_touserdata(L, -1));
   return 1;
 }
 
@@ -92,6 +98,9 @@ static int l_header_index(lua_State *L)
   p = proto_get_byname(h->proto);
   myassert(p != NULL);
 
+  if (p->methods == NULL)
+    goto err;
+
   for (m=p->methods; m->name != NULL; m++) {
     if (strncmp(name, m->name, strlen(name)) == 0) {
       lua_pushcfunction(L, m->func);
@@ -99,24 +108,22 @@ static int l_header_index(lua_State *L)
     }
   }
 
+ err:
   lua_pushnil(L);
-
   return 1;
 }
 
-static const struct luaL_reg header_methods[] =
-  {
-    {"rawdata", l_header_rawdata},
-    {"len", l_header_len},
-    {NULL, NULL}
-  };
+static const struct luaL_reg header_methods[] = {
+  {"rawdata", l_header_rawdata},
+  {"len", l_header_len},
+  {NULL, NULL}
+};
 
 void se_open_header(lua_State *L)
 {
   luaL_newmetatable(L, SE_OBJ_NAME_HEADER);
 
   lua_pushstring(L, "__index");
-  /* lua_pushvalue(L, -2); */
   lua_pushcfunction(L, l_header_index);
   lua_settable(L, -3); /* metatable.__index = cfunc */
 
