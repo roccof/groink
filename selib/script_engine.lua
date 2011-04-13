@@ -16,7 +16,7 @@
 -- along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
 
 -- script_engine.lua
--- This script is called from 'script_engine.c' and set a secure enviroment for 
+-- This script is called from 'script_engine.c' and set an enviroment for 
 -- script execution.
 
 -- Registry key
@@ -40,7 +40,6 @@ local getinfo = getinfo
 
 local D = require("debug")
 local getinfo = debug.getinfo
-local traceback = D.traceback
 local _R = D.getregistry()
 
 local string = require("string")
@@ -49,11 +48,6 @@ local format = string.format
 local coroutine = require("coroutine")
 local create = coroutine.create
 local resume = coroutine.resume
-local status = coroutine.status
-local yield = coroutine.yield
-local wrap = coroutine.wrap
-
--- local core = require("core")
 
 -- The name of the script that will be executed and the 
 -- selib path are passed as argument
@@ -116,6 +110,7 @@ end
 -- Env table
 local env = {
    SCRIPT = script,
+   SELIB_DIR = selib,
    _argv = _R[SE_ARGV],
    _argc = _R[SE_ARGC]
 }
@@ -123,6 +118,10 @@ setmetatable(env, { __index = _G });
 
 -- Initialize the engine
 local function init()
+
+   -- save selib directory into the registry
+   _R["SELIB_DIR"] = selib
+
    local func, err = loadfile(script)
 
    if func then

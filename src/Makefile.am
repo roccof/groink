@@ -17,7 +17,10 @@ groink_SOURCES =				\
 		rp_processor.c			\
 		rp_queue.c			\
 		selib.c				\
+		selib_bit.c			\
+		selib_core.c			\
 		selib_header.c			\
+		selib_netutil.c			\
 		selib_packet.c			\
 		script_engine.c			\
 		threads.c

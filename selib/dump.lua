@@ -18,9 +18,9 @@
 -- dump.lua
 -- asd
 
-local core = require("core")
+local corelib = require("core")
 local tobyte = string.byte
-local printf = core.printf
+local printf = corelib.printf
 
 module("dump")
 
@@ -79,14 +79,14 @@ local function dump(data, len, hex, ascii)
    end
 end
 
-function hex_ascii_dump(data, len)
+function hex_ascii(data, len)
    dump(data, len, true, true)
 end
 
-function hex_dump(data, len)
+function hex(data, len)
    dump(data, len, true, false)
 end
 
-function ascii_dump(data, len)
+function ascii(data, len)
    dump(data, len, false, true)
 end

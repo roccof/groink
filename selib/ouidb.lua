@@ -18,23 +18,28 @@
 -- ouidb.lua
 -- asd
 
-local core = require("core")
-local io = require("io")
-local find = string.find
-local printf = core.printf
+local iolib = require("io")
+local stirnglib = require("string")
+local find = stringlib.find
 local pairs = pairs
-local fatal = core.fatal
-local print = print
+local corelib = require("core")
+local printf = corelib.printf
+local fatal = corelib.fatal
+local D = require("debug")
+local _R = D.getregistry()
 
 module("ouidb")
 
 local _ouidb = nil
-
-local dbfile = core.selib_path().."oui_db.txt"
+local dbfile = _R["SELIB_DIR"].."oui_db.txt"
+local dbentry_regex = 
+   "([0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f])|([%w%s]+)"
+local oui_regex = 
+   "([0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f])"
 
 local function read_ouidb()
    if _ouidb == nil then
-      local f = io.open(dbfile, "r")
+      local f = iolib.open(dbfile, "r")
       if f == nil then
 	 -- no such file or permission denied
 	 fatal("error while opening oui database file")
@@ -44,7 +49,7 @@ local function read_ouidb()
 	 while line ~= nil do
 	    -- skip comment
 	    if find(line, "^%s*#") == nil then
-	       local _, _, oui, company = find(line, "([0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f])|([%w%s]+)")
+	       local _, _, oui, company = find(line, dbentry_regex)
 	       if oui ~= nil and company ~= nil then
 		  _ouidb[oui] = company
 	       end
@@ -58,7 +63,8 @@ local function read_ouidb()
 end
 
 local function is_valid(addr)
-   if addr == nil or (addr == "00:00:00:00:00:00" or addr == "FF:FF:FF:FF:FF:FF") then
+   if addr == nil or 
+      (addr == "00:00:00:00:00:00" or addr == "FF:FF:FF:FF:FF:FF") then
       return false
    end
    return true
@@ -70,14 +76,13 @@ function oui_from_addr(addr)
    end
    -- load oui db
    local db = read_ouidb()
-   local _, _, oui = find(addr, "([0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f]:[0-9A-Fa-f][0-9A-Fa-f])")
+   local _, _, oui = find(addr, oui_regex)
    if oui == nil then
       return nil
    else
-      return db[oui]
+      return db[oui:upper()]
    end
 end
-
 
 function oui_from_name(name)
    if name == nil then
@@ -86,7 +91,7 @@ function oui_from_name(name)
    -- load oui db
    local db = read_ouidb()
    for oui, company in pairs(db) do
-      if name == company then
+      if name:lower() == company:lower() then
 	 return oui
       end
    end

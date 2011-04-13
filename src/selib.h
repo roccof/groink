@@ -34,6 +34,7 @@
 /* Libraries name */
 #define SELIB_BIT_NAME "bit"
 #define SELIB_CORE_NAME "core"
+#define SELIB_NETUTIL_NAME "netutil"
 
 /* Objects name */
 #define SE_OBJ_NAME_PACKET "Packet"
@@ -66,6 +67,9 @@ header_t *check_header(lua_State *L, int arg);
 
 void se_open_packet(lua_State *L);
 void se_open_header(lua_State *L);
+void se_open_core(lua_State *L);
+void se_open_bit(lua_State *L);
+void se_open_netutil(lua_State *L);
 
 void stackDump (lua_State *L);
 

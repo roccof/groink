@@ -15,14 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
 
--- default.lua
--- Default script. This script is called by default if there isn't specified one.
--- This script dissect packet and show username and password.
+-- dump.lua
+-- this script prints the packets in esadecimal, ascii or both format
 
+local dumplib = require("dump")
 local corelib = require("core")
+local printf = corelib.printf
 
-function proc_pkt(p)
-   -- local e = p:get_header("ether")
-   -- print(e:src_addr())
-   -- print("---------------")
+local type = nil
+
+function proc_pkt(p)	      
+   printf("Got packet of %d byte(s)\n", p:len())
+   if type == "hex" then
+      dumplib.hex(p:data(), p:len())
+   elseif type == "ascii" then
+      dumplib.ascii(p:data(), p:len())
+   else
+      dumplib.hex_ascii(p:data(), p:len())
+   end
+   printf("\n")
+end
+
+function init()
+   corelib.pktdecoding(false)
+   type = _argv["type"]
 end

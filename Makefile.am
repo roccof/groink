@@ -11,21 +11,22 @@ EXTRA_DIST =
 	NEWS		\
 	ChangeLog
 
-# selibdir = $(pkgdatadir)/selib
-# selib_DATA = 				\
-# 	selib/oui_db.txt 		\
-# 	selib/http.lua			\
-# 	selib/json.lua			\
-# 	selib/script_engine.lua		\
-# 	selib/util.lua
+selibdir = $(pkgdatadir)/selib
+selib_DATA = 			\
+	selib/oui_db.txt 	\
+	selib/core.luadoc	\
+	selib/bit.luadoc	\
+	selib/script_engine.lua	\
+	selib/dump.lua		\
+	selib/netutil.luadoc	\
+	selib/ouidb.lua
 
-# scriptsdir = $(pkgdatadir)/scripts
-# scripts_DATA = 				\
-# 	scripts/default.lua 		\
-# 	scripts/dump.lua 		\
-# 	scripts/isolate.lua 		\
-# 	scripts/show.lua		\
-# 	scripts/stats.lua 		\
-# 	scripts/scripts.db
+scriptsdir = $(pkgdatadir)/scripts
+scripts_DATA = 			\
+	scripts/default.lua 	\
+	scripts/dump.lua	\
+# 	scripts/isolate.lua 	\
+#	scripts/show.lua	\
+#	scripts/scripts.db
 
 CLEANFILES = *.out *~

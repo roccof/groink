@@ -45,6 +45,9 @@ static void open_clib(lua_State *L)
 {
   se_open_packet(L);
   se_open_header(L);
+  se_open_core(L);
+  se_open_bit(L);
+  se_open_netutil(L);
 }
 
 char *append_script_dir(char *script_name)
