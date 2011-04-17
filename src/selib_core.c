@@ -282,8 +282,8 @@ static int l_core_set_pktdecoding(lua_State *L)
 {
   int decode = 0;
 
-  luaL_checktype(L, 1, LUA_TBOOLEAN);
-  decode = lua_toboolean(L, 1);
+  luaL_checktype(L, -1, LUA_TBOOLEAN);
+  decode = lua_toboolean(L, -1);
 
   gbls->decode = decode;
 

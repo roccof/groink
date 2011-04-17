@@ -53,7 +53,7 @@ static int l_header_tostring(lua_State *L)
   if (p == NULL)
     lua_pushfstring(L, "Header: %p", lua_touserdata(L, -1));
   else
-    lua_pushfstring(L, "%s: %p", p->longname, lua_touserdata(L, -1));
+    lua_pushfstring(L, "Header[%s]: %p", p->longname, lua_touserdata(L, -1));
   return 1;
 }
 

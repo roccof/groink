@@ -46,10 +46,21 @@ typedef enum _grk_se_obj_type {
   SE_OBJ_TYPE_HEADER
 } se_objtype_t;
 
-/* Definition of a constant name/value pair */
+enum se_const_type {
+  SE_TNUMBER,
+  SE_TSTRING,
+  SE_TBOOLEAN
+};
+
+
+
 typedef struct _grk_se_constant {
-  const char *name;
-  int value;
+  char* name;
+  union _val {
+    int num;
+    char *str;
+  } value;
+  enum se_const_type type;
 } se_constant_t;
 
 /* User data object */
@@ -70,6 +81,7 @@ void se_open_header(lua_State *L);
 void se_open_core(lua_State *L);
 void se_open_bit(lua_State *L);
 void se_open_netutil(lua_State *L);
+void se_open_constants(lua_State *L);
 
 void stackDump (lua_State *L);
 

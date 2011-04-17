@@ -20,5 +20,6 @@
 #define GROINK_PROTOS_NAMES_H
 
 #define PROTO_NAME_ETHER "ether"
+#define PROTO_NAME_ARP "arp"
 
 #endif /* GROINK_PROTOS_NAMES_H */

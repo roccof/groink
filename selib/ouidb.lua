@@ -19,7 +19,7 @@
 -- asd
 
 local iolib = require("io")
-local stirnglib = require("string")
+local stringlib = require("string")
 local find = stringlib.find
 local pairs = pairs
 local corelib = require("core")

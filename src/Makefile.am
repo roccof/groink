@@ -13,11 +13,13 @@ groink_SOURCES =				\
 		packet.c			\
 		parse_options.c			\
 		protos.c			\
+		protocols/arp.c			\
 		protocols/ethernet.c		\
 		rp_processor.c			\
 		rp_queue.c			\
 		selib.c				\
 		selib_bit.c			\
+		selib_constants.c		\
 		selib_core.c			\
 		selib_header.c			\
 		selib_netutil.c			\
@@ -38,6 +40,7 @@ noinst_HEADERS =				\
 		parse_options.h			\
 		protos.h			\
 		protos_name.h			\
+		protocols/arp.h			\
 		protocols/ethernet.h		\
 		rp_processor.h			\
 		rp_queue.h			\

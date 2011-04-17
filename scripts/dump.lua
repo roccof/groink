@@ -37,6 +37,6 @@ function proc_pkt(p)
 end
 
 function init()
-   corelib.pktdecoding(false)
+   corelib.set_pktdecoding(false)
    type = _argv["type"]
 end
