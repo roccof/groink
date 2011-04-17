@@ -22,7 +22,5 @@
 local corelib = require("core")
 
 function proc_pkt(p)
-   -- local e = p:get_header("ether")
-   -- print(e:src_addr())
-   -- print("---------------")
+   
 end

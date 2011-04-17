@@ -15,6 +15,7 @@ groink_SOURCES =				\
 		protos.c			\
 		protocols/arp.c			\
 		protocols/ethernet.c		\
+		protocols/pppoe.c		\
 		rp_processor.c			\
 		rp_queue.c			\
 		selib.c				\
@@ -42,6 +43,7 @@ noinst_HEADERS =				\
 		protos_name.h			\
 		protocols/arp.h			\
 		protocols/ethernet.h		\
+		protocols/pppoe.h		\
 		rp_processor.h			\
 		rp_queue.h			\
 		selib.h				\

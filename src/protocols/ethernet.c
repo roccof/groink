@@ -70,22 +70,24 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 
   switch (ntohs(eth->type)) {
   /* case ETHER_TYPE_IP: */
-  /*   return call_decoder(PROTO_IPV4, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+  /*   return call_decoder(PROTO_NAME_IPV4, p, (bytes + ETHER_HDR_LEN), 
+       (len - ETHER_HDR_LEN)); */
     
   case ETHER_TYPE_ARP:
   case ETHER_TYPE_REVARP:
-    return call_decoder(PROTO_NAME_ARP, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN));
+    return call_decoder(PROTO_NAME_ARP, p, (bytes + ETHER_HDR_LEN), 
+			(len - ETHER_HDR_LEN));
     
-  /* case ETHER_TYPE_PPPOED: */
-  /*   return call_decoder(PROTO_PPPOE, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
-    
-  /* case ETHER_TYPE_PPPOES: */
-  /*   return call_decoder(PROTO_PPPOE, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+  case ETHER_TYPE_PPPOED:
+  case ETHER_TYPE_PPPOES:
+    return call_decoder(PROTO_NAME_PPPOE, p, (bytes + ETHER_HDR_LEN), 
+			(len - ETHER_HDR_LEN));
     
   default:
     /* Insert error */
     ADD_ERROR(header, UNKNOWN_ETHER_TYPE);
-    /* return call_decoder(PROTO_RAW, p, (bytes + ETHER_HDR_LEN), (len - ETHER_HDR_LEN)); */
+    /* return call_decoder(PROTO_NAME_RAW, p, (bytes + ETHER_HDR_LEN), 
+       (len - ETHER_HDR_LEN)); */
     return DECODE_OK;
   }
 }

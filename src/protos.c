@@ -20,6 +20,7 @@
 #include "packet.h"
 #include "protocols/ethernet.h"
 #include "protocols/arp.h"
+#include "protocols/pppoe.h"
 #include "debug.h"
 #include "base.h"
 #include "hashtable.h"
@@ -30,6 +31,7 @@ typedef void(*proto_cb)();
 static const proto_cb protos[] = {
   register_ether,
   register_arp,
+  register_pppoe,
   NULL
 };
 

@@ -21,5 +21,6 @@
 
 #define PROTO_NAME_ETHER "ether"
 #define PROTO_NAME_ARP "arp"
+#define PROTO_NAME_PPPOE "pppoe"
 
 #endif /* GROINK_PROTOS_NAMES_H */
