@@ -163,40 +163,40 @@ local function print_arp(p)
    local arpe = arp:arp_ethip()
 
    if arpe ~= nil then
-      if arp:opcode() == ArpOpcode.REQUEST then
+      if arp:opcode() == ARP.OP_REQUEST then
 	 printf("Request who-as %s tell %s", arpe.tpa, arpe.spa)
-      elseif arp:opcode() == ArpOpcode.REPLY then
+      elseif arp:opcode() == ARP.OP_REPLY then
 	 printf("Reply %s is-at %s", arpe.spa, arpe.sha)
 	 -- get company name from oui
 	 local company = ouidb.oui_from_addr(arpe.sha)
 	 if company ~= nil then
 	    printf(" (%s)", company)
 	 end
-      elseif arp:opcode() == ArpOpcode.REQUEST then
+      elseif arp:opcode() == ARP.OP_REQUEST then
 	 printf("Reverse Request who-is %s tell %s", arpe.tha, arpe.sha)
-      elseif arp:opcode() == ArpOpcode.RREPLY then
+      elseif arp:opcode() == ARP.OP_RREPLY then
 	 printf("Reverse Reply %s at %s", arpe.tha, arpe.tpa)
-      elseif arp:opcode() == ArpOpcode.InREQUEST then
+      elseif arp:opcode() == ARP.OP_InREQUEST then
 	 printf("Inverse Request who-is %s tell %s", arpe.tha, arpe.sha)
-      elseif arp:opcode() == ArpOpcode.InREPLY then
+      elseif arp:opcode() == ARP.OP_InREPLY then
 	 printf("Inverse Reply %s at %s", arpe.tha, arpe.tpa)
-      elseif arp:opcode() == ArpOpcode.NAK then
+      elseif arp:opcode() == ARP.OP_NAK then
 	 printf("NACK Reply")
       end
    else
-      if arp:opcode() == ArpOpcode.REQUEST then
+      if arp:opcode() == ARP.OP_REQUEST then
 	 printf("Request")
-      elseif arp:opcode() == ArpOpcode.REPLY then
+      elseif arp:opcode() == ARP.OP_REPLY then
 	 printf("Reply")
-      elseif arp:opcode() == ArpOpcode.REQUEST then
+      elseif arp:opcode() == ARP.OP_REQUEST then
 	 printf("Reverse Request")
-      elseif arp:opcode() == ArpOpcode.RREPLY then
+      elseif arp:opcode() == ARP.OP_RREPLY then
 	 printf("Reverse Reply")
-      elseif arp:opcode() == ArpOpcode.InREQUEST then
+      elseif arp:opcode() == ARP.OP_InREQUEST then
 	 printf("Inverse Request")
-      elseif arp:opcode() == ArpOpcode.InREPLY then
+      elseif arp:opcode() == ARP.OP_InREPLY then
 	 printf("Inverse Reply")
-      elseif arp:opcode() == ArpOpcode.NAK then
+      elseif arp:opcode() == ARP.OP_NAK then
 	 printf("NACK Reply")
       end
    end

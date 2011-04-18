@@ -19,7 +19,9 @@
 #include <lua.h>
 #include <lualib.h>
 
+#include "protocols/ethernet.h"
 #include "protocols/arp.h"
+#include "protocols/pppoe.h"
 #include "protos_name.h"
 #include "selib.h"
 
@@ -35,20 +37,42 @@ static const se_constant_t protos_const[] = {
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
 
-static const se_constant_t arp_opcode_const[] = {
-  {"REQUEST", { .num = ARP_OP_REQUEST }, SE_TNUMBER},
-  {"REPLY", { .num = ARP_OP_REPLY }, SE_TNUMBER},
-  {"RREQUEST", { .num = ARP_OP_RREQUEST }, SE_TNUMBER},
-  {"RREPLY", { .num = ARP_OP_RREPLY }, SE_TNUMBER},
-  {"InREQUEST", { .num = ARP_OP_InREQUEST }, SE_TNUMBER},
-  {"InREPLY", { .num = ARP_OP_InREPLY }, SE_TNUMBER},
-  {"NAK", { .num = ARP_OP_NAK }, SE_TNUMBER},
+static const se_constant_t arp_const[] = {
+  {"OP_REQUEST", { .num = ARP_OP_REQUEST }, SE_TNUMBER},
+  {"OP_REPLY", { .num = ARP_OP_REPLY }, SE_TNUMBER},
+  {"OP_RREQUEST", { .num = ARP_OP_RREQUEST }, SE_TNUMBER},
+  {"OP_RREPLY", { .num = ARP_OP_RREPLY }, SE_TNUMBER},
+  {"OP_InREQUEST", { .num = ARP_OP_InREQUEST }, SE_TNUMBER},
+  {"OP_InREPLY", { .num = ARP_OP_InREPLY }, SE_TNUMBER},
+  {"OP_NAK", { .num = ARP_OP_NAK }, SE_TNUMBER},
+  {NULL, { .num = 0 }, SE_TNUMBER}
+};
+
+static const se_constant_t pppoe_const[] = {
+  {"HDR_LEN", { .num = PPPOE_HDR_LEN }, SE_TNUMBER},
+  {"CODE_SESSION", { .num = PPPOE_CODE_SESSION }, SE_TNUMBER},
+  {"CODE_DISCOVER_PADI", { .num = PPPOE_CODE_DISCOVER_PADI }, SE_TNUMBER},
+  {"CODE_DISCOVER_PADO", { .num = PPPOE_CODE_DISCOVER_PADO }, SE_TNUMBER},
+  {"CODE_DISCOVER_PADR", { .num = PPPOE_CODE_DISCOVER_PADR }, SE_TNUMBER},
+  {"CODE_DISCOVER_PADS", { .num = PPPOE_CODE_DISCOVER_PADS }, SE_TNUMBER},
+  {"CODE_DISCOVER_PADT", { .num = PPPOE_CODE_DISCOVER_PADT }, SE_TNUMBER},
+  {"TAG_TYPE_EOL", { .num = PPPOE_TAG_TYPE_EOL }, SE_TNUMBER},
+  {"TAG_TYPE_SERV_NAME", { .num = PPPOE_TAG_TYPE_SERV_NAME }, SE_TNUMBER},
+  {"TAG_TYPE_AC_NAME", { .num = PPPOE_TAG_TYPE_AC_NAME }, SE_TNUMBER},
+  {"TAG_TYPE_HOST_UNIQ", { .num = PPPOE_TAG_TYPE_HOST_UNIQ }, SE_TNUMBER},
+  {"TAG_TYPE_AC_COOKIE", { .num = PPPOE_TAG_TYPE_AC_COOKIE }, SE_TNUMBER},
+  {"TAG_TYPE_VENDOR_SPEC", { .num = PPPOE_TAG_TYPE_VENDOR_SPEC }, SE_TNUMBER},
+  {"TAG_TYPE_REL_SESS_ID", { .num = PPPOE_TAG_TYPE_REL_SESS_ID }, SE_TNUMBER},
+  {"TAG_TYPE_SERV_NAME_ERR", { .num = PPPOE_TAG_TYPE_SERV_NAME_ERR }, SE_TNUMBER},
+  {"TAG_TYPE_AC_SYS_ERR", { .num = PPPOE_TAG_TYPE_AC_SYS_ERR }, SE_TNUMBER},
+  {"TAG_TYPE_GEN_ERR", { .num = PPPOE_TAG_TYPE_GEN_ERR }, SE_TNUMBER},
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
 
 static const struct _grk_consts consts[] = {
   {"Proto", protos_const},
-  {"ArpOpcode", arp_opcode_const},
+  {"ARP", arp_const},
+  {"PPPoE", pppoe_const},
   {NULL, NULL}
 };
 

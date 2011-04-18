@@ -43,8 +43,8 @@ static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
     goto err;
   
   /* The payload of PPPoe Discovery Stage contains TAGS */
-  /* if (pppoe->code != PPPOE_CODE_SESSION) */
-  /*   hlen += htons(pppoe->length); */
+  if (pppoe->code != PPPOE_CODE_SESSION)
+    hlen += htons(pppoe->length);
 
   packet_append_header(p, PROTO_NAME_PPPOE, (void *)pppoe, hlen);
 
@@ -168,11 +168,10 @@ static int l_pppoe_tags(lua_State *L)
   header = check_header(L, 1);
   pppoe = (pppoe_t *)header->data;
 
-  if(pppoe->code == PPPOE_CODE_SESSION)
-    {
-      lua_pushnil(L);
-      return 1;
-    }
+  if (pppoe->code == PPPOE_CODE_SESSION) {
+    lua_pushnil(L);
+    return 1;
+  }
 
   /* PPPoE Discovery payload length */
   totlen = ntohs(pppoe->length);
@@ -181,71 +180,71 @@ static int l_pppoe_tags(lua_State *L)
 
   payload = (_uint8 *)(pppoe + 1);
 
-  while(totlen > 0)
-    {  
-      tag_type = (_uint16 *)payload;
-      tag_len =  (_uint16 *)(tag_type + 1);
-  
-      len = 4 + ntohs(*tag_len);
-  
-      /* debug("-------------------------------------------"); */
-      /* debug("[PPPoED TAG] type: 0x%x ; len: %d", ntohs(*tag_type), ntohs(*tag_len)); */
-	 
-      switch(ntohs(*tag_type))
-	{
-	case PPPOE_TAG_TYPE_EOL:
-	  goto stop;
-	  
-	case PPPOE_TAG_TYPE_SERV_NAME:
-	case PPPOE_TAG_TYPE_AC_NAME:
-	case PPPOE_TAG_TYPE_SERV_NAME_ERR:
-	case PPPOE_TAG_TYPE_AC_SYS_ERR:
-	case PPPOE_TAG_TYPE_GEN_ERR:
-	  if(ntohs(*tag_len) > 0)
-	    {
-	      tag_value = payload + 4;
-	      value = fake_unicode(tag_value, ntohs(*tag_len));
-	      /* debug("[PPPoED TAG] value: %s", value); */
-	    }
-	  break;
-	  
-	case PPPOE_TAG_TYPE_HOST_UNIQ:
-	case PPPOE_TAG_TYPE_AC_COOKIE:
-	case PPPOE_TAG_TYPE_VENDOR_SPEC:
-	case PPPOE_TAG_TYPE_REL_SESS_ID:
-	  if(ntohs(*tag_len) > 0)
-	    {
-	      tag_value = payload + 4;
-	      value = hex_string(tag_value, ntohs(*tag_len));
-	      /* debug("[PPPoED TAG] value: %s", value); */
-	    }
-	  break;
-
-	default:
-	  if(ntohs(*tag_len) > 0)
-	    {
-	      tag_value = payload + 4;
-	      value = fake_unicode(tag_value, ntohs(*tag_len));
-	      /* debug("[PPPoE TAG] value: %s", value); */
-	    }
-	  break;
-	}
-      
-      /* Clean all */
-      if(value != NULL)
-      	{
-      	  free(value);
-      	  value = NULL;
-      	  tag_value = NULL;
-      	}
-      
-      /* debug("-------------------------------------------"); */
+  while (totlen > 0) {  
+    tag_type = (_uint16 *)payload;
+    tag_len =  (_uint16 *)(tag_type + 1);
     
-      payload += len;
-      totlen -= len;
+    len = 4 + ntohs(*tag_len);
+    
+    /* debug("-------------------------------------------"); */
+    /* debug("[PPPoED TAG] type: 0x%x ; len: %d", ntohs(*tag_type), ntohs(*tag_len)); */
+    
+    switch(ntohs(*tag_type)) {
+    case PPPOE_TAG_TYPE_EOL:
+      goto stop;
+      
+    case PPPOE_TAG_TYPE_SERV_NAME:
+    case PPPOE_TAG_TYPE_AC_NAME:
+    case PPPOE_TAG_TYPE_SERV_NAME_ERR:
+    case PPPOE_TAG_TYPE_AC_SYS_ERR:
+    case PPPOE_TAG_TYPE_GEN_ERR:
+      if (ntohs(*tag_len) > 0) {
+	tag_value = payload + 4;
+	value = fake_unicode(tag_value, ntohs(*tag_len));
+	/* debug("[PPPoED TAG] value: %s", value); */
+      }
+      break;
+      
+    case PPPOE_TAG_TYPE_HOST_UNIQ:
+    case PPPOE_TAG_TYPE_AC_COOKIE:
+    case PPPOE_TAG_TYPE_VENDOR_SPEC:
+    case PPPOE_TAG_TYPE_REL_SESS_ID:
+      if(ntohs(*tag_len) > 0) {
+	tag_value = payload + 4;
+	value = hex_string(tag_value, ntohs(*tag_len));
+	/* debug("[PPPoED TAG] value: %s", value); */
+      }
+      break;
+      
+    default:
+      if (ntohs(*tag_len) > 0) {
+	tag_value = payload + 4;
+	value = fake_unicode(tag_value, ntohs(*tag_len));
+	/* debug("[PPPoE TAG] value: %s", value); */
+      }
+      break;
     }
 
+    lua_pushnumber(L, ntohs(*tag_type));
+    lua_pushstring(L, value);
+    lua_settable(L, -3);
+    
+    /* Cleanup */
+    if (value != NULL) {
+      free(value);
+      value = NULL;
+      tag_value = NULL;
+    }
+    
+    payload += len;
+    totlen -= len;
+  }
+  
  stop:
+
+  /* Make the table read-only */
+  se_setro(L);
+
   return 1;
 }
 
@@ -257,7 +256,7 @@ static const struct luaL_reg pppoe_methods[] = {
   {"code", l_pppoe_code},
   {"session", l_pppoe_session},
   {"payload_length", l_pppoe_payload_len},
-  /* {"tags", l_pppoe_tags}, */
+  {"tags", l_pppoe_tags},
   {NULL, NULL}
 };
 

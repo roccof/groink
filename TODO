@@ -37,9 +37,6 @@
 * PPP protocol
    rfc1661 - http://www.rfc-editor.org/rfc/rfc1661.txt
 
-* PPPoE tags
-   rfc2516 - http://www.rfc-editor.org/rfc/rfc2516.txt
-
 * IPv4 options
    rfc791 - page 15 - http://www.rfc-editor.org/rfc/rfc791.txt
    http://www.tcpipguide.com/free/t_IPDatagramOptionsandOptionFormat.htm
