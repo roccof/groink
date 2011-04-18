@@ -19,12 +19,12 @@
 #ifndef GROINK_HOOK_H
 #define GROINK_HOOK_H
 
-typedef enum {
+typedef enum _grk_hook_data_type {
   HOOKDATA_NONE,
   HOOKDATA_PACKET
 } hookdata_type_t;
 
-typedef enum {
+typedef enum _grk_hook_event {
   HOOK_PRE_START_SNIFF,     /* Pre start sniffing */
   HOOK_AT_EXIT,             /* Called at exit */
   HOOK_ON_ERROR,            /* Called on error */

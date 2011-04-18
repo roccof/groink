@@ -14,6 +14,7 @@ groink_SOURCES =				\
 		parse_options.c			\
 		protos.c			\
 		protocols/arp.c			\
+		protocols/ipv4.c		\
 		protocols/ethernet.c		\
 		protocols/pppoe.c		\
 		protocols/raw.c			\
@@ -43,6 +44,7 @@ noinst_HEADERS =				\
 		protos.h			\
 		protos_name.h			\
 		protocols/arp.h			\
+		protocols/ipv4.h		\
 		protocols/ethernet.h		\
 		protocols/pppoe.h		\
 		protocols/raw.h			\

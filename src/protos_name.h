@@ -23,5 +23,6 @@
 #define PROTO_NAME_ARP "arp"
 #define PROTO_NAME_PPPOE "pppoe"
 #define PROTO_NAME_RAW "raw"
+#define PROTO_NAME_IPV4 "ipv4"
 
 #endif /* GROINK_PROTOS_NAMES_H */

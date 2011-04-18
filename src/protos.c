@@ -22,6 +22,7 @@
 #include "protocols/arp.h"
 #include "protocols/pppoe.h"
 #include "protocols/raw.h"
+#include "protocols/ipv4.h"
 #include "debug.h"
 #include "base.h"
 #include "hashtable.h"
@@ -34,6 +35,7 @@ static const proto_cb protos[] = {
   register_arp,
   register_pppoe,
   register_raw,
+  register_ipv4,
   NULL
 };
 

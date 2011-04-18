@@ -73,6 +73,7 @@ static int l_header_gc(lua_State *L)
 static int l_header_eq(lua_State *L)
 {
   /* header_t *h = check_header(L, -1); */
+  /* TODO */
   return 0;
 }
 

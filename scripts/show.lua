@@ -21,7 +21,6 @@
 local core = require("core")
 local printf = core.printf
 local ouidb = require("ouidb")
-local dump = require("dump")
 
 -- Print IEEE 802.11 radiotap header
 -- local function print_ieee80211_radio(radio)
@@ -302,11 +301,6 @@ end
 --       printf("time exceeded ")
 --    end
 --    printf("\n")
--- end
-
--- Print raw header
--- local function print_raw(raw)
---    dump.hex_ascii(raw:data(), raw:length())
 -- end
 
 function proc_pkt(p)
