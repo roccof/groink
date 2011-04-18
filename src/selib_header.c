@@ -45,6 +45,13 @@ static int l_header_len(lua_State *L)
   return 1;
 }
 
+static int l_header_proto(lua_State *L)
+{
+  header_t *h = check_header(L, -1);
+  lua_pushstring(L, h->proto);
+  return 1;
+}
+
 static int l_header_tostring(lua_State *L)
 {
   header_t *h = check_header(L, -1);
@@ -116,6 +123,7 @@ static int l_header_index(lua_State *L)
 static const struct luaL_reg header_methods[] = {
   {"rawdata", l_header_rawdata},
   {"len", l_header_len},
+  {"proto", l_header_proto},
   {NULL, NULL}
 };
 

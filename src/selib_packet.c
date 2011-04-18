@@ -195,8 +195,8 @@ static int l_packet_tostring(lua_State *L)
 
 static int l_packet_gc(lua_State *L)
 {
-  packet_t *p = check_packet(L, -1);
-  packet_free(p);
+  /* packet_t *p = check_packet(L, -1); */
+  /* packet_free(p); */
   return 0;
 }
 

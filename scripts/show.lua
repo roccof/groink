@@ -125,34 +125,43 @@ local dump = require("dump")
 --    end
 -- end
 
--- Print PPPoE header
--- local function print_pppoe(pppoe)
---    printf("PPPoE")
+-- Print PPPoE Discovery header
+local function print_pppoe(p)
 
---    if pppoe:code() == PppoeCode.SESSION then
---       printf("S Session data, ")
---    elseif pppoe:code() == PppoeCode.DISCOVER_PADI then
---       printf("D PADI packet, ")
---    elseif pppoe:code() == PppoeCode.DISCOVER_PADO then
---       printf("D PADO packet, ")
---    elseif pppoe:code() == PppoeCode.DISCOVER_PADR then
---       printf("D PADR packet, ")
---    elseif pppoe:code() == PppoeCode.DISCOVER_PADT then
---       printf("D PADT packet, ")
---    elseif pppoe:code() == PppoeCode.DISCOVER_PADS then
---       printf("D PADS packet, ")
---    end
+   local pppoe = p:get_header(Proto.PPPOE)
 
---    printf("version %d, type %d, code 0x%02x, session id 0x%0002x, payload length %d\n", pppoe:version(), pppoe:type(),
--- 	  pppoe:code(), pppoe:session(), pppoe:payload_length())
+   if pppoe:code() == PPPoE.CODE_SESSION then
+      return
+   end
 
---    -- local tags = pppoe:tags()
---    -- if tags ~= nil then
---    --    for k,v in pairs(tags) do
---    -- 	 printf("\t%x : %s\n", k, v)
---    --    end
---    -- end
--- end
+   printf("PPPoED ")
+
+   if pppoe:code() == PPPoE.CODE_DISCOVER_PADI then
+      printf("PADI packet, ")
+   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADO then
+      printf("PADO packet, ")
+   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADR then
+      printf("PADR packet, ")
+   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADT then
+      printf("PADT packet, ")
+   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADS then
+      printf("PADS packet, ")
+   end
+
+   printf("version %d, type %d, code 0x%02x, session id 0x%0002x, payload length %d",
+	  pppoe:version(), pppoe:type(), pppoe:code(), pppoe:session(), 
+	  pppoe:payload_length())
+
+   local tags = pppoe:tags()
+   if tags ~= nil then
+      printf(", tags:\n")
+      for k,v in pairs(tags) do
+   	 printf("\t0x%x : %s\n", k, v)
+      end
+   else
+      printf("\n")
+   end
+end
 
 -- Print ARP/RARP packet
 local function print_arp(p)
@@ -303,6 +312,8 @@ end
 function proc_pkt(p)
    if p:contains_header(Proto.ARP) then
       print_arp(p)
+   elseif p:contains_header(Proto.PPPOE) then
+      print_pppoe(p)
    -- elseif p:contains_header(Proto.ICMP) then
    --    print_icmp(p)
    -- elseif p:contains_header(Proto.TCP) then

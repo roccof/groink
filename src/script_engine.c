@@ -265,6 +265,12 @@ void se_close()
     if(lua_pcall(gbls->L, 0, 0, 1) != 0)
 	se_fatal("%s", lua_tostring(gbls->L, -1));
 
+  /* Performs a full garbage-collection cycle */
+  lua_getglobal(gbls->L, "collectgarbage");
+  myassert(!lua_isnil(gbls->L, -1));
+  lua_pushstring(gbls->L, "collect");
+  lua_pcall(gbls->L, 1, 0, 1);
+
   /* Close lua */
   lua_close(gbls->L);
   gbls->L = NULL;
