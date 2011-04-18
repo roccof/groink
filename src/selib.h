@@ -52,8 +52,6 @@ enum se_const_type {
   SE_TBOOLEAN
 };
 
-
-
 typedef struct _grk_se_constant {
   char* name;
   union _val {

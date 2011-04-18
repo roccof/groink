@@ -16,12 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_PROTOS_NAMES_H
-#define GROINK_PROTOS_NAMES_H
+#ifndef GROINK_RAW_H
+#define GROINK_RAW_H
 
-#define PROTO_NAME_ETHER "ether"
-#define PROTO_NAME_ARP "arp"
-#define PROTO_NAME_PPPOE "pppoe"
-#define PROTO_NAME_RAW "raw"
+void register_raw();
 
-#endif /* GROINK_PROTOS_NAMES_H */
+#endif /* GROINK_RAW_H */

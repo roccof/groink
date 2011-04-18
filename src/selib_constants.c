@@ -34,6 +34,7 @@ static const se_constant_t protos_const[] = {
   {"ETHER", { .str = PROTO_NAME_ETHER }, SE_TSTRING},
   {"ARP", { .str = PROTO_NAME_ARP }, SE_TSTRING},
   {"PPPOE", { .str = PROTO_NAME_PPPOE }, SE_TSTRING},
+  {"RAW", { .str = PROTO_NAME_RAW }, SE_TSTRING},
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
 

@@ -106,8 +106,7 @@ static int decode_arp(packet_t *p, const _uint8 *bytes, size_t len)
 
  err:
   debug("malformed ARP header, invalid length");
-  /* return call_decoder(PROTO_RAW, p, bytes, len); */
-  return DECODE_OK;
+  return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 
 static int l_arp_hrd(lua_State *L)

@@ -56,8 +56,7 @@ static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
 
  err:
   debug("malformed PPPoE header: invalid length");
-  /* return call_decoder(PROTO_RAW, p, bytes, len); */
-  return DECODE_OK;
+  return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 
 static int l_pppoe_is_discovery(lua_State *L)

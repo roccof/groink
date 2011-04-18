@@ -52,7 +52,7 @@ int start_decoding(packet_t *p, const rawpacket_t *rp)
     default:
       debug("data link protocol '%s' not supported", 
 	    pcap_datalink_val_to_name(gbls->dlt));
-      /* status = call_decoder(PROTO_RAW, p, p->data, p->len); */
+      status = call_decoder(PROTO_NAME_RAW, p, p->data, p->len);
     }
 
   return status;

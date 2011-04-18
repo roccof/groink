@@ -86,9 +86,8 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
   default:
     /* Insert error */
     ADD_ERROR(header, UNKNOWN_ETHER_TYPE);
-    /* return call_decoder(PROTO_NAME_RAW, p, (bytes + ETHER_HDR_LEN), 
-       (len - ETHER_HDR_LEN)); */
-    return DECODE_OK;
+    return call_decoder(PROTO_NAME_RAW, p, (bytes + ETHER_HDR_LEN), 
+			(len - ETHER_HDR_LEN));
   }
 }
 

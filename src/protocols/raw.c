@@ -16,12 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_PROTOS_NAMES_H
-#define GROINK_PROTOS_NAMES_H
+#include "base.h"
+#include "packet.h"
+#include "raw.h"
+#include "protos.h"
+#include "protos_name.h"
 
-#define PROTO_NAME_ETHER "ether"
-#define PROTO_NAME_ARP "arp"
-#define PROTO_NAME_PPPOE "pppoe"
-#define PROTO_NAME_RAW "raw"
+static int decode_raw(packet_t *p, const _uint8 *bytes, size_t len)
+{
+  packet_append_header(p, PROTO_NAME_RAW, (void *)bytes, len);
+  return DECODE_OK;
+}
 
-#endif /* GROINK_PROTOS_NAMES_H */
+void register_raw()
+{
+  proto_t *p = (proto_t *)safe_alloc(sizeof(proto_t));
+  p->name = PROTO_NAME_RAW;
+  p->longname = "Raw Header";
+  p->layer = L5;
+  p->decoder = decode_raw;
+  p->methods = NULL;
+  
+  proto_register_byname(PROTO_NAME_RAW, p);
+}

@@ -21,6 +21,7 @@
 #include "protocols/ethernet.h"
 #include "protocols/arp.h"
 #include "protocols/pppoe.h"
+#include "protocols/raw.h"
 #include "debug.h"
 #include "base.h"
 #include "hashtable.h"
@@ -32,6 +33,7 @@ static const proto_cb protos[] = {
   register_ether,
   register_arp,
   register_pppoe,
+  register_raw,
   NULL
 };
 

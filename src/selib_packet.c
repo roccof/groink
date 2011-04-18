@@ -222,9 +222,6 @@ static const struct luaL_reg packet_methods[] = {
   {"get_header", l_packet_get_header},
   {"len", l_packet_len},
   {"data", l_packet_data},
-  /* {"is_ip_packet", l_packet_isip}, */
-  /* {"is_tcp_packet", l_packet_istcp}, */
-  /* {"is_udp_packet", l_packet_isudp}, */
   {"contains_header", l_packet_contains},
   {"hw_srcaddr", l_packet_src_hwaddr},
   {"hw_dstaddr", l_packet_dst_hwaddr},
