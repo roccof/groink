@@ -49,7 +49,7 @@
  * Those sources are based on linux <netinet/tcp.h>
  */
 
-typedef struct _tcp {
+typedef struct _grk_tcp {
   _uint16 src_port;        /* Source port */
   _uint16 dest_port;       /* Destination port */
   _uint32 seq;             /* Sequence number */

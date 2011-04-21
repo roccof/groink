@@ -25,5 +25,6 @@
 #define PROTO_NAME_RAW "raw"
 #define PROTO_NAME_IPV4 "ipv4"
 #define PROTO_NAME_TCP "tcp"
+#define PROTO_NAME_UDP "udp"
 
 #endif /* GROINK_PROTOS_NAMES_H */

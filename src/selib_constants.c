@@ -38,6 +38,7 @@ static const se_constant_t protos_const[] = {
   {"RAW", { .str = PROTO_NAME_RAW }, SE_TSTRING},
   {"IPV4", { .str = PROTO_NAME_IPV4 }, SE_TSTRING},
   {"TCP", { .str = PROTO_NAME_TCP }, SE_TSTRING},
+  {"UDP", { .str = PROTO_NAME_UDP }, SE_TSTRING},
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
 

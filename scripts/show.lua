@@ -261,10 +261,11 @@ local function print_tcp(p)
 end
 
 -- Print udp packet
--- local function print_udp(p)
---    local udp = p:get_header(Proto.UDP)
---    printf("UDP %s:%d > %s:%d\n", p:src_netaddr(), udp:src_port(), p:dst_netaddr(), udp:dst_port())
--- end
+local function print_udp(p)
+   local udp = p:get_header(Proto.UDP)
+   printf("UDP %s:%d > %s:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
+	  p:net_dstaddr(), udp:dst_port(), udp:cksum())
+end
 
 -- Print icmp header
 -- local function print_icmp(p)
@@ -317,7 +318,7 @@ function proc_pkt(p)
    --    print_icmp(p)
    elseif p:contains_header(Proto.TCP) then
       print_tcp(p)
-   -- elseif p:contains_header(Proto.UDP) then
-   --    print_udp(p)
+   elseif p:contains_header(Proto.UDP) then
+      print_udp(p)
    end
 end
