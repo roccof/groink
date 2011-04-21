@@ -20,7 +20,7 @@
 #define GROINK_ARP_H
 
 #include "base.h"
-//#include "ipv4.h"
+#include "ipv4.h"
 #include "ethernet.h"
 
 /*
@@ -37,9 +37,6 @@ typedef struct _arp
   _uint8 pln;        /* Length of protocol address */
   _uint16 opcode;    /* ARP opcode (command) */
 } arp_t;
-
-/* tmp */
-#define IPV4_ADDR_LEN 4
 
 /* Ethernet arp additional info (only into Ethernet networks) */
 typedef struct _arp_ethip

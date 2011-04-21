@@ -60,15 +60,15 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
 
   case IPV4_PROTO_TCP:
     return call_decoder(PROTO_NAME_TCP, p, (bytes + IPV4_HDR_LEN(ip)),
-       (len - IPV4_HDR_LEN(ip)));
+			(len - IPV4_HDR_LEN(ip)));
     
   case IPV4_PROTO_UDP:
     return call_decoder(PROTO_NAME_UDP, p, (bytes + IPV4_HDR_LEN(ip)),
-       (len - IPV4_HDR_LEN(ip)));
+			(len - IPV4_HDR_LEN(ip)));
     
-  /* case IPV4_PROTO_ICMP: */
-  /*   return call_decoder(PROTO_ICMP, p, (bytes + IPV4_HDR_LEN(ip)),  */
-  /*      (len - IPV4_HDR_LEN(ip))); */
+  case IPV4_PROTO_ICMP:
+    return call_decoder(PROTO_NAME_ICMP, p, (bytes + IPV4_HDR_LEN(ip)),
+			(len - IPV4_HDR_LEN(ip)));
     
   default:
     /* Unknown layer 4 protocol */

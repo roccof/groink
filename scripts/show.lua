@@ -268,54 +268,54 @@ local function print_udp(p)
 end
 
 -- Print icmp header
--- local function print_icmp(p)
---    local icmp = p:get_header(Proto.ICMP)
---    local body = icmp:body()
+local function print_icmp(p)
+   local icmp = p:get_header(Proto.ICMP)
+   local body = icmp:body()
    
---    printf("ICMP %s > %s ", p:src_netaddr(), p:dst_netaddr())
+   printf("ICMP %s > %s ", p:net_srcaddr(), p:net_dstaddr())
    
---    if icmp:type() == IcmpType.ECHO then
---       printf("echo request")
---    elseif icmp:type() == IcmpType.ECHO_REPLY then
---       printf("echo reply")
---    elseif icmp:type() == IcmpType.REDIRECT then
---       printf("redirect ")
---       if body ~= nil then
--- 	 if icmp:code() == IcmpCode.REDIRECT_NET then
--- 	    printf("to net %s ", body.gw_addr)
--- 	 elseif icmp:code() == Icmp4.REDIRECT_HOST then
--- 	    printf("to host %s ", body.gw_addr)
--- 	 else
--- 	    printf("to %s ", body.gw_addr)
--- 	 end
---       end
---    elseif icmp:type() == IcmpType.DEST_UNREACH then
---       if icmp:code() == IcmpCode.UNREACH_NET then
--- 	 printf("network unreachable")
---       elseif icmp:code() == IcmpCode.UNREACH_HOST then
--- 	 printf("host unreachable")
---       elseif icmp:code() == IcmpCode.UNREACH_PROTO then
--- 	 printf("protocol unreachable")
---       elseif icmp:code() == IcmpCode.UNREACH_PORT then
--- 	 printf("port unreachable")
---       elseif icmp:code() == IcmpCode.FRAG_NEEDED then
--- 	 printf("fragmentation needed")
---       else
--- 	 printf("destination unreachable")
---       end
---    elseif icmp:type() == IcmpType.TIME_EXCEEDED then
---       printf("time exceeded ")
---    end
---    printf("\n")
--- end
+   if icmp:type() == ICMP.TYPE_ECHO then
+      printf("echo request")
+   elseif icmp:type() == ICMP.TYPE_ECHO_REPLY then
+      printf("echo reply")
+   elseif icmp:type() == ICMP.TYPE_REDIRECT then
+      printf("redirect ")
+      if body ~= nil then
+	 if icmp:code() == ICMP.CODE_REDIR_NET then
+	    printf("to net %s ", body.gw_addr)
+	 elseif icmp:code() == ICMP.CODE_REDIR_HOST then
+	    printf("to host %s ", body.gw_addr)
+	 else
+	    printf("to %s ", body.gw_addr)
+	 end
+      end
+   elseif icmp:type() == ICMP.TYPE_DEST_UNREACH then
+      if icmp:code() == ICMP.CODE_UNREACH_NET then
+	 printf("network unreachable")
+      elseif icmp:code() == ICMP.CODE_UNREACH_HOST then
+	 printf("host unreachable")
+      elseif icmp:code() == ICMP.CODE_UNREACH_PROTO then
+	 printf("protocol unreachable")
+      elseif icmp:code() == ICMP.CODE_UNREACH_PORT then
+	 printf("port unreachable")
+      elseif icmp:code() == ICMP.CODE_UNREACH_FRAG_NEEDED then
+	 printf("fragmentation needed")
+      else
+	 printf("destination unreachable")
+      end
+   elseif icmp:type() == ICMP.TYPE_TIME_EXCEEDED then
+      printf("time exceeded ")
+   end
+   printf("\n")
+end
 
 function proc_pkt(p)
    if p:contains_header(Proto.ARP) then
       print_arp(p)
    elseif p:contains_header(Proto.PPPOE) then
       print_pppoe(p)
-   -- elseif p:contains_header(Proto.ICMP) then
-   --    print_icmp(p)
+   elseif p:contains_header(Proto.ICMP) then
+      print_icmp(p)
    elseif p:contains_header(Proto.TCP) then
       print_tcp(p)
    elseif p:contains_header(Proto.UDP) then

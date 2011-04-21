@@ -82,7 +82,7 @@ static int l_udp_src_port(lua_State *L)
   return 1;
 }
 
-static int l_udp_len(lua_State *L)
+static int l_udp_payload_len(lua_State *L)
 {
   header_t *header = NULL;
   udp_t *udp = NULL;
@@ -112,7 +112,7 @@ static const struct luaL_reg udp_methods[] = {
   {"dst_port", l_udp_dst_port},
   {"src_port", l_udp_src_port},
   {"cksum", l_udp_cksum},
-  {"length", l_udp_len},
+  {"payload_len", l_udp_payload_len},
   {NULL, NULL}
 };
 
