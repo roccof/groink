@@ -22,6 +22,7 @@
 #include "protocols/ethernet.h"
 #include "protocols/arp.h"
 #include "protocols/pppoe.h"
+#include "protocols/ipv4.h"
 #include "protos_name.h"
 #include "selib.h"
 
@@ -36,6 +37,14 @@ static const se_constant_t protos_const[] = {
   {"PPPOE", { .str = PROTO_NAME_PPPOE }, SE_TSTRING},
   {"RAW", { .str = PROTO_NAME_RAW }, SE_TSTRING},
   {"IPV4", { .str = PROTO_NAME_IPV4 }, SE_TSTRING},
+  {"TCP", { .str = PROTO_NAME_TCP }, SE_TSTRING},
+  {NULL, { .num = 0 }, SE_TNUMBER}
+};
+
+static const se_constant_t ip_const[] = {
+  {"MAX_PACKET_SIZE", { .num = IPV4_MAXPACKET }, SE_TNUMBER},
+  {"MAX_PACKET_MAX_TTL", { .num = IPV4_MAXTTL }, SE_TNUMBER},
+  {"MAX_PACKET_DEFAULT_TTL", { .num = IPV4_DEFTTL }, SE_TNUMBER},
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
 
@@ -75,6 +84,7 @@ static const struct _grk_consts consts[] = {
   {"Proto", protos_const},
   {"ARP", arp_const},
   {"PPPoE", pppoe_const},
+  {"IPv4", ip_const},
   {NULL, NULL}
 };
 

@@ -212,48 +212,53 @@ local function print_arp(p)
 end
 
 -- Print tcp packet
--- local function print_tcp(p)
---    local tcp = p:get_header(Proto.TCP)
---    local fcount = 0  -- Flags counter
+local function print_tcp(p)
+   local tcp = p:get_header(Proto.TCP)
+   local fcount = 0  -- Flags counter
 
---    printf("TCP %s:%d > %s:%d flags [", p:src_netaddr(), tcp:src_port(), p:dst_netaddr(), tcp:dst_port())
---    if tcp:flag_fin() then
---       printf("F")
---       fcount = fcount + 1
---    end
+   printf("TCP %s:%d > %s:%d flags [", p:net_srcaddr(), tcp:src_port(), 
+	  p:net_dstaddr(), tcp:dst_port())
 
---    if tcp:flag_syn() then
---       printf("S")
---       fcount = fcount + 1
---    end
+   local flags = tcp:flags()
 
---    if tcp:flag_rst() then
---       printf("R")
---       fcount = fcount + 1
---    end
+   if flags.fin then
+      printf("F")
+      fcount = fcount + 1
+   end
 
---    if tcp:flag_push() then
---       printf("P")
---       fcount = fcount + 1
---    end
+   if flags.syn then
+      printf("S")
+      fcount = fcount + 1
+   end
 
---    if tcp:flag_ack() then
---       printf("A")
---       fcount = fcount + 1
---    end
+   if flags.rst then
+      printf("R")
+      fcount = fcount + 1
+   end
 
---    if tcp:flag_urg() then
---       printf("U")
---       fcount = fcount + 1
---    end
+   if flags.push then
+      printf("P")
+      fcount = fcount + 1
+   end
 
---    -- If there aren't flags print "none"
---    if fcount == 0 then
---       printf("none")
---    end
+   if flags.ack then
+      printf("A")
+      fcount = fcount + 1
+   end
 
---    printf("]\n")
--- end
+   if flags.urg then
+      printf("U")
+      fcount = fcount + 1
+   end
+
+   -- If there aren't flags print "none"
+   if fcount == 0 then
+      printf("none")
+   end
+
+   printf("] seq %d, ack %d, win %d, cksum 0x%x\n", tcp:seq(), tcp:ack(), 
+	  tcp:window(), tcp:cksum())
+end
 
 -- Print udp packet
 -- local function print_udp(p)
@@ -310,8 +315,8 @@ function proc_pkt(p)
       print_pppoe(p)
    -- elseif p:contains_header(Proto.ICMP) then
    --    print_icmp(p)
-   -- elseif p:contains_header(Proto.TCP) then
-   --    print_tcp(p)
+   elseif p:contains_header(Proto.TCP) then
+      print_tcp(p)
    -- elseif p:contains_header(Proto.UDP) then
    --    print_udp(p)
    end

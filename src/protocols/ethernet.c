@@ -69,9 +69,10 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
   p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr);
 
   switch (ntohs(eth->type)) {
-  /* case ETHER_TYPE_IP: */
-  /*   return call_decoder(PROTO_NAME_IPV4, p, (bytes + ETHER_HDR_LEN), 
-       (len - ETHER_HDR_LEN)); */
+
+  case ETHER_TYPE_IP:
+    return call_decoder(PROTO_NAME_IPV4, p, (bytes + ETHER_HDR_LEN), 
+       (len - ETHER_HDR_LEN));
     
   case ETHER_TYPE_ARP:
   case ETHER_TYPE_REVARP:

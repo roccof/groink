@@ -56,25 +56,25 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
     ADD_ERROR(h, ERR_IPV4_BAD_VERSION);
   }
 
-  /* switch (ip->proto) { */
-  /* case IPV4_PROTO_TCP: */
-  /*   return call_decoder(PROTO_TCP, p, (bytes + IPV4_HDR_LEN(ip)), 
-       (len - IPV4_HDR_LEN(ip))); */
+  switch (ip->proto) {
+
+  case IPV4_PROTO_TCP:
+    return call_decoder(PROTO_NAME_TCP, p, (bytes + IPV4_HDR_LEN(ip)),
+       (len - IPV4_HDR_LEN(ip)));
     
   /* case IPV4_PROTO_UDP: */
-  /*   return call_decoder(PROTO_UDP, p, (bytes + IPV4_HDR_LEN(ip)), 
-       (len - IPV4_HDR_LEN(ip))); */
+  /*   return call_decoder(PROTO_UDP, p, (bytes + IPV4_HDR_LEN(ip)),  */
+  /*      (len - IPV4_HDR_LEN(ip))); */
     
   /* case IPV4_PROTO_ICMP: */
-  /*   return call_decoder(PROTO_ICMP, p, (bytes + IPV4_HDR_LEN(ip)), 
-       (len - IPV4_HDR_LEN(ip))); */
+  /*   return call_decoder(PROTO_ICMP, p, (bytes + IPV4_HDR_LEN(ip)),  */
+  /*      (len - IPV4_HDR_LEN(ip))); */
     
-  /* default: */
-  /*   /\* Unknown layer 4 protocol *\/ */
-  /*   return call_decoder(PROTO_RAW, p, (bytes + IPV4_HDR_LEN(ip)), 
-       (len - IPV4_HDR_LEN(ip))); */
-  /* } */
-  return DECODE_OK;
+  default:
+    /* Unknown layer 4 protocol */
+    return call_decoder(PROTO_NAME_RAW, p, (bytes + IPV4_HDR_LEN(ip)), 
+			(len - IPV4_HDR_LEN(ip)));
+  }
 }
 
 static int l_ipv4_ihl(lua_State *L)
@@ -110,6 +110,10 @@ static int l_ipv4_tos(lua_State *L)
   
   header = check_header(L, 1);
   ip = (ipv4_t *)header->data;
+
+  /*
+   * TODO: return a table with all values...
+   */
 
   lua_pushnumber(L, ip->tos);
 
