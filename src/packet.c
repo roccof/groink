@@ -67,12 +67,8 @@ header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t le
   return h;
 }
 
-packet_t *packet_new(_uint8 *data, size_t len)
+static void packet_init(packet_t *p)
 {
-  packet_t *p = (packet_t *)safe_alloc(sizeof(packet_t));
-  p->data = (_uint8 *)safe_alloc(len);
-  memcpy(p->data, data, len);
-  p->len = len;
   p->headers = NULL;
   p->num_headers = 0;
   p->flags = 0;
@@ -80,6 +76,25 @@ packet_t *packet_new(_uint8 *data, size_t len)
   p->hw_dstaddr = NULL;
   p->net_srcaddr = NULL;
   p->net_dstaddr = NULL;
+}
+
+packet_t *packet_new(_uint8 *data, size_t len)
+{
+  packet_t *p = (packet_t *)safe_alloc(sizeof(packet_t));
+  p->data = (_uint8 *)safe_alloc(len);
+  memcpy(p->data, data, len);
+  p->len = len;
+  packet_init(p);
+
+  return p;
+}
+
+packet_t *packet_new_empty()
+{
+  packet_t *p = (packet_t *)safe_alloc(sizeof(packet_t));
+  p->data = NULL;
+  p->len = 0;
+  packet_init(p);
 
   return p;
 }
@@ -98,8 +113,10 @@ void packet_free(packet_t *p)
   }
 
   /* Free packet data */
-  free(p->data);
-  p->data = NULL;
+  if (p->data != NULL) {
+    free(p->data);
+    p->data = NULL;
+  }
 
   if (p->hw_srcaddr != NULL) {
     free(p->hw_srcaddr);

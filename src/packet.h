@@ -67,6 +67,7 @@ typedef struct _raw_packet {
 } rawpacket_t;
 
 packet_t *packet_new(_uint8 *data, size_t len);
+packet_t *packet_new_empty();
 void packet_free(packet_t *p);
 header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t len);
 header_t *packet_get_header(packet_t *p, char *proto);
