@@ -53,7 +53,7 @@ static void *processor_thread_cb(void *arg)
     PKT_ADD_FLAG(p, PACKET_FLAG_CAPTURED);
 
     if (gbls->decode)
-      start_decoding(p, rp);
+      start_decoding(p);
 
     free(rp->data);
     free(rp);

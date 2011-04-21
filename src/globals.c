@@ -23,9 +23,9 @@
 #include "base.h"
 #include "debug.h"
 #include "globals.h"
-/* #include "host.h" */
+#include "host.h"
 /* #include "mitm.h" */
-/* #include "script_engine.h" */
+#include "script_engine.h"
 #include "capture.h"
 
 void globals_init()
@@ -40,7 +40,7 @@ void globals_init()
   gbls->daemon = 0;
   gbls->scan = 1;
 
-  /* gbls->hosts = NULL */
+  gbls->hosts = NULL;
 
   gbls->mtu = 0;
   gbls->link_addr = NULL;
@@ -59,12 +59,12 @@ void globals_init()
   gbls->decode = 1;
   gbls->cap_timeout = CAPTURE_TIMEOUT;
 
-  /* gbls->L = NULL; */
-  /* gbls->script = NULL; */
-  /* bzero(gbls->script_argv, MAX_SCRIPT_ARGS); */
-  /* gbls->script_argc = 0; */
-  /* gbls->script_debug_mode = 0; */
-  /* gbls->scripts_dir = NULL; */
+  gbls->L = NULL;
+  gbls->script = NULL;
+  bzero(gbls->script_argv, MAX_SCRIPT_ARGS);
+  gbls->script_argc = 0;
+  gbls->script_debug_mode = 0;
+  gbls->scripts_dir = NULL;
 
   gbls->mitm = NULL;
   /* gbls->mitm_state = MITM_STATE_STOP; */
@@ -76,7 +76,7 @@ void globals_destroy()
   if (gbls == NULL)
     return;
 
-  /* list_free(&(gbls->hosts), &remove_host_cb); */
+  free_hosts_list();
   
   if (gbls->link_addr != NULL)
     free(gbls->link_addr);

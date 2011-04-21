@@ -7,6 +7,7 @@ groink_SOURCES =				\
 		decoder.c			\
 		globals.c			\
 		hook.c				\
+		host.c				\
 		iface.c				\
 		inject.c			\
 		main.c				\
@@ -42,6 +43,7 @@ noinst_HEADERS =				\
 		globals.h			\
 		hashtable.h			\
 		hook.h				\
+		host.h				\
 		inject.h			\
 		netutil.h			\
 		packet.h			\

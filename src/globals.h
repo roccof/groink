@@ -24,6 +24,7 @@
 
 /* #include "mitm.h" */
 #include "script_engine.h"
+#include "host.h"
 
 struct _grk_globals {
   /* General */
@@ -33,7 +34,8 @@ struct _grk_globals {
   int daemon;                             /* Is daemon mode? */
   int scan;                               /* Host scanning */
 
-  /* List hosts; */                             /* List of all hosts present in the same network */
+  host_t *hosts;                          /* List of all hosts present 
+					     in the same network */
 
   /* Iface info */
   int mtu;                                /* Maximum transfer unit */

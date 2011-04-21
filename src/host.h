@@ -16,25 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_DECODER_H
-#define GROINK_DECODER_H
+#ifndef GROINK_HOST_H
+#define GROINK_HOST_H
 
-#include "packet.h"
+typedef struct _grk_host {
+  char *net_addr;
+  char *hw_addr;
+  struct _grk_host *next;
+} host_t;
 
-#define ADD_ERROR(h, e) ((h)->decoding_errors |= (e))
-#define REMOVE_ERROR(h, e) ((h)->decoding_errors &= ~(e))
-#define HAS_ERROR(h, e) (((h)->decoding_errors & (e)) == (e))
-#define NO_ERRORS 0x00
+void build_hosts_list();
+void free_hosts_list();
 
-#define DECODE_FAIL -1
-#define DECODE_OK 0
-#define DECODER_NOT_FOUND 2
-
-/* Decoder callback function */
-typedef int(*decoder_cb_t)(packet_t *p, const _uint8 *bytes, size_t len);
-
-int start_decoding(packet_t *p);
-int call_decoder(char *proto_name, packet_t *p, const _uint8 *bytes, size_t len);
-int call_decoder_byport(int port, packet_t *p, const _uint8 *bytes, size_t len);
-
-#endif /* GROINK_DECODER_H */
+#endif /* GROINK_HOST_H */

@@ -22,17 +22,18 @@
 #include "debug.h"
 #include "globals.h"
 
-int start_decoding(packet_t *p, const rawpacket_t *rp)
+int start_decoding(packet_t *p)
 {
   unsigned int status = 0;
 
   PKT_ADD_FLAG(p, PACKET_FLAG_DECODED);
 
   switch (gbls->dlt) {
+
       /* Raw IP */
-    /* case DLT_RAW: */
-    /*   status = call_decoder("asd", p, p->data, p->len); */
-    /*   break; */
+    case DLT_RAW:
+      status = call_decoder(PROTO_NAME_IPV4, p, p->data, p->len);
+      break;
 
       /* Ethernet 10/100/1000 header */
     case DLT_EN10MB:

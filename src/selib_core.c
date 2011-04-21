@@ -28,7 +28,8 @@
 #include "globals.h"
 #include "selib.h"
 #include "debug.h"
-/* #include "host.h" */
+#include "host.h"
+#include "utlist.h"
 
 static int l_core_debug_mode(lua_State *L)
 {
@@ -208,42 +209,37 @@ static int l_core_usleep(lua_State *L)
   return 0;
 }
 
-/* static int l_core_scanned_hosts(lua_State *L) */
-/* { */
-/*   Element *curr = NULL; */
-/*   Host *host = NULL; */
-/*   int i = 1; */
+static int l_core_scanned_hosts(lua_State *L)
+{
+  host_t *host = NULL;
+  int i = 1;
 
-/*   lua_newtable(L); */
+  lua_newtable(L);
 
-/*   LIST_FOREACH(curr, &(gbls->hosts)) */
-/*     { */
-/*       host = (Host *)list_elem_content(curr); */
+  LL_FOREACH (gbls->hosts, host) {
+
+      lua_pushnumber(L, i++);
+      lua_newtable(L);
+
+      lua_pushstring(L, "net_addr");
+      lua_pushstring(L, host->net_addr);
+      lua_settable(L, -3);
+
+      lua_pushstring(L, "hw_addr");
+      lua_pushstring(L, host->hw_addr);
+      lua_settable(L, -3);
+
+      /* Set the table in read-only */
+      se_setro(L);
       
-/*       myassert(host != NULL); */
-
-/*       lua_pushnumber(L, i++); */
-/*       lua_newtable(L); */
-
-/*       lua_pushstring(L, "net_addr"); */
-/*       lua_pushstring(L, host->net_addr); */
-/*       lua_settable(L, -3); */
-
-/*       lua_pushstring(L, "hw_addr"); */
-/*       lua_pushstring(L, host->hw_addr); */
-/*       lua_settable(L, -3); */
-
-/*       /\* Set the table in read-only *\/ */
-/*       se_setro(L); */
-      
-/*       lua_settable(L, -3); */
-/*     } */
+      lua_settable(L, -3);
+    }
   
-/*   /\* Set the table in read-only *\/ */
-/*   se_setro(L); */
+  /* Set the table in read-only */
+  se_setro(L);
   
-/*   return 1; */
-/* } */
+  return 1;
+}
 
 static int l_core_dlt(lua_State *L)
 {
@@ -310,7 +306,7 @@ static const struct luaL_reg core_lib[] = {
   {"getcwd", l_core_getcwd},
   {"sleep", l_core_sleep},
   {"usleep", l_core_usleep},
-  /* {"scanned_hosts", l_core_scanned_hosts}, */
+  {"scanned_hosts", l_core_scanned_hosts},
   {"dlt", l_core_dlt},
   {"capturing_stats", l_core_stats},
   {"set_pktdecoding", l_core_set_pktdecoding},

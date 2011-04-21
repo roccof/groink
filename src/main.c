@@ -97,6 +97,12 @@ static void groink_main()
   load_iface_info();
   protos_init();
 
+  /* Build the list with all hosts present in the same network */
+  if(gbls->scan)
+    build_hosts_list();
+
+  /* TODO: possibility to read the hosts from a file */
+
   /* Start raw packet processor */
   start_rp_processor();
 
