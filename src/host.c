@@ -163,16 +163,13 @@ void build_hosts_list() // TODO: ipv6 support
   /* Create a list with all the ips of the subnet */
   for (num=0; num<tot; num++) {
     char *hostip = NULL;
-    
     _uint32 ip_bin = (ip & netmask) | htonl(num);
-    
     hostip = ip_addr_ntoa(*((_uint32 *)&ip_bin));
     
     /* Send ARP request to retrieve mac address */
     inject_arp_request(gbls->link_addr, gbls->net_addr, ETHER_BROADCAST, hostip);
     
     free(hostip);
-    
     usleep(ARP_STORM_WAIT * 1000);
   }
 

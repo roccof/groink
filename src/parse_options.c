@@ -67,7 +67,7 @@ static void print_usage(int status)
   printf("EXAMPLE:\n");
   printf("  groink -i eth0\n");
   printf("  groink -i eth0 dump type=hex\n");
-  printf("  groink -M arpp:192.168.0.1 packet_analyzer\n");
+  printf("  groink -M arpp:192.168.0.1 show\n");
   printf("SEE MAN PAGE FOR MORE INFO\n\n");
 
   exit(status);
@@ -126,26 +126,25 @@ void parse_options(int argc, char **argv)
       break;
 
     case 'M':
+      dup = strdup(optarg);
       
-      /* dup = strdup(optarg); */
-      
-      /* /\* Get MiTM type attack *\/ */
-      /* mitm_tok = strtok_r(dup, ":", &saveptr); */
-      /* if (mitm_tok == NULL || !is_valid_mitm_attack(mitm_tok)) { */
-      /* 	free(dup); */
-      /* 	fatal(__func__, "invalid MiTM attack"); */
-      /* } */
-      /* gbls->mitm = strdup(mitm_tok); */
+      /* Get MiTM type attack */
+      mitm_tok = strtok_r(dup, ":", &saveptr);
+      if (mitm_tok == NULL || !is_valid_mitm_attack(mitm_tok)) {
+      	free(dup);
+      	fatal(__func__, "invalid MiTM attack");
+      }
+      gbls->mitm = strdup(mitm_tok);
 
-      /* /\* Get options *\/ */
-      /* mitm_tok = strchr(optarg, ':'); */
-      /* if (mitm_tok == NULL) { */
-      /* 	free(dup); */
-      /* 	fatal(__func__, "you must specify the required options for the MiTM attack"); */
-      /* } */
-      /* gbls->mitm_options = (mitm_tok + 1); */
+      /* Get options */
+      mitm_tok = strchr(optarg, ':');
+      if (mitm_tok == NULL) {
+      	free(dup);
+      	fatal(__func__, "you must specify the required options for the MiTM attack");
+      }
+      gbls->mitm_options = (mitm_tok + 1);
 
-      /* free(dup); */
+      free(dup);
       break;
 	
     default:

@@ -67,7 +67,7 @@ void globals_init()
   gbls->scripts_dir = NULL;
 
   gbls->mitm = NULL;
-  /* gbls->mitm_state = MITM_STATE_STOP; */
+  gbls->mitm_state = MITM_STATE_STOP;
   gbls->mitm_options = NULL;
 }
 

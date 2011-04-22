@@ -11,6 +11,7 @@ groink_SOURCES =				\
 		iface.c				\
 		inject.c			\
 		main.c				\
+		mitm.c				\
 		netutil.c			\
 		packet.c			\
 		parse_options.c			\
@@ -45,6 +46,7 @@ noinst_HEADERS =				\
 		hook.h				\
 		host.h				\
 		inject.h			\
+		mitm.h				\
 		netutil.h			\
 		packet.h			\
 		parse_options.h			\

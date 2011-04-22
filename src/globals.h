@@ -22,7 +22,7 @@
 #include <lua.h>
 #include <pcap.h>
 
-/* #include "mitm.h" */
+#include "mitm.h"
 #include "script_engine.h"
 #include "host.h"
 
@@ -67,7 +67,7 @@ struct _grk_globals {
 
   /* MiTM attacks */
   char *mitm;                             /* MiTM attack name */
-  /* MiTM_State mitm_state; */                  /* MiTM state */
+  mitm_state_t mitm_state;                /* MiTM state */
   char *mitm_options;
 };
 
