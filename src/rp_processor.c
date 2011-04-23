@@ -28,7 +28,7 @@
 #include "rp_queue.h"
 #include "threads.h"
 #include "decoder.h"
-/* #include "forward.h" */
+#include "forward.h"
 
 static void *processor_thread_cb(void *arg)
 {
@@ -67,9 +67,9 @@ static void *processor_thread_cb(void *arg)
 
     free(hookdata);
     
-    /* /\* If MiTM is active, do packet forwarding *\/ */
-    /* if(gbls->mitm_state == MITM_STATE_START) */
-    /* 	packet_forward(p); */
+    /* If MiTM is active, do packet forwarding */
+    if(gbls->mitm_state == MITM_STATE_START)
+    	packet_forward(p);
     
     packet_free(p);
   }
@@ -81,7 +81,7 @@ static void *processor_thread_cb(void *arg)
 /* Start the packet processor */
 void start_rp_processor()
 {
-  /* init_packet_forward_module(); */
+  init_packet_forward_module();
   thread_new(RP_PROCESSOR_THREAD_NAME, &processor_thread_cb, NULL);
   debug("packet processor started");
 }
@@ -97,6 +97,6 @@ void stop_rp_processor()
 
   thread_stop(thread);
 
-  /* destroy_packet_forward_module(); */
+  destroy_packet_forward_module();
   debug("packet processor stopped");
 }

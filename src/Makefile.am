@@ -5,6 +5,7 @@ groink_SOURCES =				\
 		capture.c			\
 		debug.c				\
 		decoder.c			\
+		forward.c			\
 		globals.c			\
 		hook.c				\
 		host.c				\
@@ -41,6 +42,7 @@ noinst_HEADERS =				\
 		capture.h			\
 		debug.h				\
 		decoder.h			\
+		forward.h			\
 		globals.h			\
 		hashtable.h			\
 		hook.h				\
