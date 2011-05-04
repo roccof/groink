@@ -29,7 +29,7 @@ struct _mitm_attack {
 };
 
 struct _mitm_attack mitms[] = {
-  /* {"arpp", &mitm_start_arp_poisoning, &mitm_stop_arp_poisoning}, */
+  {"arp", &mitm_start_arp_poisoning, &mitm_stop_arp_poisoning},
   {NULL, NULL, NULL}
 };
 

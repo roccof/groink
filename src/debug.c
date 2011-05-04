@@ -23,13 +23,14 @@
 #include "config.h"
 #include "debug.h"
 #include "globals.h"
+#include "base.h"
 
 void fatal(const char *where, const char *message, ...)
 {
   va_list ap;
 
 #ifdef GROINK_DEBUG
-  fprintf(stderr, "[!!] FATAL in %s: ", where);
+  fprintf(stderr, COLORB_RED"[!!]"COLOR_NORMAL" FATAL in %s: ", where);
 #else
   fprintf(stderr, "[!!] FATAL: ");
 #endif
@@ -47,7 +48,7 @@ void se_fatal(const char *message, ...)
 {
   va_list ap;
 
-  fprintf(stderr, "[!!] SE FATAL: ");
+  fprintf(stderr, COLORB_RED"[!!]"COLOR_NORMAL" SE FATAL: ");
 
   va_start(ap, message);
   vfprintf(stderr, message, ap);
@@ -95,7 +96,7 @@ void bug(const char *where, const char *message, ...)
 {
   va_list ap;
 
-  fprintf(stderr, "[!!] Bug in %s: ", where);
+  fprintf(stderr, COLORB_RED"[!!]"COLOR_NORMAL" Bug in %s: ", where);
 
   va_start(ap, message);
   vfprintf(stderr, message, ap);
@@ -111,7 +112,7 @@ void warning(const char *message, ...)
 {
   va_list ap;
 
-  fprintf(stderr, "[*] WARNING: ");
+  fprintf(stderr, COLORB_YELLOW"[*]"COLOR_NORMAL" WARNING: ");
 
   va_start(ap, message);
   vfprintf(stderr, message, ap);
@@ -124,7 +125,7 @@ void se_warning(const char *message, ...)
 {
   va_list ap;
 
-  fprintf(stderr, "[*] SE WARNING: ");
+  fprintf(stderr, COLORB_YELLOW"[*]"COLOR_NORMAL" SE WARNING: ");
 
   va_start(ap, message);
   vfprintf(stderr, message, ap);

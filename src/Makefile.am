@@ -13,6 +13,7 @@ groink_SOURCES =				\
 		inject.c			\
 		main.c				\
 		mitm.c				\
+		mitm_arp_poisoning.c		\
 		netutil.c			\
 		packet.c			\
 		parse_options.c			\

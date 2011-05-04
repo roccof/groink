@@ -27,5 +27,8 @@ typedef struct _grk_host {
 
 void build_hosts_list();
 void free_hosts_list();
+host_t *find_host_bymac(char *mac);
+host_t *find_host_byip(char *ip);
+host_t *host_clone(host_t *h);
 
 #endif /* GROINK_HOST_H */

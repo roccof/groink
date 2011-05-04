@@ -69,7 +69,7 @@ void add_raw_packet(rawpacket_t *rp)
 
   elem = (struct _grk_rp_elem *)safe_alloc(sizeof(struct _grk_rp_elem));
   elem->rp = rp;
-  LL_PREPEND(queue, elem);
+  LL_APPEND(queue, elem);
 
   MUTEX_UNLOCK(&mutex);
 }

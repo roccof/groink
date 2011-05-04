@@ -33,7 +33,7 @@ void mitm_stop();
 int is_valid_mitm_attack(char *name);
 
 /* MiTM ARP Poisoning */
-/* void mitm_start_arp_poisoning(); */
-/* void mitm_stop_arp_poisoning(); */
+void mitm_start_arp_poisoning();
+void mitm_stop_arp_poisoning();
 
 #endif /* GROINK_MITM_H*/

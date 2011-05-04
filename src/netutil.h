@@ -39,5 +39,6 @@ int is_ip_range_addr_notation(char *addr);
 void convert_ip_range_addr_notation(char *addr, void *list);
 int is_ip_cidr_addr_notation(char *addr);
 void convert_ip_cidr_addr_notation(char *addr, void *list);
+int is_ip_group_addr_notation(char *addr);
 
 #endif /* GROINK_NETUTIL_H */

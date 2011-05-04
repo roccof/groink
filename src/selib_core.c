@@ -217,7 +217,6 @@ static int l_core_scanned_hosts(lua_State *L)
   lua_newtable(L);
 
   LL_FOREACH (gbls->hosts, host) {
-
       lua_pushnumber(L, i++);
       lua_newtable(L);
 

@@ -44,8 +44,8 @@ static int contains_host(host_t *h)
   host_t *curr = NULL;
 
   LL_FOREACH (gbls->hosts, curr)
-    if (strcmp(h->hw_addr, curr->hw_addr) == 0 && 
-	strcmp(h->net_addr, curr->net_addr) == 0)
+    if (strncmp(h->hw_addr, curr->hw_addr, strlen(h->hw_addr)) == 0 && 
+	strncmp(h->net_addr, curr->net_addr, strlen(h->net_addr)) == 0)
       return 1;
   return 0;
 }
@@ -89,6 +89,7 @@ static void arp_received_cb(hookdata_t *data)
 
   if (!contains_host(h)) {
     LL_APPEND(gbls->hosts, h);
+    debug("find host %s, %s", h->net_addr, h->hw_addr);
     num_hosts++;
   } else {
     free(h->hw_addr);
@@ -185,7 +186,7 @@ void build_hosts_list() // TODO: ipv6 support
   /* Restore direction */
   pcap_setdirection(gbls->pcap, PCAP_D_INOUT);
 
-  message("Found %d hosts active of %d hosts", num_hosts, tot);
+  message("Found %d hosts active", num_hosts);
 }
 
 void free_hosts_list()
@@ -202,4 +203,33 @@ void free_hosts_list()
     free(curr);
     curr = NULL;
   }
+}
+
+host_t *find_host_bymac(char *mac)
+{
+  host_t *h = NULL;
+
+  LL_FOREACH (gbls->hosts, h)
+    if (strncmp(mac, h->hw_addr, strlen(mac)) == 0)
+      return h;
+  return NULL;
+}
+
+host_t *find_host_byip(char *ip)
+{
+  host_t *h = NULL;
+
+  LL_FOREACH (gbls->hosts, h)
+    if (strncmp(ip, h->net_addr, strlen(ip)) == 0)
+      return h;
+  return NULL;
+}
+
+host_t *host_clone(host_t *host)
+{
+  host_t *h = (host_t *)safe_alloc(sizeof(host_t));
+  h->net_addr = strdup(host->net_addr);
+  h->hw_addr = strdup(host->hw_addr);
+
+  return h;
 }

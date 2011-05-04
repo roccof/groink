@@ -47,12 +47,10 @@ static void cleanup()
   /* Restore terminal settings */
   tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
   debug("terminal restored");
-
   stop_sniffing();
   stop_rp_processor();
-
   se_close();
-
+  mitm_stop();
   protos_destroy();
   cleanup_rp_queue();
   capture_engine_destroy();
@@ -73,14 +71,14 @@ static void signal_handler_cb(int signal)
     size = backtrace(buffer, 10);
     strings = backtrace_symbols(buffer, size);
     
-    printf("[!!] Segmentation fault, please report this to %s\n", PACKAGE_BUGREPORT);    
+    printf(COLORB_RED"[!!]"COLOR_NORMAL" Segmentation fault, please report this to %s\n", PACKAGE_BUGREPORT);    
     printf("Backtrace:\n");
     for(i=0; i<size; i++)
       printf("\t%s\n", strings[i]);
     printf("\n");
     free(strings);
 #else
-    printf("[!!] Segmentation fault, please report this to %s\n", PACKAGE_BUGREPORT);
+    printf(COLORB_RED"[!!]"COLOR_NORMAL" Segmentation fault, please report this to %s\n", PACKAGE_BUGREPORT);
 #endif /* GROINK_DEBUG */
     
     exit(EXIT_FAILURE);
@@ -102,6 +100,9 @@ static void groink_main()
     build_hosts_list();
 
   /* TODO: possibility to read the hosts from a file */
+
+  /* Start MiTM attack if required */
+  mitm_start();
 
   /* Start raw packet processor */
   start_rp_processor();

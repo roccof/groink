@@ -24,7 +24,7 @@
 #include "debug.h"
 #include "globals.h"
 #include "host.h"
-/* #include "mitm.h" */
+#include "mitm.h"
 #include "script_engine.h"
 #include "capture.h"
 

@@ -45,6 +45,9 @@
   "(^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.]" \
   "(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[/]([0-32])$)"
 
+/* Example: 192.168.0.1,2,3,5,20 -- TODO */
+#define IP_GROUP_ADDR_REGEX ""
+
 /* Example: 00:11:22:33:44:55 */
 #define ETHER_ADDR_REGEX "(^[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]$)"
 
@@ -241,4 +244,10 @@ int is_ip_cidr_addr_notation(char *addr)
   }
   regfree(&regex);
   return 0;
+}
+
+/* The address has this format: 192.168.0.1,2,3,4,20 */
+int is_ip_group_addr_notation(char *addr)
+{
+  return 1;
 }
