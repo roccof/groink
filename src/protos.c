@@ -23,6 +23,7 @@
 #include "protocols/pppoe.h"
 #include "protocols/raw.h"
 #include "protocols/ipv4.h"
+#include "protocols/ipv6.h"
 #include "protocols/tcp.h"
 #include "protocols/udp.h"
 #include "protocols/icmp.h"
@@ -42,6 +43,7 @@ static const proto_cb protos[] = {
   register_tcp,
   register_udp,
   register_icmp,
+  register_ipv6,
   NULL
 };
 

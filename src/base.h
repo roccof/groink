@@ -79,8 +79,7 @@ typedef unsigned int _uint;
 typedef unsigned long _ulong;
 
 /* Value to name struct */
-struct _vton
-{
+struct _vton {
   char *name;
   int value;
 };

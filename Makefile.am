@@ -25,8 +25,8 @@ scriptsdir = $(pkgdatadir)/scripts
 scripts_DATA = 			\
 	scripts/default.lua 	\
 	scripts/dump.lua	\
-	scripts/show.lua	
-# 	scripts/isolate.lua 	\
+	scripts/show.lua	\
+ 	scripts/isolate.lua
 #	scripts/scripts.db
 
 CLEANFILES = *.out *~

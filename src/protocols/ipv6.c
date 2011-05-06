@@ -16,17 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_PROTOS_NAMES_H
-#define GROINK_PROTOS_NAMES_H
+#include <lua.h>
+#include <arpa/inet.h>
 
-#define PROTO_NAME_ETHER "ether"
-#define PROTO_NAME_ARP "arp"
-#define PROTO_NAME_PPPOE "pppoe"
-#define PROTO_NAME_RAW "raw"
-#define PROTO_NAME_IPV4 "ipv4"
-#define PROTO_NAME_IPV6 "ipv6"
-#define PROTO_NAME_TCP "tcp"
-#define PROTO_NAME_UDP "udp"
-#define PROTO_NAME_ICMP "icmp"
+#include "base.h"
+#include "packet.h"
+#include "ipv6.h"
+#include "ipv4.h"
+#include "protos.h"
+#include "protos_name.h"
+#include "netutil.h"
+#include "selib.h"
 
-#endif /* GROINK_PROTOS_NAMES_H */
+static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
+{
+  return DECODE_OK;
+}
+
+static const struct luaL_reg ip6_methods[] = {
+  {NULL, NULL}
+};
+
+void register_ipv6()
+{
+  proto_t *p = (proto_t *)safe_alloc(sizeof(proto_t));
+  p->name = PROTO_NAME_IPV6;
+  p->longname = "Internet Protocol version 6";
+  p->layer = L3;
+  p->decoder = decode_ipv6;
+  p->methods = (luaL_reg *)ip6_methods;
+  
+  proto_register_byname(PROTO_NAME_IPV6, p);
+}

@@ -21,6 +21,7 @@ groink_SOURCES =				\
 		protocols/arp.c			\
 		protocols/icmp.c		\
 		protocols/ipv4.c		\
+		protocols/ipv6.c		\
 		protocols/ethernet.c		\
 		protocols/pppoe.c		\
 		protocols/raw.c			\
@@ -58,6 +59,7 @@ noinst_HEADERS =				\
 		protocols/arp.h			\
 		protocols/icmp.h		\
 		protocols/ipv4.h		\
+		protocols/ipv6.h		\
 		protocols/ethernet.h		\
 		protocols/pppoe.h		\
 		protocols/raw.h			\
