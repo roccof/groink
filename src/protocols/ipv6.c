@@ -30,6 +30,26 @@
 
 static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
 {
+  ipv6_t *ip = NULL;
+  header_t *h = NULL;
+
+  if (len < IPV6_HDR_LEN) {
+    debug("too short");
+    call_decoder(PROTO_NAME_RAW, p, bytes, len);
+  }
+
+  ip = (ipv6_t *)bytes;
+
+  h = packet_append_header(p, PROTO_NAME_IPV6, (void *)ip, IPV6_HDR_LEN);
+  
+  p->net_srcaddr = ipv6_addr_ntoa(ip->src_addr);
+  p->net_dstaddr = ipv6_addr_ntoa(ip->dst_addr);
+
+  /* while (1) { */
+    
+  /* } */
+
+ /* end: */
   return DECODE_OK;
 }
 

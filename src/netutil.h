@@ -25,20 +25,29 @@
 
 #define ETHER_BROADCAST "ff:ff:ff:ff:ff:ff"
 
+#define IPV4_STR_ADDR_LEN 16
+#define IPV6_STR_ADDR_LEN 46
+
 #define ARP_STORM_WAIT 10 /* milliseconds */
 
 unsigned char *ether_addr_aton(const char *addr);
 char *ether_addr_ntoa(const unsigned char *bytes);
+int is_ether_addr(char *addr);
+
 _uint32 ip_addr_aton(const char *addr);
 char *ip_addr_ntoa(const _uint32 bytes);
-char *calculate_cksum(unsigned char *data, unsigned int len);
-char *addr_stoa(struct sockaddr *addr);
 int is_ip_addr(char *addr);
-int is_ether_addr(char *addr);
 int is_ip_range_addr_notation(char *addr);
 void convert_ip_range_addr_notation(char *addr, void *list);
 int is_ip_cidr_addr_notation(char *addr);
 void convert_ip_cidr_addr_notation(char *addr, void *list);
 int is_ip_group_addr_notation(char *addr);
+
+int is_ipv6_addr(char *addr);
+_uint8 *ipv6_addr_aton(const char *addr);
+char *ipv6_addr_ntoa(const _uint8 *bytes);
+
+char *calculate_cksum(unsigned char *data, unsigned int len);
+char *addr_stoa(struct sockaddr *addr);
 
 #endif /* GROINK_NETUTIL_H */

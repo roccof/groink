@@ -51,8 +51,8 @@
  *
  */
 
-#define IPV6_ADDR_LEN 40 /* bytes */
-#define IPV6_HDR_LEN 100 /* bytes */
+#define IPV6_ADDR_LEN 16 /* bytes */
+#define IPV6_HDR_LEN 40 /* bytes */
 
 typedef struct _grk_ipv6 {
   _uint32 vtf;                     /* Version, Traffic Class, Flow Label */
@@ -68,17 +68,46 @@ typedef struct _grk_ipv6 {
 #define IPV6_TRCLASS(ip) ((ip)->vtf & 0x0ff00000)
 #define IPV6_FLOW(ip)    ((ip)->vtf & 0x000fffff)
 
-/* Hop-by-Hop Options Header */
+/* Hop-by-Hop Options */
 /* Destination Options */
-typedef struct _grk_ext_gen {
-  _uint8 next_hdr;
-  _uint8 len;
-}ipv6_ext_gen_t;
+typedef struct _grk_ipv6_ext_options {
+  _uint8 next_hdr;        /* Next header */
+  _uint8 len;             /* Header extension header */
+} ipv6_ext_opt_t;
 
 /* Routing (Type 0) */
+typedef struct _grk_ipv6_ext_routing {
+  _uint8 next_hdr;
+  _uint8 len;
+  _uint8 routing_type;
+  _uint8 seg_left;
+  _uint32 reserved;
+} ipv6_ext_routing;
+
 /* Fragment */
+typedef struct _grk_ipv6_ext_frag {
+  _uint8 next_hdr;
+  _uint8 reserved;
+  _uint16 frags;
+  _uint16 id;
+} ipv6_ext_fragment;
+
+#define IPV6_EXT_FRAG_FRAGOFF(ip)  ((ip)->frags & 0xfff8)
+#define IPV6_EXT_FRAG_MOREFRAG(ip) ((ip)->frags & 0x0001)
+
 /* Authentication */
+typedef struct _grk_ipv6_ext_auth {
+  _uint8 next_hdr;
+  _uint8 plen;
+  _uint16 reserved;
+  _uint32 spi;
+  _uint32 seq;
+} ipv6_ext_auth;
+
 /* Encapsulating Security Payload */
+typedef struct _grk_ipv6_ext_esp {
+  
+} ipv6_ext_esp;
 
 void register_ipv6();
 

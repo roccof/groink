@@ -41,6 +41,7 @@ static const se_constant_t protos_const[] = {
   {"TCP", { .str = PROTO_NAME_TCP }, SE_TSTRING},
   {"UDP", { .str = PROTO_NAME_UDP }, SE_TSTRING},
   {"ICMP", { .str = PROTO_NAME_ICMP }, SE_TSTRING},
+  {"IPV6", { .str = PROTO_NAME_IPV6 }, SE_TSTRING},
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
 

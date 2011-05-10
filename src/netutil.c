@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "netutil.h"
 #include "protocols/ethernet.h"
+#include "protocols/ipv6.h"
 
 /* TODO: IPv6 support */
 
@@ -50,6 +51,9 @@
 
 /* Example: 00:11:22:33:44:55 */
 #define ETHER_ADDR_REGEX "(^[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]$)"
+
+/* Example: fe80::1 */
+#define IPV6_ADDR_REGEX "(^\\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?\\s*$)"
 
 static const char *octet2hex[] = {
   "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a",
@@ -152,7 +156,7 @@ char *ip_addr_ntoa(const _uint32 bytes)
 
 char *calculate_cksum(unsigned char *data, unsigned int len)
 {
-  // TODO
+  debug("function %s not implemented", __func__);  
   return NULL;
 }
 
@@ -206,12 +210,12 @@ int is_ether_addr(char *addr)
 
 void convert_ip_range_addr_notation(char *addr, void *list)
 {
-  
+  debug("function %s not implemented", __func__);
 }
 
 void convert_ip_cidr_addr_notation(char *addr, void *list)
 {
-
+  debug("function %s not implemented", __func__);
 }
 
 /* The address has this format: 192.168.0.10-20 */
@@ -250,4 +254,47 @@ int is_ip_cidr_addr_notation(char *addr)
 int is_ip_group_addr_notation(char *addr)
 {
   return 1;
+}
+
+int is_ipv6_addr(char *addr)
+{
+  regex_t regex;
+
+  if (regcomp(&regex, IPV6_ADDR_REGEX, REG_EXTENDED | REG_NOSUB | REG_ICASE) != 0)
+    bug(__func__, "invalid IPv6 regex");
+
+  if (regexec(&regex, addr, 0, NULL, 0) == 0) {
+    regfree(&regex);
+    return 1;
+  }
+  regfree(&regex);
+  return 0;
+}
+
+_uint8 *ipv6_addr_aton(const char *addr)
+{
+  _uint8 b[IPV6_ADDR_LEN];
+  _uint8 *rb = NULL;
+
+  bzero(b, IPV6_ADDR_LEN);
+  inet_pton(AF_INET6, addr, b);
+
+  rb = (_uint8 *)safe_alloc(IPV6_ADDR_LEN);
+  memcpy(rb, b, IPV6_ADDR_LEN);
+
+  return rb;
+}
+
+char *ipv6_addr_ntoa(const _uint8 *bytes)
+{
+  char addr[IPV6_STR_ADDR_LEN];
+  char *ret_addr = NULL;
+
+  bzero(addr, IPV6_STR_ADDR_LEN);
+  inet_ntop(AF_INET6, bytes, addr, IPV6_STR_ADDR_LEN);
+
+  ret_addr = (char *)safe_alloc(strlen(addr) + 1);
+  memcpy(ret_addr, addr, strlen(addr) + 1);
+
+  return ret_addr;
 }

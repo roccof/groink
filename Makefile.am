@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = src tests
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -26,7 +26,7 @@ scripts_DATA = 			\
 	scripts/default.lua 	\
 	scripts/dump.lua	\
 	scripts/show.lua	\
- 	scripts/isolate.lua
-#	scripts/scripts.db
+	scripts/isolate.lua	\
+	scripts/scripts.db
 
 CLEANFILES = *.out *~

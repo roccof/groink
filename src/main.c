@@ -38,6 +38,8 @@
 #include "rp_processor.h"
 #include "script_engine.h"
 
+#include "netutil.h"
+
 static struct termios saved_term;
 
 static void cleanup()

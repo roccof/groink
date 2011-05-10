@@ -22,5 +22,9 @@
 local corelib = require("core")
 
 function proc_pkt(p)
-
+   if p:contains_header(Proto.IPV6) then
+      print("SRC-ADDR:", p:net_srcaddr())
+      print("DST-ADDR:", p:net_dstaddr())
+      print("-----------------------------------")
+   end
 end
