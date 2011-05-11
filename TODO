@@ -26,7 +26,7 @@
    byte order, or containing 1 for Novell 802.3 frames without an
    802.2 LLC header or 4 for frames beginning with an 802.2 LLC header.
 
-* OpenBSD  loopback encapsulation protocol
+* OpenBSD loopback encapsulation protocol
    the link-layer header is a 4-byte field, in network byte order,
    containing a PF_ value from OpenBSD's socket.h for the
    network-layer protocol of the packet.

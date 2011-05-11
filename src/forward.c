@@ -30,6 +30,7 @@
 #include "protos_name.h"
 #include "protocols/ethernet.h"
 #include "protocols/ipv4.h"
+#include "protocols/ipv6.h"
 #include "protocols/tcp.h"
 #include "protocols/udp.h"
 
@@ -39,13 +40,16 @@ void init_packet_forward_module()
     return;
 
   gbls->sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
-
   if (gbls->sockfd == -1)
-    fatal(__func__, "socket creation failed");
+    fatal(__func__, "IPv4 socket creation failed");
+
+#ifdef SIOCGIFNETMASK_IN6
+  gbls->sockfd6 = socket(AF_INET6, SOCK_RAW, IPPROTO_RAW);
+  if (gbls->sockfd6 == -1)
+    fatal(__func__, "IPv6 socket creation failed");
+#endif
 
   debug("packet forwarding module initialized");
-
-  // TODO: IPv6 socket
 }
 
 void destroy_packet_forward_module()
@@ -53,11 +57,16 @@ void destroy_packet_forward_module()
   if (gbls->sockfd != -1) {
     close(gbls->sockfd);
     gbls->sockfd = -1;
-    
-    debug("packet forwarding module destroyed");
   }
 
-  // TODO: IPv6 socket
+#ifdef SIOCGIFNETMASK_IN6
+  if (gbls->sockfd6 != -1) {
+    close(gbls->sockfd6);
+    gbls->sockfd6 = -1;
+  }
+#endif
+
+  debug("packet forwarding module destroyed");
 }
 
 static void ip_forward(packet_t *p)
@@ -66,6 +75,7 @@ static void ip_forward(packet_t *p)
   ipv4_t *ip = NULL;
   size_t pkt_len = 0;
 
+  /* XXX FIXME */
   if (packet_contains_header(p, PROTO_NAME_ETHER))
     pkt_len = p->len - ETHER_HDR_LEN;
   else
@@ -90,10 +100,36 @@ static void ip_forward(packet_t *p)
   sendto(gbls->sockfd, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin, sizeof(struct sockaddr));
 }
 
-/* static void ip6_forward(packet_t *p) */
-/* { */
-/*   // TODO */
-/* } */
+static void ip6_forward(packet_t *p)
+{
+  struct sockaddr_in6 sin6;
+  ipv6_t *ip = NULL;
+  size_t pkt_len = 0;
+
+  /* XXX FIXME */
+  if (packet_contains_header(p, PROTO_NAME_ETHER))
+    pkt_len = p->len - ETHER_HDR_LEN;
+  else
+    pkt_len = p->len;  /* IP raw packet, no link layer */
+  
+  ip = (ipv6_t *)(packet_get_header(p, PROTO_NAME_IPV6))->data;
+  
+  memset(&sin6, 0, sizeof(sin6));
+  sin6.sin6_family  = AF_INET6;
+  memcpy(sin6.sin6_addr.s6_addr, ip->dst_addr, IPV6_ADDR_LEN);
+  
+  if (packet_contains_header(p, PROTO_NAME_TCP)) {
+    /* Set port for TCP */
+    tcp_t *tcp = (tcp_t *)(packet_get_header(p, PROTO_NAME_TCP))->data;
+    sin6.sin6_port = tcp->dest_port;
+  } else if (packet_contains_header(p, PROTO_NAME_UDP)) {
+    /* Set port for UDP */
+    udp_t *udp = (udp_t *)(packet_get_header(p, PROTO_NAME_UDP))->data;
+    sin6.sin6_port = udp->dest_port;
+  }
+  
+  sendto(gbls->sockfd6, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin6, sizeof(struct sockaddr));
+}
 
 void packet_forward(packet_t *p)
 {
@@ -101,13 +137,13 @@ void packet_forward(packet_t *p)
     return;
   
   /* Forward only IP packets */
-  if (packet_contains_header(p, PROTO_NAME_IPV4)) {
+  if (packet_contains_header(p, PROTO_NAME_IPV4) || packet_contains_header(p, PROTO_NAME_IPV6)) {
       /* Skip my packets */
       if (strcmp(p->net_dstaddr, gbls->net_addr) != 0 && strcmp(p->hw_dstaddr, gbls->link_addr) == 0) {
 	if (packet_contains_header(p, PROTO_NAME_IPV4))
 	  ip_forward(p);
-	/* else if (packet_contains_header(p, PROTO_NAME_IPV6)) */
-	/*   ip6_forward(p); */
+	else if (packet_contains_header(p, PROTO_NAME_IPV6))
+	  ip6_forward(p);
       }
   }
 }

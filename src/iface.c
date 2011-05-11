@@ -33,16 +33,16 @@
 void load_iface_info() /* TODO: IPv6 support */
 {
   int fd = -1;
-  int fd6 = -1;
+  /* int fd6 = -1; */
   struct ifreq ifr;
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     fatal("load_iface_info", "error");
 
-#ifdef SIOCGIFNETMASK_IN6
-  if ((fd6 = socket(AF_INET6, SOCK_DGRAM, 0)) < 0)
-    warning("load_iface_info", "error6");
-#endif
+/* #ifdef SIOCGIFNETMASK_IN6 */
+/*   if ((fd6 = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) */
+/*     warning("load_iface_info", "error6"); */
+/* #endif */
 
   strncpy(ifr.ifr_name, gbls->iface, sizeof(ifr.ifr_name));
 
