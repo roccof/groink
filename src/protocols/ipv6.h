@@ -19,6 +19,9 @@
 #ifndef GROINK_IPV6_H
 #define GROINK_IPV6_H
 
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include "base.h"
 
 /*
@@ -64,9 +67,9 @@ typedef struct _grk_ipv6 {
 } ipv6_t;
 
 /* In host endian */
-#define IPV6_VERSION(ip) ((ip)->vtf & 0xf0000000)
-#define IPV6_TRCLASS(ip) ((ip)->vtf & 0x0ff00000)
-#define IPV6_FLOW(ip)    ((ip)->vtf & 0x000fffff)
+#define IPV6_VERSION(ip) ((ntohl((ip)->vtf) & 0xf0000000) >> 28)
+#define IPV6_TRCLASS(ip) ((ntohl((ip)->vtf) & 0x0ff00000) >> 20)
+#define IPV6_FLOW(ip)    (ntohl((ip)->vtf) & 0x000fffff)
 
 /* Hop-by-Hop Options */
 /* Destination Options */

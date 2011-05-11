@@ -53,7 +53,117 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
   return DECODE_OK;
 }
 
+static int l_ipv6_version(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  lua_pushnumber(L, IPV6_TRCLASS(ip));
+  return 1;
+}
+
+static int l_ipv6_tclass(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  lua_pushnumber(L, IPV6_FLOW(ip));
+  return 1;
+}
+
+static int l_ipv6_flow(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  lua_pushnumber(L, IPV6_VERSION(ip));
+  return 1;
+}
+
+static int l_ipv6_plen(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  lua_pushnumber(L, ntohs(ip->plen));
+  return 1;
+}
+
+static int l_ipv6_nexthdr(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  lua_pushnumber(L, ip->next_hdr);
+  return 1;
+}
+
+static int l_ipv6_hoplimit(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  lua_pushnumber(L, ip->hop_limit);
+  return 1;
+}
+
+static int l_ipv6_src_addr(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  char *addr = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  addr = ipv6_addr_ntoa(ip->src_addr);
+  lua_pushstring(L, addr);
+  free(addr);
+  return 1;
+}
+
+static int l_ipv6_dst_addr(lua_State *L)
+{
+  header_t *header = NULL;
+  ipv6_t *ip = NULL;
+  char *addr = NULL;
+  
+  header = check_header(L, 1);
+  ip = (ipv6_t *)header->data;
+
+  addr = ipv6_addr_ntoa(ip->dst_addr);
+  lua_pushstring(L, addr);
+  free(addr);
+  return 1;
+}
+
 static const struct luaL_reg ip6_methods[] = {
+  {"version", l_ipv6_version},
+  {"traffic_class", l_ipv6_tclass},
+  {"flow_label", l_ipv6_flow},
+  {"payload_length", l_ipv6_plen},
+  {"next_hdr", l_ipv6_nexthdr},
+  {"hop_limit", l_ipv6_hoplimit},
+  {"src_addr", l_ipv6_src_addr},
+  {"dst_addr", l_ipv6_dst_addr},
   {NULL, NULL}
 };
 
