@@ -42,7 +42,8 @@ struct _grk_globals {
   char *link_addr;                        /* Hardware address */
   char *net_addr;                         /* Network ipv4 address */
   char *net6_addr;                        /* Network ipv6 address */
-  char *netmask;                          /* Network mask */
+  char *netmask;                          /* IPv4 network mask */
+  char *netmask6;                         /* IPv6 network mask */
 
   /* Packet forwarding */
   int sockfd;

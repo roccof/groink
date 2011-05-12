@@ -139,8 +139,13 @@ void build_hosts_list() // TODO: ipv6 support
     return;
   }
 
-  if (gbls->net_addr == NULL && gbls->netmask == NULL) {
-    warning("the iface %s has no ip address and netmask associated, skipping hosts scanning...", gbls->iface);
+  if (gbls->net_addr == NULL) {
+    warning("the iface %s has no ip address associated, skipping hosts scanning...", gbls->iface);
+    return;
+  }
+
+  if (gbls->netmask == NULL) {
+    warning("the iface %s has no netmask associated, skipping hosts scanning...", gbls->iface);
     return;
   }
 

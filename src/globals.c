@@ -47,6 +47,7 @@ void globals_init()
   gbls->net_addr = NULL;
   gbls->net6_addr = NULL;
   gbls->netmask = NULL;
+  gbls->netmask6 = NULL;
 
   gbls->sockfd = -1;
   gbls->sockfd6 = -1;
@@ -83,9 +84,15 @@ void globals_destroy()
   
   if (gbls->net_addr != NULL)
     free(gbls->net_addr);
+
+  if (gbls->net6_addr != NULL)
+    free(gbls->net6_addr);
   
   if (gbls->netmask != NULL)
     free(gbls->netmask);
+
+  if (gbls->netmask6 != NULL)
+    free(gbls->netmask6);
   
   if (gbls->mitm != NULL)
     free(gbls->mitm);

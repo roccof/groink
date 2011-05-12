@@ -48,9 +48,7 @@
    http://linuxwireless.org/en/developers/Documentation/radiotap
    http://www.radiotap.org/
 
-* IPv6 support
-   rfc2460 - http://www.rfc-editor.org/rfc/rfc2460.txt
-   rfc3513 - http://www.rfc-editor.org/rfc/rfc3513.txt
+* IPv6 multiple address per iface support
 
 * database of script
 

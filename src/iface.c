@@ -25,28 +25,28 @@
 #include <unistd.h>
 #include <ifaddrs.h>
 
-#include "base.h"
 #include "debug.h"
 #include "globals.h"
 #include "netutil.h"
 
-void load_iface_info() /* TODO: IPv6 support */
+void load_iface_info()
 {
   int fd = -1;
-  /* int fd6 = -1; */
   struct ifreq ifr;
+  struct ifaddrs *ifaddr = NULL, *ifa = NULL;
 
+  /* IPv4 socket */
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    fatal("load_iface_info", "error");
+    fatal(__func__, "unable to get iface %s info", gbls->iface);
 
-/* #ifdef SIOCGIFNETMASK_IN6 */
-/*   if ((fd6 = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) */
-/*     warning("load_iface_info", "error6"); */
-/* #endif */
+  if (getifaddrs(&ifaddr) == -1) {
+    close(fd);
+    fatal(__func__, "unable to get iface %s info", gbls->iface);
+  }
 
   strncpy(ifr.ifr_name, gbls->iface, sizeof(ifr.ifr_name));
 
-  // Get iface mtu
+  /* MTU */
   if (ioctl(fd, SIOCGIFMTU, &ifr) < 0) {
     warning("MTU, assuming 1500");
     gbls->mtu = 1500;
@@ -55,7 +55,7 @@ void load_iface_info() /* TODO: IPv6 support */
     debug("MTU: %d", gbls->mtu);
   }
 
-  /* Get hardware address */
+  /* Hardware address */
   if (ioctl(fd, SIOCGIFHWADDR, &ifr) < 0) {
     warning("the iface %s has no mac address associated", gbls->iface);
   } else {
@@ -66,31 +66,65 @@ void load_iface_info() /* TODO: IPv6 support */
       debug("HW ADDR: %s", gbls->link_addr);
   }
 
-  /* Get network address */
-  if (ioctl(fd, SIOCGIFADDR, &ifr) < 0) {
-    warning("the iface %s has no ip address associated", gbls->iface);
-  } else {
-    gbls->net_addr = addr_stoa(&(ifr.ifr_addr));
-    if (gbls->net_addr == NULL)
-      warning("the iface %s has no ip address associated", gbls->iface);
-    else
-      debug("IP ADDR: %s", gbls->net_addr);
+  for (ifa=ifaddr; ifa!=NULL; ifa=ifa->ifa_next) {
+    if (strncmp(gbls->iface, ifa->ifa_name, strlen(gbls->iface)) == 0) {
+
+      /* IPv4 address */
+      if (ifa->ifa_addr->sa_family == AF_INET) {
+	char *addr = addr_stoa(ifa->ifa_addr);
+
+	if (addr == NULL) {
+	  bug(__func__, "invalid IPv4 address");
+	} else {
+	  gbls->net_addr = addr;
+	  debug("IPv4 ADDR: %s", gbls->net_addr);
+	}
+	
+	/* Get netmask */
+	addr =  addr_stoa(ifa->ifa_netmask);
+	if (addr == NULL) {
+	  bug(__func__, "invalid IPv4 address");
+	} else {
+	  gbls->netmask = addr;
+	  debug("IPv4 NETMASK: %s", gbls->netmask);
+	}
+	/* debug("IPv4 BCAST: %s", addr_stoa(ifa->ifa_broadaddr)); */
+
+      } /* IPv6 address */
+      else if (ifa->ifa_addr->sa_family == AF_INET6) {
+	char *addr = addr_stoa(ifa->ifa_addr);
+	
+	if (addr == NULL) {
+	  bug(__func__, "invalid IPv6 address");
+	} else {
+	  gbls->net6_addr = addr;
+	  debug("IPv6 ADDR: %s", gbls->net6_addr);
+
+	  /* Get netmask */
+	  addr =  addr_stoa(ifa->ifa_netmask);
+	  if (addr == NULL) {
+	    bug(__func__, "invalid IPv6 address");
+	  } else {
+	    gbls->netmask6 = addr;
+	    debug("IPv6 NETMASK: %s", gbls->netmask6);
+	  }
+	}
+      }
+    }
   }
 
-  /* Get netmask */
-  if (ioctl(fd, SIOCGIFNETMASK, &ifr) < 0) {
-    warning("the iface %s has no netmask of ip address associated", gbls->iface);
-  } else {
-    gbls->netmask = addr_stoa(&(ifr.ifr_netmask));
-    if (gbls->netmask == NULL)
-      warning("the iface %s has no netmask of ip address associated", gbls->iface);
-    else
-      debug("NETMASK: %s", gbls->netmask);
-  }
+  if (gbls->net_addr == NULL)
+    warning("the iface %s has no IPv4 address associated", gbls->iface);
+
+  if (gbls->netmask == NULL)
+    warning("the iface %s has no netmask of IPv4 address associated", gbls->iface);
+
+  if (gbls->net6_addr == NULL)
+    warning("the iface %s has no IPv6 address associated", gbls->iface);
   
-  if(fd > 0)
-    close(fd);
-  
-  /* if(fd6 > 0) */
-  /*   close(fd6); */
+  if (gbls->netmask6 == NULL)
+    warning("the iface %s has no netmask of IPv6 address associated", gbls->iface);
+
+  close(fd);
+  freeifaddrs(ifaddr);
 }

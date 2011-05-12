@@ -160,9 +160,10 @@ char *calculate_cksum(unsigned char *data, unsigned int len)
   return NULL;
 }
 
-char *addr_stoa(struct sockaddr *addr) // TODO: IPv6
+char *addr_stoa(struct sockaddr *addr)
 {
   struct sockaddr_in *addr_in = NULL;
+  struct sockaddr_in6 *addr_in6 = NULL;
 
   switch(addr->sa_family) {
   case AF_UNSPEC:
@@ -172,6 +173,10 @@ char *addr_stoa(struct sockaddr *addr) // TODO: IPv6
   case AF_INET:
     addr_in = (struct sockaddr_in *)addr;
     return ip_addr_ntoa(addr_in->sin_addr.s_addr);
+
+  case AF_INET6:
+    addr_in6 = (struct sockaddr_in6 *)addr;
+    return ipv6_addr_ntoa(addr_in6->sin6_addr.s6_addr);
     
   default:
     return NULL;
