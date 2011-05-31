@@ -25,13 +25,13 @@
 #include "mitm.h"
 #include "script_engine.h"
 #include "host.h"
+#include "netutil.h"
 
 struct _grk_globals {
   /* General */
   char *iface;                            /* Network interface */
   int promisc;                            /* Promisc mode */
   int rfmon;                              /* Monitor mode */
-  int daemon;                             /* Is daemon mode? */
   int scan;                               /* Host scanning */
 
   host_t *hosts;                          /* List of all hosts present 
@@ -40,8 +40,8 @@ struct _grk_globals {
   /* Iface info */
   int mtu;                                /* Maximum transfer unit */
   char *link_addr;                        /* Hardware address */
-  char *net_addr;                         /* Network ipv4 address */
-  char *net6_addr;                        /* Network ipv6 address */
+  char *net_addr;                         /* Network IPv4 address */
+  struct _grk_ip6_addrs *net6_addrs;      /* Network IPv6 addresses */
   char *netmask;                          /* IPv4 network mask */
   char *netmask6;                         /* IPv6 network mask */
 

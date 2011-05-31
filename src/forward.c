@@ -33,19 +33,23 @@
 #include "protocols/ipv6.h"
 #include "protocols/tcp.h"
 #include "protocols/udp.h"
+#include "utlist.h"
+
+static int sockfd = -1;
+static int sockfd6 = -1;
 
 void init_packet_forward_module()
 {
   if (gbls->mitm == NULL)
     return;
 
-  gbls->sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
-  if (gbls->sockfd == -1)
+  sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+  if (sockfd == -1)
     fatal(__func__, "IPv4 socket creation failed");
 
 #ifdef SIOCGIFNETMASK_IN6
-  gbls->sockfd6 = socket(AF_INET6, SOCK_RAW, IPPROTO_RAW);
-  if (gbls->sockfd6 == -1)
+  sockfd6 = socket(AF_INET6, SOCK_RAW, IPPROTO_RAW);
+  if (sockfd6 == -1)
     fatal(__func__, "IPv6 socket creation failed");
 #endif
 
@@ -54,15 +58,15 @@ void init_packet_forward_module()
 
 void destroy_packet_forward_module()
 {
-  if (gbls->sockfd != -1) {
-    close(gbls->sockfd);
-    gbls->sockfd = -1;
+  if (sockfd != -1) {
+    close(sockfd);
+    sockfd = -1;
   }
 
 #ifdef SIOCGIFNETMASK_IN6
-  if (gbls->sockfd6 != -1) {
-    close(gbls->sockfd6);
-    gbls->sockfd6 = -1;
+  if (sockfd6 != -1) {
+    close(sockfd6);
+    sockfd6 = -1;
   }
 #endif
 
@@ -74,6 +78,10 @@ static void ip_forward(packet_t *p)
   struct sockaddr_in sin;
   ipv4_t *ip = NULL;
   size_t pkt_len = 0;
+
+  /* Skip my packets */
+  if (strncmp(p->net_dstaddr, gbls->net_addr, strlen(p->net_dstaddr)))
+      return;
 
   /* XXX FIXME */
   if (packet_contains_header(p, PROTO_NAME_ETHER))
@@ -97,7 +105,7 @@ static void ip_forward(packet_t *p)
     sin.sin_port = udp->dest_port;
   }
   
-  sendto(gbls->sockfd, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin, sizeof(struct sockaddr));
+  sendto(sockfd, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin, sizeof(struct sockaddr));
 }
 
 static void ip6_forward(packet_t *p)
@@ -105,6 +113,12 @@ static void ip6_forward(packet_t *p)
   struct sockaddr_in6 sin6;
   ipv6_t *ip = NULL;
   size_t pkt_len = 0;
+  struct _grk_ip6_addrs *net6 = NULL;
+
+  /* Skip my packets */
+  LL_FOREACH(gbls->net6_addrs, net6)
+    if (strncmp(p->net_dstaddr, net6->addr, strlen(p->net_dstaddr)) == 0)
+      return;
 
   /* XXX FIXME */
   if (packet_contains_header(p, PROTO_NAME_ETHER))
@@ -128,7 +142,7 @@ static void ip6_forward(packet_t *p)
     sin6.sin6_port = udp->dest_port;
   }
   
-  sendto(gbls->sockfd6, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin6, sizeof(struct sockaddr));
+  sendto(sockfd6, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin6, sizeof(struct sockaddr));
 }
 
 void packet_forward(packet_t *p)
@@ -137,13 +151,8 @@ void packet_forward(packet_t *p)
     return;
   
   /* Forward only IP packets */
-  if (packet_contains_header(p, PROTO_NAME_IPV4) || packet_contains_header(p, PROTO_NAME_IPV6)) {
-      /* Skip my packets */
-      if (strcmp(p->net_dstaddr, gbls->net_addr) != 0 && strcmp(p->hw_dstaddr, gbls->link_addr) == 0) {
-	if (packet_contains_header(p, PROTO_NAME_IPV4))
-	  ip_forward(p);
-	else if (packet_contains_header(p, PROTO_NAME_IPV6))
-	  ip6_forward(p);
-      }
-  }
+  if (packet_contains_header(p, PROTO_NAME_IPV4))
+    ip_forward(p);
+  else if (packet_contains_header(p, PROTO_NAME_IPV6))
+    ip6_forward(p);
 }

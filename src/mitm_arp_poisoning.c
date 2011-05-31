@@ -29,6 +29,7 @@
 #include "utlist.h"
 
 #define ARP_REPOISONING 1 /* seconds */
+#define ARP_STORM_WAIT 10 /* milliseconds */
 
 /* Thread name */
 #define ARP_THREAD_NAME "arp_poisoner"

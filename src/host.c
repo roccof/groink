@@ -35,6 +35,7 @@
 #include "utlist.h"
 #include "protos_name.h"
 
+#define ARP_STORM_WAIT 10 /* milliseconds */
 #define HOST_CAP_THREAD_NAME "host_target_capture"
 
 static int num_hosts = 0;

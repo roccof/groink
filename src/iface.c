@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "globals.h"
 #include "netutil.h"
+#include "utlist.h"
 
 void load_iface_info()
 {
@@ -88,8 +89,6 @@ void load_iface_info()
 	  gbls->netmask = addr;
 	  debug("IPv4 NETMASK: %s", gbls->netmask);
 	}
-	/* debug("IPv4 BCAST: %s", addr_stoa(ifa->ifa_broadaddr)); */
-
       } /* IPv6 address */
       else if (ifa->ifa_addr->sa_family == AF_INET6) {
 	char *addr = addr_stoa(ifa->ifa_addr);
@@ -97,17 +96,24 @@ void load_iface_info()
 	if (addr == NULL) {
 	  bug(__func__, "invalid IPv6 address");
 	} else {
-	  gbls->net6_addr = addr;
-	  debug("IPv6 ADDR: %s", gbls->net6_addr);
+
+	  struct _grk_ip6_addrs *ip6 = (struct _grk_ip6_addrs *)safe_alloc(sizeof(struct _grk_ip6_addrs));
+	  ip6->addr = addr;
+	  
+	  debug("IPv6 ADDR: %s", addr);
 
 	  /* Get netmask */
 	  addr =  addr_stoa(ifa->ifa_netmask);
 	  if (addr == NULL) {
+	    free(ip6->addr);
+	    free(ip6);
 	    bug(__func__, "invalid IPv6 address");
 	  } else {
-	    gbls->netmask6 = addr;
-	    debug("IPv6 NETMASK: %s", gbls->netmask6);
+	    ip6->netmask = addr;
+	    debug("IPv6 NETMASK: %s", addr);
 	  }
+
+	  LL_APPEND(gbls->net6_addrs, ip6);
 	}
       }
     }
@@ -119,11 +125,8 @@ void load_iface_info()
   if (gbls->netmask == NULL)
     warning("the iface %s has no netmask of IPv4 address associated", gbls->iface);
 
-  if (gbls->net6_addr == NULL)
+  if (gbls->net6_addrs == NULL)
     warning("the iface %s has no IPv6 address associated", gbls->iface);
-  
-  if (gbls->netmask6 == NULL)
-    warning("the iface %s has no netmask of IPv6 address associated", gbls->iface);
 
   close(fd);
   freeifaddrs(ifaddr);

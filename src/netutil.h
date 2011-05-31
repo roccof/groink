@@ -28,7 +28,11 @@
 #define IPV4_STR_ADDR_LEN 16
 #define IPV6_STR_ADDR_LEN 46
 
-#define ARP_STORM_WAIT 10 /* milliseconds */
+struct _grk_ip6_addrs {
+  char *addr;
+  char *netmask;
+  struct _grk_ip6_addrs *next;
+};
 
 unsigned char *ether_addr_aton(const char *addr);
 char *ether_addr_ntoa(const unsigned char *bytes);

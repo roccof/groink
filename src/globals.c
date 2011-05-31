@@ -27,6 +27,7 @@
 #include "mitm.h"
 #include "script_engine.h"
 #include "capture.h"
+#include "utlist.h"
 
 void globals_init()
 {
@@ -37,7 +38,6 @@ void globals_init()
   gbls->iface = NULL;
   gbls->promisc = 1;
   gbls->rfmon = 0;
-  gbls->daemon = 0;
   gbls->scan = 1;
 
   gbls->hosts = NULL;
@@ -45,12 +45,9 @@ void globals_init()
   gbls->mtu = 0;
   gbls->link_addr = NULL;
   gbls->net_addr = NULL;
-  gbls->net6_addr = NULL;
+  gbls->net6_addrs = NULL;
   gbls->netmask = NULL;
   gbls->netmask6 = NULL;
-
-  gbls->sockfd = -1;
-  gbls->sockfd6 = -1;
 
   gbls->pcap = NULL;
   gbls->dlt = 0;
@@ -74,6 +71,8 @@ void globals_init()
 
 void globals_destroy()
 {
+  struct _grk_ip6_addrs *curr = NULL, *tmp = NULL;
+
   if (gbls == NULL)
     return;
 
@@ -85,11 +84,18 @@ void globals_destroy()
   if (gbls->net_addr != NULL)
     free(gbls->net_addr);
 
-  if (gbls->net6_addr != NULL)
-    free(gbls->net6_addr);
-  
   if (gbls->netmask != NULL)
     free(gbls->netmask);
+
+  /* Free IPv6 addresses */
+  LL_FOREACH_SAFE(gbls->net6_addrs, curr, tmp) {
+    LL_DELETE(gbls->net6_addrs, curr);
+
+    free(curr->addr);
+    free(curr->netmask);
+    free(curr);
+    curr = NULL;
+  }
 
   if (gbls->netmask6 != NULL)
     free(gbls->netmask6);
