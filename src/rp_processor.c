@@ -81,7 +81,7 @@ static void *processor_thread_cb(void *arg)
 /* Start the packet processor */
 void start_rp_processor()
 {
-  init_packet_forward_module();
+  packet_forward_module_init();
   thread_new(RP_PROCESSOR_THREAD_NAME, &processor_thread_cb, NULL);
   debug("packet processor started");
 }
@@ -97,6 +97,6 @@ void stop_rp_processor()
 
   thread_stop(thread);
 
-  destroy_packet_forward_module();
+  packet_forward_module_destroy();
   debug("packet processor stopped");
 }

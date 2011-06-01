@@ -23,7 +23,7 @@
 
 #define CAPTURE_THREAD_NAME "sniff"
 #define CAPTURE_SNAPLEN 65535
-#define CAPTURE_TIMEOUT 0
+#define CAPTURE_TIMEOUT 10 /* ms */
 
 enum _grk_capture_state {
   CAP_STATE_NONE,        /* sniffing not started  */

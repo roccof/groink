@@ -37,7 +37,8 @@ groink_SOURCES =				\
 		selib_netutil.c			\
 		selib_packet.c			\
 		script_engine.c			\
-		threads.c
+		threads.c			\
+		pcap_util.c
 
 noinst_HEADERS =				\
 		base.h				\
@@ -71,7 +72,8 @@ noinst_HEADERS =				\
 		script_engine.h			\
 		threads.h			\
 		utlist.h			\
-		uthash.h
+		uthash.h			\
+		pcap_util.h
 
 groink_CFLAGS = $(LUA_CFLAGS)
 groink_LDADD = $(LUA_LIBS)

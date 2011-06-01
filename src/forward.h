@@ -21,8 +21,8 @@
 
 #include "packet.h"
 
-void init_packet_forward_module();
-void destroy_packet_forward_module();
+void packet_forward_module_init();
+void packet_forward_module_destroy();
 void packet_forward(packet_t *p);
 
 #endif /* GROINK_FORWARD_H */

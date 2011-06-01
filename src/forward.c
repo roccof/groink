@@ -38,7 +38,7 @@
 static int sockfd = -1;
 static int sockfd6 = -1;
 
-void init_packet_forward_module()
+void packet_forward_module_init()
 {
   if (gbls->mitm == NULL)
     return;
@@ -56,8 +56,13 @@ void init_packet_forward_module()
   debug("packet forwarding module initialized");
 }
 
-void destroy_packet_forward_module()
+void packet_forward_module_destroy()
 {
+  int show = 0;
+
+  if (sockfd != -1 || sockfd6 != -1)
+    show = 1;
+
   if (sockfd != -1) {
     close(sockfd);
     sockfd = -1;
@@ -70,7 +75,8 @@ void destroy_packet_forward_module()
   }
 #endif
 
-  debug("packet forwarding module destroyed");
+  if (show)
+    debug("packet forwarding module destroyed");
 }
 
 static void ip_forward(packet_t *p)

@@ -16,46 +16,50 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <execinfo.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-#include <termios.h>
 #include <unistd.h>
+#include <pcap.h>
 
 #include "config.h"
 #include "base.h"
 #include "debug.h"
 #include "globals.h"
 #include "threads.h"
-#include "rp_queue.h"
-#include "capture.h"
 #include "parse_options.h"
 #include "hook.h"
 #include "protos.h"
-#include "rp_processor.h"
 #include "script_engine.h"
+#include "pcap_util.h"
+#include "forward.h"
+#include "decoder.h"
+#include "packet.h"
 
-#include "netutil.h"
-
-static struct termios saved_term;
+static pcap_t *pcap = NULL;
+static int stop = 0;
 
 static void cleanup()
 {
-  debug("cleaning up...");
+  struct pcap_stat ps;
 
-  /* Restore terminal settings */
-  tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
-  debug("terminal restored");
-  stop_sniffing();
-  stop_rp_processor();
+  debug("cleaning up...");
+  
   se_close();
   mitm_stop();
   protos_destroy();
-  cleanup_rp_queue();
-  capture_engine_destroy();
+  
+  if (pcap_stats(pcap, &ps) == -1)
+    fatal(__func__, pcap_geterr(pcap));
+  else
+    debug("cap/recv/drop packet: %d/%d/%d", 
+	  gbls->cap_packets, ps.ps_recv, ps.ps_drop);
+
+  pcap_close(pcap);
+  
+  packet_forward_module_destroy();
   threads_manager_destroy();
   hook_cleanup();
   globals_destroy();
@@ -63,108 +67,107 @@ static void cleanup()
 
 static void signal_handler_cb(int signal)
 {
-  if(signal == SIGSEGV) {
-#ifdef GROINK_DEBUG    /* Print backtrace */
-    void *buffer[10];
-    size_t size;
-    char **strings;
-    int i;
-    
-    size = backtrace(buffer, 10);
-    strings = backtrace_symbols(buffer, size);
-    
-    printf(COLORB_RED"[!!]"COLOR_NORMAL" Segmentation fault, please report this to %s\n", PACKAGE_BUGREPORT);    
-    printf("Backtrace:\n");
-    for(i=0; i<size; i++)
-      printf("\t%s\n", strings[i]);
-    printf("\n");
-    free(strings);
-#else
-    printf(COLORB_RED"[!!]"COLOR_NORMAL" Segmentation fault, please report this to %s\n", PACKAGE_BUGREPORT);
-#endif /* GROINK_DEBUG */
-    
-    exit(EXIT_FAILURE);
-  } else {
-    exit(EXIT_SUCCESS);
-  }
+  stop = 1;
 }
 
-static void groink_main()
+static void main_loop()
 {
-  /* Initialization phase */
-  threads_manager_init();
-  capture_engine_init();
-  load_iface_info();
-  protos_init();
+  struct pcap_pkthdr *header = NULL;
+  _uchar *bytes = NULL;
+  packet_t *p = NULL;
+  hookdata_t *hookdata = NULL;
+  int res = 0;
 
-  /* Build the list with all hosts present in the same network */
-  if(gbls->scan)
-    build_hosts_list();
+  while (!stop) {
 
-  /* TODO: possibility to read the hosts from a file */
+    res = pcap_next_ex(pcap, &header, (const _uchar **)&bytes);
 
-  /* Start MiTM attack if required */
-  mitm_start();
-
-  /* Start raw packet processor */
-  start_rp_processor();
-
-  message(COLOR_BOLD"%s %s"COLOR_NORMAL" started, type "COLOR_BOLD"Q"
-	  COLOR_NORMAL" or "COLOR_BOLD"q"COLOR_NORMAL" to quit...", PACKAGE_NAME, VERSION);
-
-  /* Start script engine */
-  se_open();
-
-  /* Start capturing process */
-  start_sniffing();
-
-  /* Run script */
-  se_run();
+    if (res == 0) /* Timeout */
+      continue;
+    else if (res == -2) /* EOF */
+      break;
+    
+    /* Skip truncated packets */
+    if (header->len > gbls->snaplen) {
+      debug("captured truncated packet [pkt-len: %d, snaplen: %d], skipping...",
+	    header->len, gbls->snaplen);
+      continue;
+    }
+    
+    gbls->cap_packets++;
+    
+    p = packet_new(bytes, header->len);
+    PKT_ADD_FLAG(p, PACKET_FLAG_CAPTURED);
+    
+    if (gbls->decode)
+      start_decoding(p);
+    
+    hookdata = (hookdata_t *)safe_alloc(sizeof(hookdata_t));
+    hookdata->type = HOOKDATA_PACKET;
+    hookdata->data = (void *)p;
+    
+    /* Raise event */
+    hook_event(HOOK_RECEIVED, hookdata);
+    
+    free(hookdata);
+    
+    /* If MiTM is active, do packet forwarding */
+    if(gbls->mitm_state == MITM_STATE_START)
+      packet_forward(p);
+    
+    packet_free(p);
+  }
 }
 
 int main(int argc, char **argv)
 {
-  struct termios term;
+  char errbuf[PCAP_ERRBUF_SIZE];
 
   globals_init();
-
-  atexit(&cleanup);
-
-  /* 
-   * Set up a terminal device to read single 
-   * characters in noncanonical input mode
-   */
-
-  tcgetattr(STDIN_FILENO, &saved_term);
-  term = saved_term;
-
-  /* Clear ICANON and ECHO. */
-  term.c_lflag &= ~(ICANON | ECHO);
-  term.c_cc[VMIN] = 1;
-  term.c_cc[VTIME] = 0;
- 
-  tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
   /* Register signals */
   signal(SIGINT, &signal_handler_cb);
   signal(SIGTERM, &signal_handler_cb);
-  signal(SIGSEGV, &signal_handler_cb);
   
   parse_options(argc, argv);
   
-  groink_main();
+  threads_manager_init();
+  load_iface_info();
+  protos_init();
 
-  while(1) {
-    char c = getchar();
-    
-    switch(c) {
-    case 'q':   /* Quit GroinK */
-    case 'Q':
-      goto end;
-      break;
-    }
+  /* Get iface name */
+  if ((gbls->iface == NULL) && ((gbls->iface = pcap_lookupdev(errbuf)) == NULL)) {
+    fatal(__func__, errbuf);
+    exit(-1);
   }
+
+  pcap = pcap_init(gbls->iface, gbls->snaplen, gbls->promisc, gbls->rfmon, 
+		   gbls->cap_timeout);
+
+  /* Get the device type */
+  gbls->dlt = pcap_datalink(pcap);
+
+  /* Build the list with all hosts present in the same network */
+  /* if(gbls->scan) */
+  /*   build_hosts_list(); */
   
- end: 
+  /* TODO: possibility to read the hosts from a file */
+
+  /* Start MiTM attack if required */
+  /* mitm_start(); */
+
+  if(gbls->mitm_state == MITM_STATE_START)
+    packet_forward_module_init();
+
+  message(COLOR_BOLD"%s %s"COLOR_NORMAL" started", PACKAGE_NAME, VERSION);
+
+  /* Start script engine and run the script */
+  se_open();
+  se_run();
+
+  main_loop();
+
+  cleanup();
+
   return EXIT_SUCCESS;
 }

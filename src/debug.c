@@ -41,7 +41,7 @@ void fatal(const char *where, const char *message, ...)
 
   fprintf(stderr, "\n");
 
-  exit(-1);
+  //exit(-1);
 }
 
 void se_fatal(const char *message, ...)
@@ -56,7 +56,7 @@ void se_fatal(const char *message, ...)
 
   fprintf(stderr, "\n");
 
-  exit(-1);
+  //exit(-1);
 }
 
 void debug(const char *message, ...)
@@ -105,7 +105,7 @@ void bug(const char *where, const char *message, ...)
   fprintf(stderr, "\n");
   fprintf(stderr, "Please send this bugs to: %s\n", PACKAGE_BUGREPORT);
 
-  exit(-1);
+  //exit(-1);
 }
 
 void warning(const char *message, ...)
