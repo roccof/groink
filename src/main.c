@@ -39,7 +39,6 @@
 #include "packet.h"
 
 static pcap_t *pcap = NULL;
-static int stop = 0;
 
 static void cleanup()
 {
@@ -47,6 +46,10 @@ static void cleanup()
 
   debug("cleaning up...");
   
+  pcap_breakloop(pcap);
+  usleep(100);
+  debug("sniffing stopped");
+
   se_close();
   mitm_stop();
   protos_destroy();
@@ -67,61 +70,50 @@ static void cleanup()
 
 static void signal_handler_cb(int signal)
 {
-  stop = 1;
+  exit(EXIT_SUCCESS);
 }
 
-static void main_loop()
+static void process_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *bytes)
 {
-  struct pcap_pkthdr *header = NULL;
-  _uchar *bytes = NULL;
   packet_t *p = NULL;
   hookdata_t *hookdata = NULL;
-  int res = 0;
 
-  while (!stop) {
-
-    res = pcap_next_ex(pcap, &header, (const _uchar **)&bytes);
-
-    if (res == 0) /* Timeout */
-      continue;
-    else if (res == -2) /* EOF */
-      break;
-    
-    /* Skip truncated packets */
-    if (header->len > gbls->snaplen) {
-      debug("captured truncated packet [pkt-len: %d, snaplen: %d], skipping...",
-	    header->len, gbls->snaplen);
-      continue;
-    }
-    
-    gbls->cap_packets++;
-    
-    p = packet_new(bytes, header->len);
-    PKT_ADD_FLAG(p, PACKET_FLAG_CAPTURED);
-    
-    if (gbls->decode)
-      start_decoding(p);
-    
-    hookdata = (hookdata_t *)safe_alloc(sizeof(hookdata_t));
-    hookdata->type = HOOKDATA_PACKET;
-    hookdata->data = (void *)p;
-    
-    /* Raise event */
-    hook_event(HOOK_RECEIVED, hookdata);
-    
-    free(hookdata);
-    
-    /* If MiTM is active, do packet forwarding */
-    if(gbls->mitm_state == MITM_STATE_START)
-      packet_forward(p);
-    
-    packet_free(p);
+  /* Skip truncated packets */
+  if (header->len > gbls->snaplen) {
+    debug("captured truncated packet [pkt-len: %d, snaplen: %d], skipping...",
+	  header->len, gbls->snaplen);
+    return;
   }
+  
+  gbls->cap_packets++;
+  
+  p = packet_new((_uchar *)bytes, header->len);
+  PKT_ADD_FLAG(p, PACKET_FLAG_CAPTURED);
+  
+  if (gbls->decode)
+    start_decoding(p);
+  
+  hookdata = (hookdata_t *)safe_alloc(sizeof(hookdata_t));
+  hookdata->type = HOOKDATA_PACKET;
+  hookdata->data = (void *)p;
+  
+  /* Raise event */
+  hook_event(HOOK_RECEIVED, hookdata);
+  
+  free(hookdata);
+  
+  /* If MiTM is active, do packet forwarding */
+  if(gbls->mitm_state == MITM_STATE_START)
+    packet_forward(p);
+  
+  packet_free(p);
 }
 
 int main(int argc, char **argv)
 {
   char errbuf[PCAP_ERRBUF_SIZE];
+
+  atexit(&cleanup);
 
   globals_init();
 
@@ -152,7 +144,7 @@ int main(int argc, char **argv)
   /*   build_hosts_list(); */
   
   /* TODO: possibility to read the hosts from a file */
-
+  
   /* Start MiTM attack if required */
   /* mitm_start(); */
 
@@ -165,9 +157,16 @@ int main(int argc, char **argv)
   se_open();
   se_run();
 
-  main_loop();
+  if (gbls->promisc)
+    debug("start sniffing on '%s' in promisc mode, datalink: %s (%s), snaplen %d", 
+	  gbls->iface, pcap_datalink_val_to_name(gbls->dlt), 
+	  pcap_datalink_val_to_description(gbls->dlt), gbls->snaplen);
+  else
+    debug("start sniffing on '%s', datalink: %s (%s), snaplen %d", gbls->iface, 
+	  pcap_datalink_val_to_name(gbls->dlt), 
+	  pcap_datalink_val_to_description(gbls->dlt), gbls->snaplen);
 
-  cleanup();
+  pcap_loop(pcap, 0, &process_packet, NULL);
 
   return EXIT_SUCCESS;
 }

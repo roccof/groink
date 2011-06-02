@@ -28,7 +28,7 @@
 #include "netutil.h"
 
 struct _grk_globals {
-  /* General */
+
   char *iface;                            /* Network interface */
   int promisc;                            /* Promisc mode */
   int rfmon;                              /* Monitor mode */
@@ -37,7 +37,6 @@ struct _grk_globals {
   host_t *hosts;                          /* List of all hosts present 
 					     in the same network */
 
-  /* Iface info */
   int mtu;                                /* Maximum transfer unit */
   char *link_addr;                        /* Hardware address */
   char *net_addr;                         /* Network IPv4 address */
@@ -45,20 +44,13 @@ struct _grk_globals {
   char *netmask;                          /* IPv4 network mask */
   char *netmask6;                         /* IPv6 network mask */
 
-  /* Packet forwarding */
-  int sockfd;
-  int sockfd6;
-  
-  /* Capture engine */
   pcap_t *pcap;                           /* Pcap handler */
   int dlt;                                /* Data link type  */
   long cap_packets;                       /* Captured packet counter */
-  int cs;                                 /* State of capture engine */
   int snaplen;                            /* Captured packet length */
   int decode;                             /* If 1 the packet is decoded */
   int cap_timeout;                        /* Pcap capture packet timeout*/
 
-  /* Script engine */
   lua_State *L;                           /* Lua state */
   char *script;                           /* Script to run */
   char *script_argv[MAX_SCRIPT_ARGS];     /* Arguments of script */
@@ -66,7 +58,6 @@ struct _grk_globals {
   int script_debug_mode;                  /* Script debug mode */
   char *scripts_dir;                      /* Scripts directory */
 
-  /* MiTM attacks */
   char *mitm;                             /* MiTM attack name */
   mitm_state_t mitm_state;                /* MiTM state */
   char *mitm_options;

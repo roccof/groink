@@ -2,7 +2,6 @@ bin_PROGRAMS = groink
 
 groink_SOURCES =				\
 		base.c				\
-		capture.c			\
 		debug.c				\
 		decoder.c			\
 		forward.c			\
@@ -27,8 +26,6 @@ groink_SOURCES =				\
 		protocols/raw.c			\
 		protocols/tcp.c			\
 		protocols/udp.c			\
-		rp_processor.c			\
-		rp_queue.c			\
 		selib.c				\
 		selib_bit.c			\
 		selib_constants.c		\
@@ -42,7 +39,6 @@ groink_SOURCES =				\
 
 noinst_HEADERS =				\
 		base.h				\
-		capture.h			\
 		debug.h				\
 		decoder.h			\
 		forward.h			\
@@ -66,8 +62,6 @@ noinst_HEADERS =				\
 		protocols/raw.h			\
 		protocols/tcp.h			\
 		protocols/udp.h			\
-		rp_processor.h			\
-		rp_queue.h			\
 		selib.h				\
 		script_engine.h			\
 		threads.h			\

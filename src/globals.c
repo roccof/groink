@@ -26,7 +26,7 @@
 #include "host.h"
 #include "mitm.h"
 #include "script_engine.h"
-#include "capture.h"
+#include "pcap_util.h"
 #include "utlist.h"
 
 void globals_init()
@@ -52,10 +52,9 @@ void globals_init()
   gbls->pcap = NULL;
   gbls->dlt = 0;
   gbls->cap_packets = 0;
-  gbls->cs = CAP_STATE_NONE;
-  gbls->snaplen = CAPTURE_SNAPLEN;
+  gbls->snaplen = CAP_SNAPLEN;
   gbls->decode = 1;
-  gbls->cap_timeout = CAPTURE_TIMEOUT;
+  gbls->cap_timeout = CAP_TIMEOUT;
 
   gbls->L = NULL;
   gbls->script = NULL;

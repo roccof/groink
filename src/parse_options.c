@@ -112,7 +112,7 @@ void parse_options(int argc, char **argv)
       else
 	fatal(__func__, "'%s' is an invalid option", long_options[opt_index].name);
       break;
-	
+      
     case 'h':
       print_usage(0);
       break;
