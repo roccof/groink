@@ -34,6 +34,7 @@
 #include "threads.h"
 #include "utlist.h"
 #include "protos_name.h"
+#include "pcap_util.h"
 
 #define ARP_STORM_WAIT 10 /* milliseconds */
 #define HOST_CAP_THREAD_NAME "host_target_capture"
@@ -120,14 +121,18 @@ static void proc_packet_cb(u_char *user, const struct pcap_pkthdr *header, const
 
 static void *capture_thread_cb(void *arg)
 {
+  pcap_t *pcap = NULL;
+
   THREAD_DEFAULT_INIT;
+
+  pcap = (pcap_t *)arg;
   
-  pcap_loop(gbls->pcap, 0, &proc_packet_cb, NULL);
+  pcap_loop(pcap, 0, &proc_packet_cb, NULL);
 
   return NULL;
 }
 
-void build_hosts_list() // TODO: ipv6 support
+void build_hosts_list(pcap_t *pcap) /* TODO: ipv6 support */
 {
   int num = 0;
   int tot = 0;
@@ -161,9 +166,9 @@ void build_hosts_list() // TODO: ipv6 support
   tot = ~ntohl(netmask);
 
   /* Get only packet received by the device */
-  pcap_setdirection(gbls->pcap, PCAP_D_IN);
+  pcap_setdirection(pcap, PCAP_D_IN);
 
-  thread_new(HOST_CAP_THREAD_NAME, &capture_thread_cb, NULL);
+  thread_new(HOST_CAP_THREAD_NAME, &capture_thread_cb, (void *)pcap);
 
   hook_register(HOOK_ARP, &arp_received_cb);
 
@@ -188,10 +193,10 @@ void build_hosts_list() // TODO: ipv6 support
   
   if (thread != 0)
     thread_stop(thread);
-  
-  /* Restore direction */
-  pcap_setdirection(gbls->pcap, PCAP_D_INOUT);
 
+  /* Restore capture direction */
+  pcap_setdirection(pcap, PCAP_D_INOUT);
+  
   message("Found %d hosts active", num_hosts);
 }
 

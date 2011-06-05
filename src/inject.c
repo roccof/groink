@@ -17,7 +17,12 @@
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <string.h>
-#include <pcap.h>
+#include <sys/socket.h>
+#include <linux/if_ether.h>
+#include <netpacket/packet.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/ioctl.h>
 
 #include "inject.h"
 #include "globals.h"
@@ -27,11 +32,57 @@
 #include "protocols/ethernet.h"
 #include "protocols/arp.h"
 #include "protos_name.h"
+#include "debug.h"
+#include "iface.h"
+
+static int fd = -1;
+
+void inject_initialize()
+{
+  struct sockaddr_ll sll;
+  int ifindex = 0;
+
+  fd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+  if (fd == -1)
+    fatal(__func__, "inject module: raw socket not opened (%s)", strerror(errno));
+
+  /* Get iface index */
+  ifindex = get_iface_index(fd, gbls->iface);
+  if (ifindex == -1) {
+    close(fd);
+    fd = -1;
+    fatal(__func__, "inject module: invalid device index (%s)", strerror(errno));
+  }
+
+  memset(&sll, 0, sizeof(sll));
+  sll.sll_family = AF_PACKET;
+  sll.sll_ifindex = ifindex;
+  sll.sll_protocol = htons(ETH_P_ALL);
+
+  if (bind(fd, (struct sockaddr *)&sll, sizeof(sll)) == -1) {
+    close(fd);
+    fd = -1;
+    fatal(__func__, "inject module: bind failed (%s)", strerror(errno));
+  }
+
+  debug("inject module initialized");
+}
+
+void inject_cleanup()
+{
+  if (fd != -1) {
+    close(fd);
+    fd = -1;
+    debug("inject module cleaned up");
+  }
+}
 
 /* Send a packet over network */
 void inject(packet_t *p)
 {
-  pcap_sendpacket(gbls->pcap, p->data, p->len);
+  int res = send(fd, p->data, p->len, 0);
+  if(res == -1)
+    debug("packet not injected (%s)", strerror(errno));
 }
 
 /* Send ARP Reply packet */

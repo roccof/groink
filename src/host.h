@@ -19,13 +19,15 @@
 #ifndef GROINK_HOST_H
 #define GROINK_HOST_H
 
+#include <pcap.h>
+
 typedef struct _grk_host {
   char *net_addr;
   char *hw_addr;
   struct _grk_host *next;
 } host_t;
 
-void build_hosts_list();
+void build_hosts_list(pcap_t *pcap);
 void free_hosts_list();
 host_t *find_host_bymac(char *mac);
 host_t *find_host_byip(char *ip);

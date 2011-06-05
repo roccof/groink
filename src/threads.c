@@ -21,7 +21,6 @@
 #include <pthread.h>
 
 #include "base.h"
-#include "globals.h"
 #include "debug.h"
 #include "threads.h"
 #include "utlist.h"

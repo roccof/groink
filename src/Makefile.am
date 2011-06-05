@@ -67,7 +67,8 @@ noinst_HEADERS =				\
 		threads.h			\
 		utlist.h			\
 		uthash.h			\
-		pcap_util.h
+		pcap_util.h			\
+		iface.h
 
 groink_CFLAGS = $(LUA_CFLAGS)
 groink_LDADD = $(LUA_LIBS)

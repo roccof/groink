@@ -91,6 +91,5 @@ void *safe_alloc(size_t size);
 void *safe_realloc(void *ptr, size_t size);
 char *fake_unicode(unsigned char *bytes, int len);
 char *hex_string(unsigned char *bytes, int len);
-void load_iface_info();
 
 #endif /* GROINK_BASE_H */

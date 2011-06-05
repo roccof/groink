@@ -189,7 +189,7 @@ static void proc_pkt_cb(hookdata_t *data)
   lua_settop(gbls->L, 0); /* Clear the stack */
 }
 
-void se_run()
+static void se_run()
 {
   myassert(gbls->L != NULL);
 
@@ -244,12 +244,18 @@ void se_open()
     se_fatal("%s", lua_tostring(gbls->L, -1));
 
   lua_settop(gbls->L, 0); /* Clear the stack */
+
+  /* Run the script */
+  se_run();
 }
 
 void se_close()
 {
   if(gbls->L == NULL)
     return;
+
+  /* Unregister hook for SE_PROC_PKT */
+  hook_unregister(HOOK_RECEIVED, proc_pkt_cb);
 
   lua_settop(gbls->L, 0); /* Clear the stack */
 

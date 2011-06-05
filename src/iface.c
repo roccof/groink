@@ -29,6 +29,7 @@
 #include "globals.h"
 #include "netutil.h"
 #include "utlist.h"
+#include "iface.h"
 
 void load_iface_info()
 {
@@ -130,4 +131,17 @@ void load_iface_info()
 
   close(fd);
   freeifaddrs(ifaddr);
+}
+
+int get_iface_index(int sockfd, char *device)
+{
+  struct ifreq ifr;
+  
+  memset(&ifr, 0, sizeof(ifr));
+  strncpy(ifr.ifr_name, device, sizeof(ifr.ifr_name));
+  
+  if (ioctl(sockfd, SIOCGIFINDEX, &ifr) == -1)
+    return -1;
+  
+  return ifr.ifr_ifindex;
 }

@@ -28,7 +28,6 @@
 
 void se_open();
 void se_close();
-void se_run();
 char *append_script_dir(char *script_name);
 
 #endif /* GROINK_SCRIPT_ENGINE_H */

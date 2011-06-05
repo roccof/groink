@@ -37,6 +37,8 @@
 #include "forward.h"
 #include "decoder.h"
 #include "packet.h"
+#include "inject.h"
+#include "iface.h"
 
 static pcap_t *pcap = NULL;
 
@@ -47,16 +49,14 @@ static void cleanup()
   debug("cleaning up...");
   
   pcap_breakloop(pcap);
-  usleep(100);
   debug("sniffing stopped");
 
   se_close();
   mitm_stop();
+  inject_cleanup();
   protos_destroy();
   
-  if (pcap_stats(pcap, &ps) == -1)
-    fatal(__func__, pcap_geterr(pcap));
-  else
+  if (pcap_stats(pcap, &ps) != -1)
     debug("cap/recv/drop packet: %d/%d/%d", 
 	  gbls->cap_packets, ps.ps_recv, ps.ps_drop);
 
@@ -73,10 +73,20 @@ static void signal_handler_cb(int signal)
   exit(EXIT_SUCCESS);
 }
 
-static void process_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *bytes)
+static void 
+process_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *bytes)
 {
   packet_t *p = NULL;
   hookdata_t *hookdata = NULL;
+
+  if (header->len == 0 || bytes == NULL) {
+      /*
+       * XXX:
+       *     If header->len is 0, header->caplen is
+       *     greater than zero. Why???? oO
+       */
+      return;
+    }
 
   /* Skip truncated packets */
   if (header->len > gbls->snaplen) {
@@ -133,20 +143,23 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
+  /* Initialize pcap handler */
   pcap = pcap_init(gbls->iface, gbls->snaplen, gbls->promisc, gbls->rfmon, 
 		   gbls->cap_timeout);
 
   /* Get the device type */
   gbls->dlt = pcap_datalink(pcap);
 
+  inject_initialize();
+
   /* Build the list with all hosts present in the same network */
-  /* if(gbls->scan) */
-  /*   build_hosts_list(); */
+  if(gbls->scan)
+    build_hosts_list(pcap);
   
   /* TODO: possibility to read the hosts from a file */
   
   /* Start MiTM attack if required */
-  /* mitm_start(); */
+  mitm_start();
 
   if(gbls->mitm_state == MITM_STATE_START)
     packet_forward_module_init();
@@ -155,7 +168,6 @@ int main(int argc, char **argv)
 
   /* Start script engine and run the script */
   se_open();
-  se_run();
 
   if (gbls->promisc)
     debug("start sniffing on '%s' in promisc mode, datalink: %s (%s), snaplen %d", 
@@ -166,6 +178,7 @@ int main(int argc, char **argv)
 	  pcap_datalink_val_to_name(gbls->dlt), 
 	  pcap_datalink_val_to_description(gbls->dlt), gbls->snaplen);
 
+  /* Start sniffing */
   pcap_loop(pcap, 0, &process_packet, NULL);
 
   return EXIT_SUCCESS;

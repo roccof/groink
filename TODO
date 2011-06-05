@@ -48,8 +48,6 @@
    http://linuxwireless.org/en/developers/Documentation/radiotap
    http://www.radiotap.org/
 
-* IPv6 multiple address per iface support
-
 * database of script
 
 * DHCP spoofing MiTM attack

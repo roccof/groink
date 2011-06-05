@@ -32,9 +32,6 @@ typedef enum _grk_layer {
   L5
 } layer_t;
 
-#define FIELD_OP_GET 0   /* Get operation */
-#define FIELD_OP_EDIT 1  /* Edit operation */
-
 typedef struct _grk_proto_fields {
   char *name;
   void (*cb)(lua_State *L, void *data, short op);
@@ -48,7 +45,7 @@ typedef struct _grk_protocol {
 				get and edit the fields of the protocol */
   luaL_reg *methods;
   decoder_cb_t decoder;      /* Protocol decoder callback */
-  int refcount;              /* Used from hashtables, iit ndicates if the struct 
+  int refcount;              /* Used from hashtables, it indicates if the struct 
 				can be freed */
 } proto_t;
 

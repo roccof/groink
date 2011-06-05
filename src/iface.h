@@ -16,28 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_INJECT_H
-#define GROINK_INJECT_H
+#ifndef GROINK_IFACE_H
+#define GROINK_IFACE_H
 
-#include "packet.h"
+void load_iface_info();
+int get_iface_index(int sockfd, char *iface);
 
-void inject_initialize();
-void inject_cleanup();
-void inject(packet_t *p);
-void inject_arp_reply(char *eth_src, char *ip_src, char *eth_target, char *ip_target);
-void inject_arp_request(char *eth_src, char *ip_src, char *eth_target, char *ip_target);
-void inject_arp(char *eth_src, char *eth_dst, _uint16 opcode, char *sha, char *spa, char *tha, char *tpa);
-
-/*
- * TODO:
- *  - inject_ipv4
- *  - inject_ipv6
- *  - inject_tcp
- *  - inject_tcp6
- *  - inject_udp
- *  - inject_udp6
- *  - inject_icmp
- *  - inject_icmpv6
- */
-
-#endif /* GROINK_INJECT_H */
+#endif /* GROINK_IFACE_H */
