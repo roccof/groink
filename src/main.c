@@ -48,19 +48,21 @@ static void cleanup()
 
   debug("cleaning up...");
   
-  pcap_breakloop(pcap);
-  debug("sniffing stopped");
+  if(pcap != NULL) {
+    pcap_breakloop(pcap);
+    debug("sniffing stopped");
+
+    if (pcap_stats(pcap, &ps) != -1)
+      debug("cap/recv/drop packet: %d/%d/%d", 
+	    gbls->cap_packets, ps.ps_recv, ps.ps_drop);
+    
+    pcap_close(pcap);
+  }
 
   se_close();
   mitm_stop();
   inject_cleanup();
   protos_destroy();
-  
-  if (pcap_stats(pcap, &ps) != -1)
-    debug("cap/recv/drop packet: %d/%d/%d", 
-	  gbls->cap_packets, ps.ps_recv, ps.ps_drop);
-
-  pcap_close(pcap);
   
   packet_forward_module_destroy();
   threads_manager_destroy();
