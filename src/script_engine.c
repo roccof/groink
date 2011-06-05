@@ -35,9 +35,11 @@
 #define INIT_SCRIPT GROINK_DATADIR"/selib/script_engine.lua"
 #define DEFAULT_SCRIPT "default"
 
+static lua_State *L = NULL;
+
 static int se_panic(lua_State *L)
 {
-  se_fatal("%s", (char *)lua_tostring(gbls->L, -1));
+  se_fatal("%s", (char *)lua_tostring(L, -1));
   return 0;
 }
 
@@ -171,41 +173,39 @@ static int se_init(lua_State *L)
 
 static void proc_pkt_cb(hookdata_t *data)
 {
-  myassert(gbls->L != NULL);
+  myassert(L != NULL);
   myassert(data != NULL && data->type == HOOKDATA_PACKET);
 
   /* Stack pos 1: traceback function */
-  lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_TRACEBACK);
+  lua_getfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK);
 
   /* Stack pos 2: proc_pkt function in the script */
-  lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_PROC_PKT);
+  lua_getfield(L, LUA_REGISTRYINDEX, SE_PROC_PKT);
 
-  se_pushobject(gbls->L, (packet_t *)data->data, SE_OBJ_TYPE_PACKET, 
+  se_pushobject(L, (packet_t *)data->data, SE_OBJ_TYPE_PACKET, 
 		SE_OBJ_NAME_PACKET);
 
-  if (lua_pcall(gbls->L, 1, 0, 1) != 0)
-      lua_error(gbls->L);
+  if (lua_pcall(L, 1, 0, 1) != 0)
+      lua_error(L);
   
-  lua_settop(gbls->L, 0); /* Clear the stack */
+  lua_settop(L, 0); /* Clear the stack */
 }
 
 static void se_run()
 {
-  myassert(gbls->L != NULL);
-
   se_debug("running script '%s'", gbls->script);
 
   /* Stack pos 1: traceback function */
-  lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_TRACEBACK);
+  lua_getfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK);
 
   /* Stack pos 2: init function in the script */
-  lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_INIT);
+  lua_getfield(L, LUA_REGISTRYINDEX, SE_INIT);
 
-  if (!lua_isnil(gbls->L, 2))
-    if (lua_pcall(gbls->L, 0, 0, 1) != 0)
-      lua_error(gbls->L);
+  if (!lua_isnil(L, 2))
+    if (lua_pcall(L, 0, 0, 1) != 0)
+      lua_error(L);
   
-  lua_settop(gbls->L, 0); /* Clear the stack */
+  lua_settop(L, 0); /* Clear the stack */
 
   /* Register hook for SE_PROC_PKT */
   hook_register(HOOK_RECEIVED, proc_pkt_cb);
@@ -213,22 +213,22 @@ static void se_run()
 
 void se_open()
 {
-  myassert(gbls->L == NULL);
+  myassert(L == NULL);
 
   debug("starting script engine...");
 
   /* Start lua */
-  gbls->L = luaL_newstate();
+  L = luaL_newstate();
 
   /* Set panic callback function */
-  lua_atpanic(gbls->L, &se_panic);
+  lua_atpanic(L, &se_panic);
 
   /* Open lua libraries */
-  luaL_openlibs(gbls->L);
+  luaL_openlibs(L);
   debug("loaded lua libraries");
 
   /* Open C libraries */
-  open_clib(gbls->L);
+  open_clib(L);
   debug("loaded C libraries");  
 
  /* If not setted, set default script */
@@ -237,13 +237,13 @@ void se_open()
 
   /**** Start the engine ****/
 
-  lua_pushcfunction(gbls->L, &se_init);
-  lua_pushstring(gbls->L, gbls->script);
+  lua_pushcfunction(L, &se_init);
+  lua_pushstring(L, gbls->script);
 
-  if(lua_pcall(gbls->L, 1, 0, 0) != 0)
-    se_fatal("%s", lua_tostring(gbls->L, -1));
+  if(lua_pcall(L, 1, 0, 0) != 0)
+    se_fatal("%s", lua_tostring(L, -1));
 
-  lua_settop(gbls->L, 0); /* Clear the stack */
+  lua_settop(L, 0); /* Clear the stack */
 
   /* Run the script */
   se_run();
@@ -251,35 +251,35 @@ void se_open()
 
 void se_close()
 {
-  if(gbls->L == NULL)
+  if(L == NULL)
     return;
 
   /* Unregister hook for SE_PROC_PKT */
   hook_unregister(HOOK_RECEIVED, proc_pkt_cb);
 
-  lua_settop(gbls->L, 0); /* Clear the stack */
+  lua_settop(L, 0); /* Clear the stack */
 
   /*** Call cleanup script function ***/
 
   /* Stack pos 1: traceback function */
-  lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_TRACEBACK);
+  lua_getfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK);
 
   /* Stack pos 2: callback function */
-  lua_getfield(gbls->L, LUA_REGISTRYINDEX, SE_CLEANUP);
+  lua_getfield(L, LUA_REGISTRYINDEX, SE_CLEANUP);
 
-  if(!lua_isnil(gbls->L, 2))
-    if(lua_pcall(gbls->L, 0, 0, 1) != 0)
-	se_fatal("%s", lua_tostring(gbls->L, -1));
+  if(!lua_isnil(L, 2))
+    if(lua_pcall(L, 0, 0, 1) != 0)
+	se_fatal("%s", lua_tostring(L, -1));
 
   /* Performs a full garbage-collection cycle */
-  lua_getglobal(gbls->L, "collectgarbage");
-  myassert(!lua_isnil(gbls->L, -1));
-  lua_pushstring(gbls->L, "collect");
-  lua_pcall(gbls->L, 1, 0, 1);
+  lua_getglobal(L, "collectgarbage");
+  myassert(!lua_isnil(L, -1));
+  lua_pushstring(L, "collect");
+  lua_pcall(L, 1, 0, 1);
 
   /* Close lua */
-  lua_close(gbls->L);
-  gbls->L = NULL;
+  lua_close(L);
+  L = NULL;
 
   debug("script engine closed");
 }

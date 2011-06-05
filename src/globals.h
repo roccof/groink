@@ -19,9 +19,6 @@
 #ifndef GROINK_GLOBALS_H
 #define GROINK_GLOBALS_H
 
-#include <lua.h>
-#include <pcap.h>
-
 #include "mitm.h"
 #include "script_engine.h"
 #include "host.h"
@@ -44,14 +41,12 @@ struct _grk_globals {
   char *netmask;                          /* IPv4 network mask */
   char *netmask6;                         /* IPv6 network mask */
 
-  pcap_t *pcap;                           /* Pcap handler */
   int dlt;                                /* Data link type  */
   long cap_packets;                       /* Captured packet counter */
   int snaplen;                            /* Captured packet length */
   int decode;                             /* If 1 the packet is decoded */
   int cap_timeout;                        /* Pcap capture packet timeout*/
 
-  lua_State *L;                           /* Lua state */
   char *script;                           /* Script to run */
   char *script_argv[MAX_SCRIPT_ARGS];     /* Arguments of script */
   int script_argc;                        /* Number of argument of script */

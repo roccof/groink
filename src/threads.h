@@ -55,7 +55,6 @@ pthread_t thread_new(char *name, thread_cb callback, void *data);
 void thread_register(pthread_t id, char *name);
 void thread_stop(pthread_t id);
 void thread_unregister(pthread_t id);
-void thread_kill_all();
 pthread_t thread_id_from_name(char *name);
 int thread_is_occupated_name(char *name);
 int thread_exec_num();

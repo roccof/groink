@@ -41,6 +41,8 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 /* Thread's attributes */
 static pthread_attr_t attr;
 
+static void thread_kill_all();
+
 void threads_manager_init()
 {
   pthread_attr_init(&attr);
@@ -85,7 +87,7 @@ void thread_register(pthread_t id, char *name)
 {
   struct _grk_thread_elem *new = NULL;
 
-  // Register thread in the list
+  /* Register thread in the list */
   new = (struct _grk_thread_elem *)safe_alloc(sizeof(struct _grk_thread_elem));
   new->id = id;
   new->name = name;
@@ -163,7 +165,7 @@ int thread_is_occupated_name(char *name)
   return 0;
 }
 
-void thread_kill_all()
+static void thread_kill_all()
 {
   struct _grk_thread_elem *t = NULL;
   struct _grk_thread_elem *tmp = NULL;
@@ -174,7 +176,7 @@ void thread_kill_all()
   MUTEX_LOCK(&mutex);
 
   LL_FOREACH_SAFE (list, t, tmp) {
-    // Skip ourself
+    /* Skip ourself */
     if (!pthread_equal(t->id, self_id)) {
       pthread_cancel(t->id);
       /* pthread_join(t->id, NULL); */

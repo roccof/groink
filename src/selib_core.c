@@ -22,7 +22,6 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include <unistd.h>
-#include <pcap.h>
 
 #include "base.h"
 #include "globals.h"
@@ -246,33 +245,6 @@ static int l_core_dlt(lua_State *L)
   return 1;
 }
 
-static int l_core_stats(lua_State *L)
-{
-  struct pcap_stat ps;
-
-  lua_newtable(L);
-
-  if(pcap_stats(gbls->pcap, &ps) == -1)
-    return 1; /* TODO: error */
-
-  lua_pushstring(L, "captured");
-  lua_pushnumber(L, gbls->cap_packets);
-  lua_settable(L, -3);
-
-  lua_pushstring(L, "received");
-  lua_pushnumber(L, ps.ps_recv);
-  lua_settable(L, -3);
-
-  lua_pushstring(L, "dropped");
-  lua_pushnumber(L, ps.ps_drop);
-  lua_settable(L, -3);
-
-  /* Read-Only table */
-  se_setro(L);
-
-  return 1;
-}
-
 static int l_core_set_pktdecoding(lua_State *L)
 {
   int decode = 0;
@@ -307,7 +279,6 @@ static const struct luaL_reg core_lib[] = {
   {"usleep", l_core_usleep},
   {"scanned_hosts", l_core_scanned_hosts},
   {"dlt", l_core_dlt},
-  {"capturing_stats", l_core_stats},
   {"set_pktdecoding", l_core_set_pktdecoding},
   {"pktdecoding", l_core_pktdecoding},
   {NULL, NULL}

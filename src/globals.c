@@ -49,14 +49,12 @@ void globals_init()
   gbls->netmask = NULL;
   gbls->netmask6 = NULL;
 
-  gbls->pcap = NULL;
   gbls->dlt = 0;
   gbls->cap_packets = 0;
   gbls->snaplen = CAP_SNAPLEN;
   gbls->decode = 1;
   gbls->cap_timeout = CAP_TIMEOUT;
 
-  gbls->L = NULL;
   gbls->script = NULL;
   bzero(gbls->script_argv, MAX_SCRIPT_ARGS);
   gbls->script_argc = 0;
