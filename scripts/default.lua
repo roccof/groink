@@ -20,7 +20,8 @@
 -- This script dissect packet and show username and password.
 
 local corelib = require("core")
+local printf = corelib.printf
 
 function proc_pkt(p)
-
+   
 end

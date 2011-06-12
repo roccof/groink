@@ -71,11 +71,21 @@ typedef struct _grk_ipv6 {
 #define IPV6_TRCLASS(ip) ((ntohl((ip)->vtf) & 0x0ff00000) >> 20)
 #define IPV6_FLOW(ip)    (ntohl((ip)->vtf) & 0x000fffff)
 
-/* Hop-by-Hop Options */
-/* Destination Options */
-typedef struct _grk_ipv6_ext_options {
+#define IPV6_PROTO_ICMP 58
+
+/* Extension headers */
+#define IPV6_EXTH_HBH 0
+#define IPV6_EXTH_DST_OPT 60
+#define IPV6_EXTH_ROUTING 43
+#define IPV6_EXTH_FRAG 44
+#define IPV6_EXTH_AH 51
+#define IPV6_EXTH_ESP 50
+#define IPV6_NO_EXT_HDR 59
+
+/* Hop-by-Hop Options & Destination Options */
+typedef struct _grk_ipv6_ext_opt {
   _uint8 next_hdr;        /* Next header */
-  _uint8 len;             /* Header extension header */
+  _uint8 len;             /* Header extension header len */
 } ipv6_ext_opt_t;
 
 /* Routing (Type 0) */
@@ -85,7 +95,7 @@ typedef struct _grk_ipv6_ext_routing {
   _uint8 routing_type;
   _uint8 seg_left;
   _uint32 reserved;
-} ipv6_ext_routing;
+} ipv6_ext_routing_t;
 
 /* Fragment */
 typedef struct _grk_ipv6_ext_frag {
@@ -93,7 +103,7 @@ typedef struct _grk_ipv6_ext_frag {
   _uint8 reserved;
   _uint16 frags;
   _uint16 id;
-} ipv6_ext_fragment;
+} ipv6_ext_frag_t;
 
 #define IPV6_EXT_FRAG_FRAGOFF(ip)  ((ip)->frags & 0xfff8)
 #define IPV6_EXT_FRAG_MOREFRAG(ip) ((ip)->frags & 0x0001)
@@ -105,12 +115,12 @@ typedef struct _grk_ipv6_ext_auth {
   _uint16 reserved;
   _uint32 spi;
   _uint32 seq;
-} ipv6_ext_auth;
+} ipv6_ext_auth_t;
 
 /* Encapsulating Security Payload */
 typedef struct _grk_ipv6_ext_esp {
   
-} ipv6_ext_esp;
+} ipv6_ext_esp_t;
 
 void register_ipv6();
 

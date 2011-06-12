@@ -62,8 +62,7 @@ static void cleanup()
   se_close();
   mitm_stop();
   inject_cleanup();
-  protos_destroy();
-  
+  protos_destroy();  
   packet_forward_module_destroy();
   threads_manager_destroy();
   hook_cleanup();

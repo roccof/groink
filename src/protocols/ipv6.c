@@ -32,24 +32,83 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
 {
   ipv6_t *ip = NULL;
   header_t *h = NULL;
+  _uint8 nexth;
+  _uint totlen = 0;
+  ipv6_ext_opt_t *opt = NULL;
+  ipv6_ext_routing_t *r = NULL;
+  ipv6_ext_frag_t *f = NULL;
 
   if (len < IPV6_HDR_LEN) {
-    debug("too short");
+    debug("IPv6 decoder: too short");
     call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
   ip = (ipv6_t *)bytes;
+  totlen += IPV6_HDR_LEN;
 
   h = packet_append_header(p, PROTO_NAME_IPV6, (void *)ip, IPV6_HDR_LEN);
   
   p->net_srcaddr = ipv6_addr_ntoa(ip->src_addr);
   p->net_dstaddr = ipv6_addr_ntoa(ip->dst_addr);
 
-  /* while (1) { */
-    
-  /* } */
+  nexth = ip->next_hdr;
 
- /* end: */
+  while (1) {
+    switch (nexth) {
+
+    case IPV6_EXTH_HBH:
+    case IPV6_EXTH_DST_OPT:
+      opt = (ipv6_ext_opt_t *)(bytes + totlen);
+      totlen += sizeof(ipv6_ext_opt_t) + opt->len;
+      nexth = opt->next_hdr;
+      break;
+
+    case IPV6_EXTH_ROUTING:
+      r = (ipv6_ext_routing_t *)(bytes + totlen);
+      totlen += sizeof(ipv6_ext_routing_t) + r->len;
+      nexth = r->next_hdr;
+      break;
+
+    case IPV6_EXTH_FRAG:
+      f = (ipv6_ext_frag_t *)(bytes + totlen);
+      totlen += sizeof(ipv6_ext_frag_t);
+      nexth = f->next_hdr;
+      break;
+
+    case IPV6_EXTH_AH:
+      debug("IPv6 decoder: AH extension header not implemented");
+      return totlen;
+
+    case IPV6_EXTH_ESP:
+      debug("IPv6 decoder: ESP extension header not implemented");
+      return totlen;
+
+    case IPV4_PROTO_TCP:
+      totlen += call_decoder(PROTO_NAME_TCP, p, (bytes + totlen), (len - totlen));
+      return totlen;
+      
+    case IPV4_PROTO_UDP:
+      totlen += call_decoder(PROTO_NAME_UDP, p, (bytes + totlen), (len - totlen));
+      return totlen;
+
+    case IPV4_PROTO_ICMP:
+      totlen += call_decoder(PROTO_NAME_ICMP, p, (bytes + totlen), (len - totlen));
+      return totlen;
+
+    case IPV6_PROTO_ICMP:
+      return totlen;
+
+    case IPV6_NO_EXT_HDR: /* No extension header */
+      return totlen;
+
+    default:
+      /* Unknown layer 4 protocol or extension header */
+      totlen += call_decoder(PROTO_NAME_RAW, p, (bytes + totlen), (len - totlen));
+      return totlen;
+    }
+    break;
+  }
+
   return DECODE_OK;
 }
 
