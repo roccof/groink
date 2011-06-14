@@ -20,8 +20,8 @@
 #define GROINK_ICMP6_H
 
 /*
- * RFC 2463 - ICMPv6 HEADER
- * ========================
+ * RFC 2463, RFC 4861 - ICMPv6 HEADER
+ * ==================================
  *
  *   0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -63,6 +63,25 @@ typedef struct _grk_icmp6_echo_body {
 #define ICMP6_TYPE_NEIGH_ADV 136       /* ND Neighbor Advertisement */
 #define ICMP6_TYPE_REDIRECT 137        /* ND Redirect */
 #define ICMP6_TYPE_ROUTER_RENUM 138    /* Router Renumbering */
+
+/* ICMPv6 Destination Unreachable code value */
+#define ICMP6_CODE_DEST_UNR_NO_ROUTE 0         /* No route to the destination */
+#define ICMP6_CODE_DEST_UNR_COMMUN_ADM_PROIB 1 /* Communication Administratively
+						  prohibited */
+#define ICMP6_CODE_DEST_UNR_ADDR_UNREACH 3     /* Address unreachable */
+#define ICMP6_CODE_DEST_UNR_PORT_UNREACH 4     /* Port unreachable */
+
+/* ICMPv6 Time Exceeded code value */
+#define ICMP6_CODE_TIME_EXC_HOP_LIM 0     /* Hop limit exceeded in transit */
+#define ICMP6_CODE_TIME_EXC_FRAG_REASS 1  /* Fragment reassembly time exceeded */
+
+/* ICMPv6 Parameter Problem code value */
+#define ICMP6_CODE_PARAM_PROB_ERR_HDR_FIELD 0   /* Erroneous header field 
+						   encountered */
+#define ICMP6_CODE_PARAM_PROB_UNREC_NXT_HDR 1   /* Unrecognized Next Header 
+						   type encountered */
+#define ICMP6_CODE_PARAM_PROB_UNREC_OPT 2       /* Unrecognized IPv6 option 
+						   encountered */
 
 void register_icmp6();
 
