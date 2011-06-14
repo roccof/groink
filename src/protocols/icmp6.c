@@ -105,6 +105,20 @@ static void process_echo(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_settable(L, -3);
 }
 
+static void process_pkt_too_big(lua_State *L, icmp6_t *icmp, unsigned int len)
+{
+  if (len < sizeof(_uint32)) {
+    debug("malformed ICMPv6 packet too big body: invalid length");
+    lua_pushnil(L);
+  }
+
+  lua_newtable(L);
+  
+  lua_pushstring(L, "mtu");
+  lua_pushnumber(L, htonl(*((_uint32 *)(icmp + 1))));
+  lua_settable(L, -3);
+}
+
 static int l_icmp6_body(lua_State *L)
 {
   header_t *header = NULL;
@@ -118,6 +132,10 @@ static int l_icmp6_body(lua_State *L)
   case ICMP6_TYPE_ECHO_REQ:
   case ICMP6_TYPE_ECHO_REP:
     process_echo(L, icmp, (header->len - ICMP6_HDR_LEN));
+    break;
+
+  case ICMP6_TYPE_PKT_TOO_BIG:
+    process_pkt_too_big(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
 
   case ICMP6_TYPE_DEST_UNREACH:    
