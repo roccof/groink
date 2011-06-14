@@ -55,7 +55,7 @@
  */
 
 #define IPV6_ADDR_LEN 16 /* bytes */
-#define IPV6_HDR_LEN 40 /* bytes */
+#define IPV6_HDR_LEN 40  /* bytes */
 
 typedef struct _grk_ipv6 {
   _uint32 vtf;                     /* Version, Traffic Class, Flow Label */

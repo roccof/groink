@@ -28,5 +28,6 @@
 #define PROTO_NAME_TCP "tcp"
 #define PROTO_NAME_UDP "udp"
 #define PROTO_NAME_ICMP "icmp"
+#define PROTO_NAME_ICMP6 "icmp6"
 
 #endif /* GROINK_PROTOS_NAMES_H */

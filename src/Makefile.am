@@ -19,6 +19,7 @@ groink_SOURCES =				\
 		protos.c			\
 		protocols/arp.c			\
 		protocols/icmp.c		\
+		protocols/icmp6.c		\
 		protocols/ipv4.c		\
 		protocols/ipv6.c		\
 		protocols/ethernet.c		\
@@ -55,6 +56,7 @@ noinst_HEADERS =				\
 		protos_name.h			\
 		protocols/arp.h			\
 		protocols/icmp.h		\
+		protocols/icmp6.h		\
 		protocols/ipv4.h		\
 		protocols/ipv6.h		\
 		protocols/ethernet.h		\
