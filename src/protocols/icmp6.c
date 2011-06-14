@@ -119,6 +119,20 @@ static void process_pkt_too_big(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_settable(L, -3);
 }
 
+static void process_param_problem(lua_State *L, icmp6_t *icmp, unsigned int len)
+{
+  if (len < sizeof(_uint32)) {
+    debug("malformed ICMPv6 parameter problem body: invalid length");
+    lua_pushnil(L);
+  }
+
+  lua_newtable(L);
+  
+  lua_pushstring(L, "pointer");
+  lua_pushnumber(L, htonl(*((_uint32 *)(icmp + 1))));
+  lua_settable(L, -3);
+}
+
 static int l_icmp6_body(lua_State *L)
 {
   header_t *header = NULL;
@@ -136,6 +150,10 @@ static int l_icmp6_body(lua_State *L)
 
   case ICMP6_TYPE_PKT_TOO_BIG:
     process_pkt_too_big(L, icmp, (header->len - ICMP6_HDR_LEN));
+    break;
+
+  case ICMP6_TYPE_PARAM_PROB:
+    process_param_problem(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
 
   case ICMP6_TYPE_DEST_UNREACH:    
