@@ -24,6 +24,7 @@
 #include "protocols/pppoe.h"
 #include "protocols/ipv4.h"
 #include "protocols/icmp.h"
+#include "protocols/icmp6.h"
 #include "protos_name.h"
 #include "selib.h"
 
@@ -47,12 +48,11 @@ static const se_constant_t protos_const[] = {
 };
 
 static const se_constant_t icmp_const[] = {
-  {"HDR_LEN", { .num = ICMP_HDR_LEN }, SE_TNUMBER},
   {"TYPE_ECHO_REPLY", { .num = ICMP_TYPE_ECHOREPLY }, SE_TNUMBER},
   {"TYPE_DEST_UNREACH", { .num = ICMP_TYPE_DEST_UNREACH }, SE_TNUMBER},
   {"TYPE_SOURCE_QUENCH", { .num = ICMP_TYPE_SOURCE_QUENCH }, SE_TNUMBER},
   {"TYPE_REDIRECT", { .num = ICMP_TYPE_REDIRECT }, SE_TNUMBER},
-  {"TYPE_ECHO", { .num = ICMP_TYPE_ECHO }, SE_TNUMBER},
+  {"TYPE_ECHO_REQUEST", { .num = ICMP_TYPE_ECHO }, SE_TNUMBER},
   {"TYPE_ROUTER_ADV", { .num = ICMP_TYPE_ROUTER_ADV }, SE_TNUMBER},
   {"TYPE_ROUTER_SOL", { .num = ICMP_TYPE_ROUTER_SOL }, SE_TNUMBER},
   {"TYPE_TIME_EXCEEDED", { .num = ICMP_TYPE_TIME_EXCEEDED }, SE_TNUMBER},
@@ -88,6 +88,32 @@ static const se_constant_t icmp_const[] = {
   {"CODE_TEXC_FRAGTIME", { .num = ICMP_TEXC_FRAGTIME }, SE_TNUMBER},
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
+
+static const se_constant_t icmp6_const[] = {
+  {"TYPE_ECHO_REPLY", { .num = ICMP6_TYPE_ECHO_REP }, SE_TNUMBER},
+  {"TYPE_DEST_UNREACH", { .num = ICMP6_TYPE_DEST_UNREACH }, SE_TNUMBER},
+  {"TYPE_PKT_TOO_BIG", { .num = ICMP6_TYPE_PKT_TOO_BIG }, SE_TNUMBER},
+  {"TYPE_REDIRECT", { .num = ICMP6_TYPE_REDIRECT }, SE_TNUMBER},
+  {"TYPE_ECHO_REQUEST", { .num = ICMP6_TYPE_ECHO_REQ }, SE_TNUMBER},
+  {"TYPE_ROUTER_ADV", { .num = ICMP6_TYPE_ROUTER_ADV }, SE_TNUMBER},
+  {"TYPE_ROUTER_SOL", { .num = ICMP6_TYPE_ROUTER_SOL }, SE_TNUMBER},
+  {"TYPE_TIME_EXCEEDED", { .num = ICMP6_TYPE_TIME_EXCEEDED }, SE_TNUMBER},
+  {"TYPE_PARAM_PROB", { .num = ICMP6_TYPE_PARAM_PROB }, SE_TNUMBER},
+  {"TYPE_NEIGH_ADV", { .num = ICMP6_TYPE_NEIGH_ADV }, SE_TNUMBER},
+  {"TYPE_NEIGH_SOL", { .num = ICMP6_TYPE_NEIGH_SOL }, SE_TNUMBER},
+  {"TYPE_ROUTER_RENUMBERING", { .num = ICMP6_TYPE_ROUTER_RENUM }, SE_TNUMBER},
+  {"CODE_UNREACH_NO_ROUTE", { .num = ICMP6_CODE_DEST_UNR_NO_ROUTE }, SE_TNUMBER},
+  {"CODE_UNREACH_ADM_PROIB", { .num = ICMP6_CODE_DEST_UNR_COMMUN_ADM_PROIB }, SE_TNUMBER},
+  {"CODE_UNREACH_ADDR", { .num = ICMP6_CODE_DEST_UNR_ADDR_UNREACH }, SE_TNUMBER},
+  {"CODE_UNREACH_PORT", { .num = ICMP6_CODE_DEST_UNR_PORT_UNREACH }, SE_TNUMBER},
+  {"CODE_TEXC_HOP_LIMIT", { .num = ICMP6_CODE_TIME_EXC_HOP_LIM }, SE_TNUMBER},
+  {"CODE_TEXC_FRAG_REASSEMBLY", { .num = ICMP6_CODE_TIME_EXC_FRAG_REASS }, SE_TNUMBER},
+  {"CODE_PARAM_PROB_ERR_HDR_FIELD", { .num = ICMP6_CODE_PARAM_PROB_ERR_HDR_FIELD }, SE_TNUMBER},
+  {"CODE_PARAM_PROB_UNREC_NXT_HDR", { .num = ICMP6_CODE_PARAM_PROB_UNREC_NXT_HDR }, SE_TNUMBER},
+  {"CODE_PARAM_PROB_UNREC_OPT", { .num = ICMP6_CODE_PARAM_PROB_UNREC_OPT }, SE_TNUMBER},
+  {NULL, { .num = 0 }, SE_TNUMBER}
+};
+
 
 static const se_constant_t ip_const[] = {
   {"MAX_PACKET_SIZE", { .num = IPV4_MAXPACKET }, SE_TNUMBER},
@@ -134,6 +160,7 @@ static const struct _grk_consts consts[] = {
   {"PPPoE", pppoe_const},
   {"IPv4", ip_const},
   {"ICMP", icmp_const},
+  {"ICMP6", icmp6_const},
   {NULL, NULL}
 };
 

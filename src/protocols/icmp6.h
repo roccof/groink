@@ -57,7 +57,7 @@ typedef struct _grk_icmp6_echo_body {
 #define ICMP6_TYPE_PARAM_PROB 4        /* Parameter Problem */
 #define ICMP6_TYPE_ECHO_REQ 128        /* Echo Request */
 #define ICMP6_TYPE_ECHO_REP 129        /* Echo Reply */
-#define ICMP6_TYPE_ROUTER_SOLIC 133    /* ND Router Solicitation */
+#define ICMP6_TYPE_ROUTER_SOL 133      /* ND Router Solicitation */
 #define ICMP6_TYPE_ROUTER_ADV 134      /* ND Router Advertisement */
 #define ICMP6_TYPE_NEIGH_SOL 135       /* ND Neighbor Solicitation */
 #define ICMP6_TYPE_NEIGH_ADV 136       /* ND Neighbor Advertisement */

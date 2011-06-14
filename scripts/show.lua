@@ -274,7 +274,7 @@ local function print_icmp(p)
    
    printf("ICMP %s > %s ", p:net_srcaddr(), p:net_dstaddr())
    
-   if icmp:type() == ICMP.TYPE_ECHO then
+   if icmp:type() == ICMP.TYPE_ECHO_REQUEST then
       printf("echo request")
    elseif icmp:type() == ICMP.TYPE_ECHO_REPLY then
       printf("echo reply")
@@ -309,6 +309,48 @@ local function print_icmp(p)
    printf("\n")
 end
 
+-- Print icmp6 header
+local function print_icmp6(p)
+   local icmp = p:get_header(Proto.ICMP6)
+   local body = icmp:body()
+   
+   printf("ICMPv6 %s > %s ", p:net_srcaddr(), p:net_dstaddr())
+   
+   if icmp:type() == ICMP6.TYPE_ECHO_REQUEST then
+      printf("echo request")
+   elseif icmp:type() == ICMP6.TYPE_ECHO_REPLY then
+      printf("echo reply")
+   elseif icmp:type() == ICMP6.TYPE_DEST_UNREACH then
+      if icmp:code() == ICMP6.CODE_UNREACH_NO_ROUTE then
+   	 printf("no route to destination")
+      elseif icmp:code() == ICMP6.CODE_UNREACH_ADM_PROIB then
+   	 printf("communication with destination administratively prohibited")
+      elseif icmp:code() == ICMP6.CODE_UNREACH_ADDR then
+   	 printf("address unreachable")
+      elseif icmp:code() == ICMP6.CODE_UNREACH_PORT then
+   	 printf("port unreachable")
+      end
+   elseif icmp:type() == ICMP6.TYPE_TIME_EXCEEDED then
+      printf("time exceeded")
+      if icmp:code() == ICMP6.CODE_TEXC_HOP_LIMIT then
+	 printf(", hop limit exceeded in transit")
+      elseif icmp:code() == ICMP6.CODE_TEXC_FRAG_REASSEMBLY then
+	 printf(", fragment reassembly time exceeded")
+      end
+   elseif icmp:type() == ICMP6.TYPE_PARAM_PROB then
+      if icmp:code() == ICMP6.CODE_PARAM_PROB_ERR_HDR_FIELD then
+	 printf("erroneous header field")
+      elseif icmp:code() == ICMP6.CODE_PARAM_PROB_UNREC_NXT_HDR then
+	 printf("unrecognized Next Header type")
+      elseif icmp:code() == ICMP6.CODE_PARAM_PROB_UNREC_OPT then
+	 printf("unrecognized IPv6 option")
+      end
+   elseif icmp:type() == ICMP6.TYPE_PKT_TOO_BIG then
+      printf("packet too big, mtu: %d", body.mtu)
+   end
+   printf("\n")
+end
+
 function proc_pkt(p)
    if p:contains_header(Proto.ARP) then
       print_arp(p)
@@ -316,6 +358,8 @@ function proc_pkt(p)
       print_pppoe(p)
    elseif p:contains_header(Proto.ICMP) then
       print_icmp(p)
+   elseif p:contains_header(Proto.ICMP6) then
+      print_icmp6(p)
    elseif p:contains_header(Proto.TCP) then
       print_tcp(p)
    elseif p:contains_header(Proto.UDP) then

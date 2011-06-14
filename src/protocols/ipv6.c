@@ -96,6 +96,7 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
       return totlen;
 
     case IPV6_PROTO_ICMP:
+      totlen += call_decoder(PROTO_NAME_ICMP6, p, (bytes + totlen), (len - totlen));
       return totlen;
 
     case IPV6_NO_EXT_HDR: /* No extension header */
