@@ -38,12 +38,8 @@ static int decode_icmp(packet_t *p, const _uint8 *bytes, size_t len)
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
-  if (len != sizeof(icmp_t))
-    debug("icmp decoder: more bytes after icmp header...");
-  
   icmp = (icmp_t *)bytes;
-
-  packet_append_header(p, PROTO_NAME_ICMP, (void *)icmp, sizeof(icmp_t));
+  packet_append_header(p, PROTO_NAME_ICMP, (void *)icmp, len);
   
   return DECODE_OK;
 }

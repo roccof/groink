@@ -83,6 +83,28 @@ static int l_icmp6_cksum(lua_State *L)
   return 1;
 }
 
+static void process_echo(lua_State *L, icmp6_t *icmp, unsigned int len)
+{
+  icmp6_echo_t *echo = NULL;
+
+  if (len < sizeof(icmp6_echo_t)) {
+    debug("malformed ICMPv6 echo body: invalid length");
+    lua_pushnil(L);
+  }
+
+  echo = (icmp6_echo_t *)(icmp + 1);
+
+  lua_newtable(L);
+  
+  lua_pushstring(L, "id");
+  lua_pushnumber(L, htons(echo->id));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "seq");
+  lua_pushnumber(L, htons(echo->seq));
+  lua_settable(L, -3);
+}
+
 static int l_icmp6_body(lua_State *L)
 {
   header_t *header = NULL;
@@ -93,19 +115,12 @@ static int l_icmp6_body(lua_State *L)
 
   switch (icmp->type) {
   
-  /* case ICMP6_TYPE_ECHO_REQ: */
-  /* case ICMP6_TYPE_ECHO_REP: */
-  /*   process_echo(L, icmp, header->len); */
-  /*   break; */
-    
-  /* case ICMP6_TYPE_DEST_UNREACH: */
-  /*   lua_pushnil(L); */
-  /*   break; */
-    
-  /* case ICMP6_TYPE_REDIRECT: */
-  /*   process_redirect(L, icmp, header->len); */
-  /*   break; */
-    
+  case ICMP6_TYPE_ECHO_REQ:
+  case ICMP6_TYPE_ECHO_REP:
+    process_echo(L, icmp, (header->len - ICMP6_HDR_LEN));
+    break;
+
+  case ICMP6_TYPE_DEST_UNREACH:    
   case ICMP6_TYPE_TIME_EXCEEDED:
   default:
     lua_pushnil(L);

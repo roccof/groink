@@ -43,7 +43,12 @@ typedef struct _grk_icmp6 {
   _uint16 cksum;
 } icmp6_t;
 
-#define ICMP_HDR_LEN sizeof(icmp_t)
+#define ICMP6_HDR_LEN sizeof(icmp6_t)
+
+typedef struct _grk_icmp6_echo_body {
+  _uint16 id;
+  _uint16 seq;
+} icmp6_echo_t;
 
 /* ICMPv6 type value  */
 #define ICMP6_TYPE_DEST_UNREACH 1      /* Destination Unreachable */
