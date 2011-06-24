@@ -57,6 +57,16 @@ typedef struct _grk_icmp6_neigh_sol {
   _uint8 target_addr[IPV6_ADDR_LEN];
 } icmp6_neigh_sol_t;
 
+typedef struct _grk_icmp6_router_adv {
+  _uint8 cur_hop_limit;
+  _uint8 flags;
+#define ICMP6_ROUTER_ADV_F_MANAGED 1 << 7
+#define ICMP6_ROUTER_ADV_F_OTHER 1 << 6
+  _uint16 router_lifetime;
+  _uint32 reachable_time;
+  _uint32 retrans_timer;
+} icmp6_router_adv_t;
+
 /* ICMPv6 type value  */
 #define ICMP6_TYPE_DEST_UNREACH 1      /* Destination Unreachable */
 #define ICMP6_TYPE_PKT_TOO_BIG 2       /* Packet Too Big */

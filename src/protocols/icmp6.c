@@ -152,6 +152,44 @@ static void process_neigh_sol(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_settable(L, -3);
 }
 
+static void process_router_adv(lua_State *L, icmp6_t *icmp, unsigned int len)
+{
+  icmp6_router_adv_t *b = NULL;
+
+  if (len < sizeof(icmp6_router_adv_t)) {
+    debug("malformed ICMPv6 router adv body: invalid length");
+    lua_pushnil(L);
+  }
+
+  b = (icmp6_router_adv_t *)icmp + 1;
+
+  lua_newtable(L);
+  
+  lua_pushstring(L, "cur_hop_limit");
+  lua_pushnumber(L, b->cur_hop_limit);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "managed_addr_conf");
+  lua_pushboolean(L, ((b->flags & ICMP6_ROUTER_ADV_F_MANAGED) == ICMP6_ROUTER_ADV_F_MANAGED));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "other_addr_conf");
+  lua_pushboolean(L, ((b->flags & ICMP6_ROUTER_ADV_F_OTHER) == ICMP6_ROUTER_ADV_F_OTHER));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "router_lifetime");
+  lua_pushnumber(L, htons(b->router_lifetime));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "reachable_time");
+  lua_pushnumber(L, htonl(b->reachable_time));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "retrans_timer");
+  lua_pushnumber(L, htonl(b->retrans_timer));
+  lua_settable(L, -3);
+}
+
 static int l_icmp6_body(lua_State *L)
 {
   header_t *header = NULL;
@@ -180,6 +218,7 @@ static int l_icmp6_body(lua_State *L)
     break;
 
   case ICMP6_TYPE_ROUTER_ADV:
+    process_router_adv(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
 
   case ICMP6_TYPE_NEIGH_ADV:
