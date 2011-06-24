@@ -19,6 +19,8 @@
 #ifndef GROINK_ICMP6_H
 #define GROINK_ICMP6_H
 
+#include "ipv6.h"
+
 /*
  * RFC 2463, RFC 4861 - ICMPv6 HEADER
  * ==================================
@@ -49,6 +51,11 @@ typedef struct _grk_icmp6_echo_body {
   _uint16 id;
   _uint16 seq;
 } icmp6_echo_t;
+
+typedef struct _grk_icmp6_neigh_sol {
+  _uint32 reserved;
+  _uint8 target_addr[IPV6_ADDR_LEN];
+} icmp6_neigh_sol_t;
 
 /* ICMPv6 type value  */
 #define ICMP6_TYPE_DEST_UNREACH 1      /* Destination Unreachable */

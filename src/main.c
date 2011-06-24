@@ -62,7 +62,7 @@ static void cleanup()
   se_close();
   mitm_stop();
   inject_cleanup();
-  protos_destroy();  
+  protos_destroy();
   packet_forward_module_destroy();
   threads_manager_destroy();
   hook_cleanup();
@@ -74,8 +74,7 @@ static void signal_handler_cb(int signal)
   exit(EXIT_SUCCESS);
 }
 
-static void 
-process_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *bytes)
+static void process_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *bytes)
 {
   packet_t *p = NULL;
   hookdata_t *hookdata = NULL;
@@ -181,6 +180,8 @@ int main(int argc, char **argv)
 
   /* Start sniffing */
   pcap_loop(pcap, 0, &process_packet, NULL);
+
+  cleanup();
 
   return EXIT_SUCCESS;
 }

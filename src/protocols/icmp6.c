@@ -28,6 +28,7 @@
 #include "protos.h"
 #include "protos_name.h"
 #include "selib.h"
+#include "netutil.h"
 
 static int decode_icmp6(packet_t *p, const _uint8 *bytes, size_t len)
 {
@@ -133,6 +134,24 @@ static void process_param_problem(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_settable(L, -3);
 }
 
+static void process_neigh_sol(lua_State *L, icmp6_t *icmp, unsigned int len)
+{
+  icmp6_neigh_sol_t *b = NULL;
+
+  if (len < sizeof(icmp6_neigh_sol_t)) {
+    debug("malformed ICMPv6 neigh solocit body: invalid length");
+    lua_pushnil(L);
+  }
+
+  b = (icmp6_neigh_sol_t *)icmp + 1;
+
+  lua_newtable(L);
+  
+  lua_pushstring(L, "target_addr");
+  lua_pushstring(L, ipv6_addr_ntoa(b->target_addr));
+  lua_settable(L, -3);
+}
+
 static int l_icmp6_body(lua_State *L)
 {
   header_t *header = NULL;
@@ -156,7 +175,24 @@ static int l_icmp6_body(lua_State *L)
     process_param_problem(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
 
-  case ICMP6_TYPE_DEST_UNREACH:    
+  case ICMP6_TYPE_NEIGH_SOL:
+    process_neigh_sol(L, icmp, (header->len - ICMP6_HDR_LEN));
+    break;
+
+  case ICMP6_TYPE_ROUTER_ADV:
+    break;
+
+  case ICMP6_TYPE_NEIGH_ADV:
+    break;
+
+  case ICMP6_TYPE_REDIRECT:
+    break;
+
+  case ICMP6_TYPE_ROUTER_RENUM:
+    break;
+
+  case ICMP6_TYPE_ROUTER_SOL:
+  case ICMP6_TYPE_DEST_UNREACH:
   case ICMP6_TYPE_TIME_EXCEEDED:
   default:
     lua_pushnil(L);
@@ -170,6 +206,7 @@ static const struct luaL_reg icmp6_methods[] = {
   {"code", l_icmp6_code},
   {"cksum", l_icmp6_cksum},
   {"body", l_icmp6_body},
+  /* {"opt", l_icmp6_opt}, */
   {NULL, NULL}
 };
 

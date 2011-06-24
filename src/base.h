@@ -56,6 +56,9 @@
 #define HT '\t'
 #define CRLF "\r\n"
 
+#define MIN(a,b) (a < b ? a : b)
+#define MAX(a,b) (a > b ? a : b)
+
 #define BITNO_32(_x) (((_x) >> 16) ? 16 + BITNO_16((_x) >> 16) : BITNO_16((_x)))
 #define BITNO_16(_x) (((_x) >> 8) ? 8 + BITNO_8((_x) >> 8) : BITNO_8((_x)))
 #define BITNO_8(_x) (((_x) >> 4) ? 4 + BITNO_4((_x) >> 4) : BITNO_4((_x)))

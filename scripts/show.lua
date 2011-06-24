@@ -347,6 +347,18 @@ local function print_icmp6(p)
       end
    elseif icmp:type() == ICMP6.TYPE_PKT_TOO_BIG then
       printf("packet too big, mtu: %d", body.mtu)
+   elseif icmp:type() == ICMP6.TYPE_ROUTER_SOL then
+      printf("router solicitation")
+   elseif icmp:type() == ICMP6.TYPE_ROUTER_ADV then
+      printf("router advertisement")
+   elseif icmp:type() == ICMP6.TYPE_NEIGH_SOL then
+      printf("neighbor solicitation")
+   elseif icmp:type() == ICMP6.TYPE_NEIGH_ADV then
+      printf("neighbor advertisement")
+   elseif icmp:type() == ICMP6.TYPE_REDIRECT then
+      printf("redirect")
+   elseif icmp:type() == ICMP6.TYPE_ROUTER_RENUMBERING then
+      printf("router renumbering")
    end
    printf("\n")
 end
