@@ -82,14 +82,13 @@ static int decode_arp(packet_t *p, const _uint8 *bytes, size_t len)
   arplen = sizeof(arp_t);
 
   /* If is ethernet arp, the header has more info */
-  if(ntohs(arp->hrd) == ARP_HRD_ETHER && ntohs(arp->pro) == ARP_PROTO_IPV4)
-    {
-      /* Control length */
-      if(arplen + sizeof(arp_ethip_t) > len)
-	goto err;
-      
-      arplen += sizeof(arp_ethip_t);
-    }
+  if(ntohs(arp->hrd) == ARP_HRD_ETHER && ntohs(arp->pro) == ARP_PROTO_IPV4) {
+    /* Control length */
+    if(arplen + sizeof(arp_ethip_t) > len)
+      goto err;
+    
+    arplen += sizeof(arp_ethip_t);
+  }
 
   packet_append_header(p, PROTO_NAME_ARP, (void *)arp, arplen);
 
@@ -105,7 +104,7 @@ static int decode_arp(packet_t *p, const _uint8 *bytes, size_t len)
   return DECODE_OK;
 
  err:
-  debug("malformed ARP header, invalid length");
+  decoder_add_error(p, "invalid ARP header length");
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 

@@ -81,3 +81,9 @@ int call_decoder_byport(int port, packet_t *p, const _uint8 *bytes, size_t len)
   return DECODER_NOT_FOUND;
 }
 
+void decoder_add_error(packet_t *p, char *err)
+{
+  int len = (strlen(err) > (MAX_ERR_LEN - 1))? (MAX_ERR_LEN - 1) : strlen(err);
+  memcpy(p->dec_err, err, len);
+  p->dec_err[len + 1] = '\0';
+}

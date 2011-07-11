@@ -26,7 +26,6 @@ typedef struct _grk_header {
   char *proto;                 /* Protocol */
   size_t len;                  /* Lenght */
   _uchar *data;                /* Raw header data */
-  _uint8 decoding_errors;      /* Decoding errors bitmap */
   struct _grk_header *next;    /* Next header */
   struct _grk_header *prev;    /* Previous header */
   struct _grk_packet *packet;  /* The packet that contains this header */
@@ -46,25 +45,17 @@ typedef struct _grk_header {
 
 /* Packet object structure */
 typedef struct _grk_packet {
-  _uchar *data;              /* Packet data */
-  size_t len;                /* Packet length*/
-  header_t *headers;         /* Headers list */
-  int num_headers;           /* Number of headers */
-  _uint8 flags;              /* Flags bit mask */
-  char *hw_dstaddr;          /* Destination hw address */
-  char *hw_srcaddr;          /* Source hw address */
-  char *net_srcaddr;         /* Source net address */
-  char *net_dstaddr;         /* Destination net address */
+  _uchar *data;                   /* Packet data */
+  size_t len;                     /* Packet length*/
+  header_t *headers;              /* Headers list */
+  int num_headers;                /* Number of headers */
+  _uint8 flags;                   /* Flags bit mask */
+  _uint8 dec_err[MAX_ERR_LEN];    /* Decoding error */
+  char *hw_dstaddr;               /* Destination hw address */
+  char *hw_srcaddr;               /* Source hw address */
+  char *net_srcaddr;              /* Source net address */
+  char *net_dstaddr;              /* Destination net address */
 } packet_t;
-
-/*
- * Raw packet structure used from capture engine for
- * save captured packet
- */
-typedef struct _raw_packet {
-  unsigned char *data;      /* Pointer of packet data */
-  size_t len;               /* Packet length */
-} rawpacket_t;
 
 packet_t *packet_new(_uint8 *data, size_t len);
 packet_t *packet_new_empty();

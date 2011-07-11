@@ -21,11 +21,6 @@
 
 #include "packet.h"
 
-#define ADD_ERROR(h, e) ((h)->decoding_errors |= (e))
-#define REMOVE_ERROR(h, e) ((h)->decoding_errors &= ~(e))
-#define HAS_ERROR(h, e) (((h)->decoding_errors & (e)) == (e))
-#define NO_ERRORS 0x00
-
 #define DECODE_FAIL -1
 #define DECODE_OK 0
 #define DECODER_NOT_FOUND 2
@@ -36,5 +31,6 @@ typedef int(*decoder_cb_t)(packet_t *p, const _uint8 *bytes, size_t len);
 int start_decoding(packet_t *p);
 int call_decoder(char *proto_name, packet_t *p, const _uint8 *bytes, size_t len);
 int call_decoder_byport(int port, packet_t *p, const _uint8 *bytes, size_t len);
+void decoder_add_error(packet_t *p, char *err);
 
 #endif /* GROINK_DECODER_H */

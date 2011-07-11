@@ -35,7 +35,7 @@ static int decode_udp(packet_t *p, const _uint8 *bytes, size_t len)
   udp_t *udp = NULL;
 
   if (UDP_HDR_LEN > len) {
-    debug("malformed UDP header: invalid length");
+    decoder_add_error(p, "invalid UDP header length");
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 

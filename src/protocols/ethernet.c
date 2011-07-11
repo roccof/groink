@@ -57,8 +57,8 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
   header_t *header = NULL;
 
   if (ETHER_HDR_LEN > len) {
-    debug("malformed ethernet header: invalid length");
-    return call_decoder("raw", p, bytes, len);
+    decoder_add_error(p, "invalid ETHERNET header length");
+    return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
   eth = (ether_t *)bytes;
@@ -89,8 +89,7 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 			(len - ETHER_HDR_LEN));
     
   default:
-    /* Insert error */
-    ADD_ERROR(header, UNKNOWN_ETHER_TYPE);
+    decoder_add_error(p, "unknown ether type protocol");
     return call_decoder(PROTO_NAME_RAW, p, (bytes + ETHER_HDR_LEN), 
 			(len - ETHER_HDR_LEN));
   }

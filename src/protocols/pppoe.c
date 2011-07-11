@@ -42,7 +42,7 @@ static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
   if (len < hlen)
     goto err;
   
-  /* The payload of PPPoe Discovery Stage contains TAGS */
+  /* The payload of PPPoE Discovery Stage contains TAGS */
   if (pppoe->code != PPPOE_CODE_SESSION)
     hlen += htons(pppoe->length);
 
@@ -55,7 +55,7 @@ static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
   return status;
 
  err:
-  debug("malformed PPPoE header: invalid length");
+  decoder_add_error(p, "invalid PPPoE header length");
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 

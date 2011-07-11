@@ -56,6 +56,8 @@
 #define HT '\t'
 #define CRLF "\r\n"
 
+#define MAX_ERR_LEN 250
+
 #define MIN(a,b) (a < b ? a : b)
 #define MAX(a,b) (a > b ? a : b)
 

@@ -62,7 +62,7 @@ static int decode_tcp(packet_t *p, const _uint8 *bytes, size_t len)
   return status;
 
  err:
-  debug("malformed TCP header: invalid length");
+  decoder_add_error(p, "invalid TCP header length");
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 

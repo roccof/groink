@@ -34,7 +34,7 @@ static int decode_icmp(packet_t *p, const _uint8 *bytes, size_t len)
   icmp_t *icmp = NULL;
 
   if (sizeof(icmp_t) > len) {
-    debug("malformed ICMP header: invalid length");
+    decoder_add_error(p, "invalid ICMP header length");
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 

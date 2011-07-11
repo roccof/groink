@@ -39,7 +39,7 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
   ipv6_ext_frag_t *f = NULL;
 
   if (len < IPV6_HDR_LEN) {
-    debug("IPv6 decoder: too short");
+    decoder_add_error(p, "invalid IPv6 header length");
     call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
@@ -104,6 +104,7 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
 
     default:
       /* Unknown layer 4 protocol or extension header */
+      decoder_add_error(p, "unknown layer 4 protocol");
       totlen += call_decoder(PROTO_NAME_RAW, p, (bytes + totlen), (len - totlen));
       return totlen;
     }

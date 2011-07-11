@@ -22,7 +22,7 @@
 #include "ipv6.h"
 
 /*
- * RFC 2463, RFC 4861 - ICMPv6 HEADER
+ * RFC 2463, RFC 2461 - ICMPv6 HEADER
  * ==================================
  *
  *   0                   1                   2                   3
@@ -39,6 +39,7 @@
  *
  */
 
+/* ICMPv6 general message */
 typedef struct _grk_icmp6 {
   _uint8 type;
   _uint8 code;
@@ -47,16 +48,28 @@ typedef struct _grk_icmp6 {
 
 #define ICMP6_HDR_LEN sizeof(icmp6_t)
 
+/* ICMPv6 echo body message */
 typedef struct _grk_icmp6_echo_body {
   _uint16 id;
   _uint16 seq;
 } icmp6_echo_t;
 
+/* ICMPv6 neighbor solicitation body message */
 typedef struct _grk_icmp6_neigh_sol {
   _uint32 reserved;
   _uint8 target_addr[IPV6_ADDR_LEN];
 } icmp6_neigh_sol_t;
 
+/* ICMPv6 neighbor advertisement body message */
+typedef struct _grk_icmp6_neigh_adv {
+  _uint32 flags;
+#define ICMP6_NEIGH_ADV_F_ROUTER 1 << 31
+#define ICMP6_NEIGH_ADV_F_SOLICITED 1 << 30
+#define ICMP6_NEIGH_ADV_F_OVERRIDE 1 << 29
+  _uint8 target_addr[IPV6_ADDR_LEN];
+} icmp6_neigh_adv_t;
+
+/* ICMPv6 router advertisement body message */
 typedef struct _grk_icmp6_router_adv {
   _uint8 cur_hop_limit;
   _uint8 flags;

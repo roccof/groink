@@ -54,7 +54,6 @@ header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t le
   h->len = len;
   h->next = NULL;
   h->prev = NULL;
-  h->decoding_errors = 0;
   h->packet = p;
 
   /* Append the header into the packet */
@@ -76,6 +75,7 @@ static void packet_init(packet_t *p)
   p->hw_dstaddr = NULL;
   p->net_srcaddr = NULL;
   p->net_dstaddr = NULL;
+  bzero(p->dec_err, MAX_ERR_LEN);
 }
 
 packet_t *packet_new(_uint8 *data, size_t len)

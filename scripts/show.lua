@@ -216,8 +216,13 @@ local function print_tcp(p)
    local tcp = p:get_header(Proto.TCP)
    local fcount = 0  -- Flags counter
 
-   printf("TCP %s:%d > %s:%d flags [", p:net_srcaddr(), tcp:src_port(), 
+   if p:contains_header(Proto.IPV6) then
+      printf("TCP [%s]:%d > [%s]:%d flags [", p:net_srcaddr(), tcp:src_port(), 
 	  p:net_dstaddr(), tcp:dst_port())
+   else
+      printf("TCP %s:%d > %s:%d flags [", p:net_srcaddr(), tcp:src_port(), 
+	     p:net_dstaddr(), tcp:dst_port())
+   end
 
    local flags = tcp:flags()
 
@@ -263,8 +268,14 @@ end
 -- Print udp packet
 local function print_udp(p)
    local udp = p:get_header(Proto.UDP)
-   printf("UDP %s:%d > %s:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
+
+   if p:contains_header(Proto.IPV6) then
+      printf("UDP [%s]:%d > [%s]:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
 	  p:net_dstaddr(), udp:dst_port(), udp:cksum())
+      else
+	 printf("UDP %s:%d > %s:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
+		p:net_dstaddr(), udp:dst_port(), udp:cksum())
+      end
 end
 
 -- Print icmp header

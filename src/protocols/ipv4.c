@@ -33,7 +33,7 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
   header_t *h = NULL;
 
   if (len < sizeof(ipv4_t)) {
-    debug("malformed IPv4 header: invalid length");
+    decoder_add_error(p, "invalid IPv4 header length");
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
@@ -41,7 +41,7 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
 
   /* Control if IHL is valid, min 20 bytes */
   if (IPV4_HDR_LEN(ip) < sizeof(ipv4_t)) {
-    debug("bad IPv4 header size");
+    decoder_add_error(p, "invalid IPv4 header length");
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
@@ -51,10 +51,8 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
   p->net_dstaddr = ip_addr_ntoa(ip->dest_addr);
   
   /* Control VERSION */
-  if (IPV4_VERS(ip) != 4) {
+  if (IPV4_VERS(ip) != 4)
     debug("packet decoding: bad IPv4 VERSION (%d)", IPV4_VERS(ip));
-    ADD_ERROR(h, ERR_IPV4_BAD_VERSION);
-  }
 
   switch (ip->proto) {
 
@@ -70,8 +68,8 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
     return call_decoder(PROTO_NAME_ICMP, p, (bytes + IPV4_HDR_LEN(ip)),
 			(len - IPV4_HDR_LEN(ip)));
     
-  default:
-    /* Unknown layer 4 protocol */
+  default: /* Unknown layer 4 protocol */
+    decoder_add_error(p, "unknown layer 4 protocol");
     return call_decoder(PROTO_NAME_RAW, p, (bytes + IPV4_HDR_LEN(ip)), 
 			(len - IPV4_HDR_LEN(ip)));
   }

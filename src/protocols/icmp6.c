@@ -35,7 +35,7 @@ static int decode_icmp6(packet_t *p, const _uint8 *bytes, size_t len)
   icmp6_t *icmp = NULL;
 
   if (sizeof(icmp6_t) > len) {
-    debug("malformed ICMPv6 header: invalid length");
+    decoder_add_error(p, "invalid ICMPv6 header length");
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
   
@@ -137,6 +137,7 @@ static void process_param_problem(lua_State *L, icmp6_t *icmp, unsigned int len)
 static void process_neigh_sol(lua_State *L, icmp6_t *icmp, unsigned int len)
 {
   icmp6_neigh_sol_t *b = NULL;
+  char *addr = NULL;
 
   if (len < sizeof(icmp6_neigh_sol_t)) {
     debug("malformed ICMPv6 neigh solocit body: invalid length");
@@ -144,12 +145,15 @@ static void process_neigh_sol(lua_State *L, icmp6_t *icmp, unsigned int len)
   }
 
   b = (icmp6_neigh_sol_t *)icmp + 1;
+  addr = ipv6_addr_ntoa(b->target_addr);
 
   lua_newtable(L);
   
   lua_pushstring(L, "target_addr");
-  lua_pushstring(L, ipv6_addr_ntoa(b->target_addr));
+  lua_pushstring(L, addr);
   lua_settable(L, -3);
+
+  free(addr);
 }
 
 static void process_router_adv(lua_State *L, icmp6_t *icmp, unsigned int len)
