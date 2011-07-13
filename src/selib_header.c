@@ -106,10 +106,8 @@ static int l_header_index(lua_State *L)
   p = proto_get_byname(h->proto);
   myassert(p != NULL);
 
-  if (p->methods == NULL) {
-    lua_pushnil(L);
-    return 1;
-  }
+  if (p->methods == NULL)
+    goto end;
 
   for (m=p->methods; m->name != NULL; m++) {
     if (strncmp(name, m->name, strlen(name)) == 0) {
@@ -117,6 +115,10 @@ static int l_header_index(lua_State *L)
       return 1;
     }
   }
+
+ end:
+  lua_pushnil(L);
+  return 1;
 }
 
 static const struct luaL_reg header_methods[] = {

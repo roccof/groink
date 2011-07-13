@@ -374,18 +374,26 @@ local function print_icmp6(p)
    printf("\n")
 end
 
+-- function proc_pkt(p)
+--    if p:contains_header(Proto.ARP) then
+--       print_arp(p)
+--    elseif p:contains_header(Proto.PPPOE) then
+--       print_pppoe(p)
+--    elseif p:contains_header(Proto.ICMP) then
+--       print_icmp(p)
+--    elseif p:contains_header(Proto.ICMP6) then
+--       print_icmp6(p)
+--    elseif p:contains_header(Proto.TCP) then
+--       print_tcp(p)
+--    elseif p:contains_header(Proto.UDP) then
+--       print_udp(p)
+--    end
+-- end
+
 function proc_pkt(p)
-   if p:contains_header(Proto.ARP) then
-      print_arp(p)
-   elseif p:contains_header(Proto.PPPOE) then
-      print_pppoe(p)
-   elseif p:contains_header(Proto.ICMP) then
-      print_icmp(p)
-   elseif p:contains_header(Proto.ICMP6) then
-      print_icmp6(p)
-   elseif p:contains_header(Proto.TCP) then
-      print_tcp(p)
-   elseif p:contains_header(Proto.UDP) then
-      print_udp(p)
+   if p:tostring():len() > 0 then
+      printf("%s\n", p:tostring())
+   else
+      printf("Unknown packet\n");
    end
 end

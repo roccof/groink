@@ -58,6 +58,7 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 
   if (ETHER_HDR_LEN > len) {
     decoder_add_error(p, "invalid ETHERNET header length");
+    packet_set_tostring(p, "ETHER| invalid length %d", len);
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
@@ -67,6 +68,8 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 
   p->hw_srcaddr = ether_addr_ntoa(eth->src_addr);
   p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr);
+
+  packet_set_tostring(p, "ETHER %s > %s type 0x%04x", p->hw_srcaddr, p->hw_dstaddr, ntohs(eth->type));
 
   switch (ntohs(eth->type)) {
 
@@ -90,6 +93,7 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
     
   default:
     decoder_add_error(p, "unknown ether type protocol");
+    packet_set_tostring(p, "ETHER %s > %s type 0x%04x (unknown)", p->hw_srcaddr, p->hw_dstaddr, ntohs(eth->type));
     return call_decoder(PROTO_NAME_RAW, p, (bytes + ETHER_HDR_LEN), 
 			(len - ETHER_HDR_LEN));
   }

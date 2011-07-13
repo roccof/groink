@@ -48,7 +48,7 @@ static void cleanup()
 
   debug("cleaning up...");
   
-  if(pcap != NULL) {
+  if (pcap != NULL) {
     pcap_breakloop(pcap);
     debug("sniffing stopped");
 

@@ -43,18 +43,21 @@ typedef struct _grk_header {
 #define PACKET_FLAG_DECODE_ERR 0x04      /* Indicates that there is an error 
 					    while packet decoding */
 
+#define PACKET_TOSTRING_MAXLEN 256
+
 /* Packet object structure */
 typedef struct _grk_packet {
-  _uchar *data;                   /* Packet data */
-  size_t len;                     /* Packet length*/
-  header_t *headers;              /* Headers list */
-  int num_headers;                /* Number of headers */
-  _uint8 flags;                   /* Flags bit mask */
-  _uint8 dec_err[MAX_ERR_LEN];    /* Decoding error */
-  char *hw_dstaddr;               /* Destination hw address */
-  char *hw_srcaddr;               /* Source hw address */
-  char *net_srcaddr;              /* Source net address */
-  char *net_dstaddr;              /* Destination net address */
+  _uchar *data;                           /* Packet data */
+  size_t len;                             /* Packet length*/
+  header_t *headers;                      /* Headers list */
+  int num_headers;                        /* Number of headers */
+  _uint8 flags;                           /* Flags bit mask */
+  _uint8 dec_err[MAX_ERR_LEN];            /* Decoding error */
+  char *hw_dstaddr;                       /* Destination hw address */
+  char *hw_srcaddr;                       /* Source hw address */
+  char *net_srcaddr;                      /* Source net address */
+  char *net_dstaddr;                      /* Destination net address */
+  char tostring[PACKET_TOSTRING_MAXLEN];  /* Printable packet string. Is filled by decoder */
 } packet_t;
 
 packet_t *packet_new(_uint8 *data, size_t len);
@@ -63,5 +66,6 @@ void packet_free(packet_t *p);
 header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t len);
 header_t *packet_get_header(packet_t *p, char *proto);
 int packet_contains_header(packet_t *p, char *proto);
+void packet_set_tostring(packet_t *p, char *format, ...);
 
 #endif /* GROINK_PACKET_H */

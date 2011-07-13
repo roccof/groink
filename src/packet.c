@@ -17,6 +17,7 @@
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <string.h>
+#include <stdarg.h>
 
 #include "base.h"
 #include "packet.h"
@@ -76,6 +77,7 @@ static void packet_init(packet_t *p)
   p->net_srcaddr = NULL;
   p->net_dstaddr = NULL;
   bzero(p->dec_err, MAX_ERR_LEN);
+  bzero(p->tostring, PACKET_TOSTRING_MAXLEN);
 }
 
 packet_t *packet_new(_uint8 *data, size_t len)
@@ -163,4 +165,13 @@ header_t *packet_get_header(packet_t *p, char *proto)
       return h;
   }
   return NULL;
+}
+
+void packet_set_tostring(packet_t *p, char *format, ...)
+{
+  va_list ap;
+
+  va_start(ap, format);
+  vsnprintf(p->tostring, PACKET_TOSTRING_MAXLEN, format, ap);
+  va_end(ap);
 }

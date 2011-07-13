@@ -42,6 +42,8 @@ static int decode_icmp6(packet_t *p, const _uint8 *bytes, size_t len)
   icmp = (icmp6_t *)bytes;
 
   packet_append_header(p, PROTO_NAME_ICMP6, (void *)icmp, len);
+
+  /* TODO: control len of all bodies */
   
   return DECODE_OK;
 }

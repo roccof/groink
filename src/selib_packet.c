@@ -187,6 +187,13 @@ static int l_packet_isunmod(lua_State *L)
   return 1;
 }
 
+static int l_packet_printable(lua_State *L)
+{
+  packet_t *p = check_packet(L, 1);
+  lua_pushstring(L, p->tostring);
+  return 1;
+}
+
 static int l_packet_tostring(lua_State *L)
 {
   lua_pushfstring(L, "Packet: %p", lua_touserdata(L, -1));
@@ -231,6 +238,7 @@ static const struct luaL_reg packet_methods[] = {
   {"is_drop", l_packet_isdrop},
   {"set_unmodificable", l_packet_setunmod},
   {"is_unmodificable", l_packet_isunmod},
+  {"tostring", l_packet_printable},
   {NULL, NULL}
 };
 
