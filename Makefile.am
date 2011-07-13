@@ -29,4 +29,8 @@ scripts_DATA = 			\
 	scripts/isolate.lua	\
 	scripts/scripts.db
 
+datadir = $(pkgdatadir)/data
+data_DATA =			\
+	data/oui_db.txt
+
 CLEANFILES = *.out *~

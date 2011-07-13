@@ -39,6 +39,7 @@
 #include "packet.h"
 #include "inject.h"
 #include "iface.h"
+#include "ouidb.h"
 
 static pcap_t *pcap = NULL;
 
@@ -62,6 +63,7 @@ static void cleanup()
   se_close();
   mitm_stop();
   inject_cleanup();
+  ouidb_free();
   protos_destroy();
   packet_forward_module_destroy();
   threads_manager_destroy();
@@ -136,6 +138,7 @@ int main(int argc, char **argv)
   threads_manager_init();
   load_iface_info();
   protos_init();
+  ouidb_load();
 
   /* Get iface name */
   if ((gbls->iface == NULL) && ((gbls->iface = pcap_lookupdev(errbuf)) == NULL)) {

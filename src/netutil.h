@@ -24,6 +24,7 @@
 #include "base.h"
 
 #define ETHER_BROADCAST "ff:ff:ff:ff:ff:ff"
+#define ETHER_NULL "00:00:00:00:00:00"
 
 #define IPV4_STR_ADDR_LEN 16
 #define IPV6_STR_ADDR_LEN 46

@@ -11,7 +11,7 @@ use WWW::Curl::Easy;
 my $oui_file_url = "http://standards.ieee.org/develop/regauth/oui/oui.txt";
 
 # Oui database file
-my $oui_db = "./selib/oui_db.txt";
+my $oui_db = "./data/oui_db.txt";
 
 my $oui_regex = "[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]";
 

@@ -28,6 +28,7 @@
 #include "protos.h"
 #include "protos_name.h"
 #include "selib.h"
+#include "ouidb.h"
 
 /* Builder */
 ether_t *build_ethernet(char *src, char *dst, _uint16 type)
@@ -55,6 +56,8 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 {
   ether_t *eth = NULL;
   header_t *header = NULL;
+  char *src_oui = NULL;
+  char *dst_oui = NULL;
 
   if (ETHER_HDR_LEN > len) {
     decoder_add_error(p, "invalid ETHERNET header length");
@@ -69,10 +72,15 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
   p->hw_srcaddr = ether_addr_ntoa(eth->src_addr);
   p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr);
 
-  packet_set_tostring(p, "ETHER %s > %s type 0x%04x", p->hw_srcaddr, p->hw_dstaddr, ntohs(eth->type));
+  src_oui = ouidb_find_company_by_addr(p->hw_srcaddr);
+  dst_oui = ouidb_find_company_by_addr(p->hw_dstaddr);
+  
+  packet_set_tostring(p, "ETHER %s (%s) > %s (%s) type 0x%04x", p->hw_srcaddr, 
+		      (src_oui != NULL)? src_oui : "unknown", p->hw_dstaddr, 
+		      (dst_oui != NULL)? dst_oui : "unknown", ntohs(eth->type));
 
   switch (ntohs(eth->type)) {
-
+    
   case ETHER_TYPE_IP:
     return call_decoder(PROTO_NAME_IPV4, p, (bytes + ETHER_HDR_LEN), 
 			(len - ETHER_HDR_LEN));
@@ -93,7 +101,9 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
     
   default:
     decoder_add_error(p, "unknown ether type protocol");
-    packet_set_tostring(p, "ETHER %s > %s type 0x%04x (unknown)", p->hw_srcaddr, p->hw_dstaddr, ntohs(eth->type));
+    packet_set_tostring(p, "ETHER %s (%s) > %s (%s) type 0x%04x (unknown)", p->hw_srcaddr, 
+			(src_oui != NULL)? src_oui : "unknown", p->hw_dstaddr, 
+			(dst_oui != NULL)? dst_oui : "unknown", ntohs(eth->type));
     return call_decoder(PROTO_NAME_RAW, p, (bytes + ETHER_HDR_LEN), 
 			(len - ETHER_HDR_LEN));
   }

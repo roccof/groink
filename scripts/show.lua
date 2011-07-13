@@ -20,9 +20,9 @@
 
 local core = require("core")
 local printf = core.printf
-local ouidb = require("ouidb")
+-- local ouidb = require("ouidb")
 
--- Print IEEE 802.11 radiotap header
+-- -- Print IEEE 802.11 radiotap header
 -- local function print_ieee80211_radio(radio)
 --    printf("IEEE 802.11 RADIOTAP version %d, pad %d, len %d, bitmap fields:\n", radio:version(), radio:pad(), radio:length())
 --    for k,v in pairs(radio:fields()) do
@@ -124,255 +124,255 @@ local ouidb = require("ouidb")
 --    end
 -- end
 
--- Print PPPoE Discovery header
-local function print_pppoe(p)
+-- -- Print PPPoE Discovery header
+-- local function print_pppoe(p)
 
-   local pppoe = p:get_header(Proto.PPPOE)
+--    local pppoe = p:get_header(Proto.PPPOE)
 
-   if pppoe:code() == PPPoE.CODE_SESSION then
-      return
-   end
+--    if pppoe:code() == PPPoE.CODE_SESSION then
+--       return
+--    end
 
-   printf("PPPoED ")
+--    printf("PPPoED ")
 
-   if pppoe:code() == PPPoE.CODE_DISCOVER_PADI then
-      printf("PADI packet, ")
-   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADO then
-      printf("PADO packet, ")
-   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADR then
-      printf("PADR packet, ")
-   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADT then
-      printf("PADT packet, ")
-   elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADS then
-      printf("PADS packet, ")
-   end
+--    if pppoe:code() == PPPoE.CODE_DISCOVER_PADI then
+--       printf("PADI packet, ")
+--    elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADO then
+--       printf("PADO packet, ")
+--    elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADR then
+--       printf("PADR packet, ")
+--    elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADT then
+--       printf("PADT packet, ")
+--    elseif pppoe:code() == PPPoE.CODE_DISCOVER_PADS then
+--       printf("PADS packet, ")
+--    end
 
-   printf("version %d, type %d, code 0x%02x, session id 0x%0002x, payload length %d",
-	  pppoe:version(), pppoe:type(), pppoe:code(), pppoe:session(), 
-	  pppoe:payload_length())
+--    printf("version %d, type %d, code 0x%02x, session id 0x%0002x, payload length %d",
+-- 	  pppoe:version(), pppoe:type(), pppoe:code(), pppoe:session(), 
+-- 	  pppoe:payload_length())
 
-   local tags = pppoe:tags()
-   if tags ~= nil then
-      printf(", tags:\n")
-      for k,v in pairs(tags) do
-   	 printf("\t0x%x : %s\n", k, v)
-      end
-   else
-      printf("\n")
-   end
-end
+--    local tags = pppoe:tags()
+--    if tags ~= nil then
+--       printf(", tags:\n")
+--       for k,v in pairs(tags) do
+--    	 printf("\t0x%x : %s\n", k, v)
+--       end
+--    else
+--       printf("\n")
+--    end
+-- end
 
--- Print ARP/RARP packet
-local function print_arp(p)
+-- -- Print ARP/RARP packet
+-- local function print_arp(p)
 
-   local arp = p:get_header(Proto.ARP)
+--    local arp = p:get_header(Proto.ARP)
 
-   printf("ARP ")
-   local arpe = arp:arp_ethip()
+--    printf("ARP ")
+--    local arpe = arp:arp_ethip()
 
-   if arpe ~= nil then
-      if arp:opcode() == ARP.OP_REQUEST then
-	 printf("Request who-as %s tell %s", arpe.tpa, arpe.spa)
-      elseif arp:opcode() == ARP.OP_REPLY then
-	 printf("Reply %s is-at %s", arpe.spa, arpe.sha)
-	 -- get company name from oui
-	 local company = ouidb.oui_from_addr(arpe.sha)
-	 if company ~= nil then
-	    printf(" (%s)", company)
-	 end
-      elseif arp:opcode() == ARP.OP_REQUEST then
-	 printf("Reverse Request who-is %s tell %s", arpe.tha, arpe.sha)
-      elseif arp:opcode() == ARP.OP_RREPLY then
-	 printf("Reverse Reply %s at %s", arpe.tha, arpe.tpa)
-      elseif arp:opcode() == ARP.OP_InREQUEST then
-	 printf("Inverse Request who-is %s tell %s", arpe.tha, arpe.sha)
-      elseif arp:opcode() == ARP.OP_InREPLY then
-	 printf("Inverse Reply %s at %s", arpe.tha, arpe.tpa)
-      elseif arp:opcode() == ARP.OP_NAK then
-	 printf("NACK Reply")
-      end
-   else
-      if arp:opcode() == ARP.OP_REQUEST then
-	 printf("Request")
-      elseif arp:opcode() == ARP.OP_REPLY then
-	 printf("Reply")
-      elseif arp:opcode() == ARP.OP_REQUEST then
-	 printf("Reverse Request")
-      elseif arp:opcode() == ARP.OP_RREPLY then
-	 printf("Reverse Reply")
-      elseif arp:opcode() == ARP.OP_InREQUEST then
-	 printf("Inverse Request")
-      elseif arp:opcode() == ARP.OP_InREPLY then
-	 printf("Inverse Reply")
-      elseif arp:opcode() == ARP.OP_NAK then
-	 printf("NACK Reply")
-      end
-   end
-   printf("\n")
-end
+--    if arpe ~= nil then
+--       if arp:opcode() == ARP.OP_REQUEST then
+-- 	 printf("Request who-as %s tell %s", arpe.tpa, arpe.spa)
+--       elseif arp:opcode() == ARP.OP_REPLY then
+-- 	 printf("Reply %s is-at %s", arpe.spa, arpe.sha)
+-- 	 -- get company name from oui
+-- 	 local company = ouidb.oui_from_addr(arpe.sha)
+-- 	 if company ~= nil then
+-- 	    printf(" (%s)", company)
+-- 	 end
+--       elseif arp:opcode() == ARP.OP_REQUEST then
+-- 	 printf("Reverse Request who-is %s tell %s", arpe.tha, arpe.sha)
+--       elseif arp:opcode() == ARP.OP_RREPLY then
+-- 	 printf("Reverse Reply %s at %s", arpe.tha, arpe.tpa)
+--       elseif arp:opcode() == ARP.OP_InREQUEST then
+-- 	 printf("Inverse Request who-is %s tell %s", arpe.tha, arpe.sha)
+--       elseif arp:opcode() == ARP.OP_InREPLY then
+-- 	 printf("Inverse Reply %s at %s", arpe.tha, arpe.tpa)
+--       elseif arp:opcode() == ARP.OP_NAK then
+-- 	 printf("NACK Reply")
+--       end
+--    else
+--       if arp:opcode() == ARP.OP_REQUEST then
+-- 	 printf("Request")
+--       elseif arp:opcode() == ARP.OP_REPLY then
+-- 	 printf("Reply")
+--       elseif arp:opcode() == ARP.OP_REQUEST then
+-- 	 printf("Reverse Request")
+--       elseif arp:opcode() == ARP.OP_RREPLY then
+-- 	 printf("Reverse Reply")
+--       elseif arp:opcode() == ARP.OP_InREQUEST then
+-- 	 printf("Inverse Request")
+--       elseif arp:opcode() == ARP.OP_InREPLY then
+-- 	 printf("Inverse Reply")
+--       elseif arp:opcode() == ARP.OP_NAK then
+-- 	 printf("NACK Reply")
+--       end
+--    end
+--    printf("\n")
+-- end
 
--- Print tcp packet
-local function print_tcp(p)
-   local tcp = p:get_header(Proto.TCP)
-   local fcount = 0  -- Flags counter
+-- -- Print tcp packet
+-- local function print_tcp(p)
+--    local tcp = p:get_header(Proto.TCP)
+--    local fcount = 0  -- Flags counter
 
-   if p:contains_header(Proto.IPV6) then
-      printf("TCP [%s]:%d > [%s]:%d flags [", p:net_srcaddr(), tcp:src_port(), 
-	  p:net_dstaddr(), tcp:dst_port())
-   else
-      printf("TCP %s:%d > %s:%d flags [", p:net_srcaddr(), tcp:src_port(), 
-	     p:net_dstaddr(), tcp:dst_port())
-   end
+--    if p:contains_header(Proto.IPV6) then
+--       printf("TCP [%s]:%d > [%s]:%d flags [", p:net_srcaddr(), tcp:src_port(), 
+-- 	  p:net_dstaddr(), tcp:dst_port())
+--    else
+--       printf("TCP %s:%d > %s:%d flags [", p:net_srcaddr(), tcp:src_port(), 
+-- 	     p:net_dstaddr(), tcp:dst_port())
+--    end
 
-   local flags = tcp:flags()
+--    local flags = tcp:flags()
 
-   if flags.fin then
-      printf("F")
-      fcount = fcount + 1
-   end
+--    if flags.fin then
+--       printf("F")
+--       fcount = fcount + 1
+--    end
 
-   if flags.syn then
-      printf("S")
-      fcount = fcount + 1
-   end
+--    if flags.syn then
+--       printf("S")
+--       fcount = fcount + 1
+--    end
 
-   if flags.rst then
-      printf("R")
-      fcount = fcount + 1
-   end
+--    if flags.rst then
+--       printf("R")
+--       fcount = fcount + 1
+--    end
 
-   if flags.push then
-      printf("P")
-      fcount = fcount + 1
-   end
+--    if flags.push then
+--       printf("P")
+--       fcount = fcount + 1
+--    end
 
-   if flags.ack then
-      printf("A")
-      fcount = fcount + 1
-   end
+--    if flags.ack then
+--       printf("A")
+--       fcount = fcount + 1
+--    end
 
-   if flags.urg then
-      printf("U")
-      fcount = fcount + 1
-   end
+--    if flags.urg then
+--       printf("U")
+--       fcount = fcount + 1
+--    end
 
-   -- If there aren't flags print "none"
-   if fcount == 0 then
-      printf("none")
-   end
+--    -- If there aren't flags print "none"
+--    if fcount == 0 then
+--       printf("none")
+--    end
 
-   printf("] seq %d, ack %d, win %d, cksum 0x%x\n", tcp:seq(), tcp:ack(), 
-	  tcp:window(), tcp:cksum())
-end
+--    printf("] seq %d, ack %d, win %d, cksum 0x%x\n", tcp:seq(), tcp:ack(), 
+-- 	  tcp:window(), tcp:cksum())
+-- end
 
--- Print udp packet
-local function print_udp(p)
-   local udp = p:get_header(Proto.UDP)
+-- -- Print udp packet
+-- local function print_udp(p)
+--    local udp = p:get_header(Proto.UDP)
 
-   if p:contains_header(Proto.IPV6) then
-      printf("UDP [%s]:%d > [%s]:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
-	  p:net_dstaddr(), udp:dst_port(), udp:cksum())
-      else
-	 printf("UDP %s:%d > %s:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
-		p:net_dstaddr(), udp:dst_port(), udp:cksum())
-      end
-end
+--    if p:contains_header(Proto.IPV6) then
+--       printf("UDP [%s]:%d > [%s]:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
+-- 	  p:net_dstaddr(), udp:dst_port(), udp:cksum())
+--       else
+-- 	 printf("UDP %s:%d > %s:%d cksum 0x%x\n", p:net_srcaddr(), udp:src_port(), 
+-- 		p:net_dstaddr(), udp:dst_port(), udp:cksum())
+--       end
+-- end
 
--- Print icmp header
-local function print_icmp(p)
-   local icmp = p:get_header(Proto.ICMP)
-   local body = icmp:body()
+-- -- Print icmp header
+-- local function print_icmp(p)
+--    local icmp = p:get_header(Proto.ICMP)
+--    local body = icmp:body()
    
-   printf("ICMP %s > %s ", p:net_srcaddr(), p:net_dstaddr())
+--    printf("ICMP %s > %s ", p:net_srcaddr(), p:net_dstaddr())
    
-   if icmp:type() == ICMP.TYPE_ECHO_REQUEST then
-      printf("echo request")
-   elseif icmp:type() == ICMP.TYPE_ECHO_REPLY then
-      printf("echo reply")
-   elseif icmp:type() == ICMP.TYPE_REDIRECT then
-      printf("redirect ")
-      if body ~= nil then
-	 if icmp:code() == ICMP.CODE_REDIR_NET then
-	    printf("to net %s ", body.gw_addr)
-	 elseif icmp:code() == ICMP.CODE_REDIR_HOST then
-	    printf("to host %s ", body.gw_addr)
-	 else
-	    printf("to %s ", body.gw_addr)
-	 end
-      end
-   elseif icmp:type() == ICMP.TYPE_DEST_UNREACH then
-      if icmp:code() == ICMP.CODE_UNREACH_NET then
-	 printf("network unreachable")
-      elseif icmp:code() == ICMP.CODE_UNREACH_HOST then
-	 printf("host unreachable")
-      elseif icmp:code() == ICMP.CODE_UNREACH_PROTO then
-	 printf("protocol unreachable")
-      elseif icmp:code() == ICMP.CODE_UNREACH_PORT then
-	 printf("port unreachable")
-      elseif icmp:code() == ICMP.CODE_UNREACH_FRAG_NEEDED then
-	 printf("fragmentation needed")
-      else
-	 printf("destination unreachable")
-      end
-   elseif icmp:type() == ICMP.TYPE_TIME_EXCEEDED then
-      printf("time exceeded ")
-   end
-   printf("\n")
-end
+--    if icmp:type() == ICMP.TYPE_ECHO_REQUEST then
+--       printf("echo request")
+--    elseif icmp:type() == ICMP.TYPE_ECHO_REPLY then
+--       printf("echo reply")
+--    elseif icmp:type() == ICMP.TYPE_REDIRECT then
+--       printf("redirect ")
+--       if body ~= nil then
+-- 	 if icmp:code() == ICMP.CODE_REDIR_NET then
+-- 	    printf("to net %s ", body.gw_addr)
+-- 	 elseif icmp:code() == ICMP.CODE_REDIR_HOST then
+-- 	    printf("to host %s ", body.gw_addr)
+-- 	 else
+-- 	    printf("to %s ", body.gw_addr)
+-- 	 end
+--       end
+--    elseif icmp:type() == ICMP.TYPE_DEST_UNREACH then
+--       if icmp:code() == ICMP.CODE_UNREACH_NET then
+-- 	 printf("network unreachable")
+--       elseif icmp:code() == ICMP.CODE_UNREACH_HOST then
+-- 	 printf("host unreachable")
+--       elseif icmp:code() == ICMP.CODE_UNREACH_PROTO then
+-- 	 printf("protocol unreachable")
+--       elseif icmp:code() == ICMP.CODE_UNREACH_PORT then
+-- 	 printf("port unreachable")
+--       elseif icmp:code() == ICMP.CODE_UNREACH_FRAG_NEEDED then
+-- 	 printf("fragmentation needed")
+--       else
+-- 	 printf("destination unreachable")
+--       end
+--    elseif icmp:type() == ICMP.TYPE_TIME_EXCEEDED then
+--       printf("time exceeded ")
+--    end
+--    printf("\n")
+-- end
 
--- Print icmp6 header
-local function print_icmp6(p)
-   local icmp = p:get_header(Proto.ICMP6)
-   local body = icmp:body()
+-- -- Print icmp6 header
+-- local function print_icmp6(p)
+--    local icmp = p:get_header(Proto.ICMP6)
+--    local body = icmp:body()
    
-   printf("ICMPv6 %s > %s ", p:net_srcaddr(), p:net_dstaddr())
+--    printf("ICMPv6 %s > %s ", p:net_srcaddr(), p:net_dstaddr())
    
-   if icmp:type() == ICMP6.TYPE_ECHO_REQUEST then
-      printf("echo request")
-   elseif icmp:type() == ICMP6.TYPE_ECHO_REPLY then
-      printf("echo reply")
-   elseif icmp:type() == ICMP6.TYPE_DEST_UNREACH then
-      if icmp:code() == ICMP6.CODE_UNREACH_NO_ROUTE then
-   	 printf("no route to destination")
-      elseif icmp:code() == ICMP6.CODE_UNREACH_ADM_PROIB then
-   	 printf("communication with destination administratively prohibited")
-      elseif icmp:code() == ICMP6.CODE_UNREACH_ADDR then
-   	 printf("address unreachable")
-      elseif icmp:code() == ICMP6.CODE_UNREACH_PORT then
-   	 printf("port unreachable")
-      end
-   elseif icmp:type() == ICMP6.TYPE_TIME_EXCEEDED then
-      printf("time exceeded")
-      if icmp:code() == ICMP6.CODE_TEXC_HOP_LIMIT then
-	 printf(", hop limit exceeded in transit")
-      elseif icmp:code() == ICMP6.CODE_TEXC_FRAG_REASSEMBLY then
-	 printf(", fragment reassembly time exceeded")
-      end
-   elseif icmp:type() == ICMP6.TYPE_PARAM_PROB then
-      if icmp:code() == ICMP6.CODE_PARAM_PROB_ERR_HDR_FIELD then
-	 printf("erroneous header field")
-      elseif icmp:code() == ICMP6.CODE_PARAM_PROB_UNREC_NXT_HDR then
-	 printf("unrecognized Next Header type")
-      elseif icmp:code() == ICMP6.CODE_PARAM_PROB_UNREC_OPT then
-	 printf("unrecognized IPv6 option")
-      end
-   elseif icmp:type() == ICMP6.TYPE_PKT_TOO_BIG then
-      printf("packet too big, mtu: %d", body.mtu)
-   elseif icmp:type() == ICMP6.TYPE_ROUTER_SOL then
-      printf("router solicitation")
-   elseif icmp:type() == ICMP6.TYPE_ROUTER_ADV then
-      printf("router advertisement")
-   elseif icmp:type() == ICMP6.TYPE_NEIGH_SOL then
-      printf("neighbor solicitation")
-   elseif icmp:type() == ICMP6.TYPE_NEIGH_ADV then
-      printf("neighbor advertisement")
-   elseif icmp:type() == ICMP6.TYPE_REDIRECT then
-      printf("redirect")
-   elseif icmp:type() == ICMP6.TYPE_ROUTER_RENUMBERING then
-      printf("router renumbering")
-   end
-   printf("\n")
-end
+--    if icmp:type() == ICMP6.TYPE_ECHO_REQUEST then
+--       printf("echo request")
+--    elseif icmp:type() == ICMP6.TYPE_ECHO_REPLY then
+--       printf("echo reply")
+--    elseif icmp:type() == ICMP6.TYPE_DEST_UNREACH then
+--       if icmp:code() == ICMP6.CODE_UNREACH_NO_ROUTE then
+--    	 printf("no route to destination")
+--       elseif icmp:code() == ICMP6.CODE_UNREACH_ADM_PROIB then
+--    	 printf("communication with destination administratively prohibited")
+--       elseif icmp:code() == ICMP6.CODE_UNREACH_ADDR then
+--    	 printf("address unreachable")
+--       elseif icmp:code() == ICMP6.CODE_UNREACH_PORT then
+--    	 printf("port unreachable")
+--       end
+--    elseif icmp:type() == ICMP6.TYPE_TIME_EXCEEDED then
+--       printf("time exceeded")
+--       if icmp:code() == ICMP6.CODE_TEXC_HOP_LIMIT then
+-- 	 printf(", hop limit exceeded in transit")
+--       elseif icmp:code() == ICMP6.CODE_TEXC_FRAG_REASSEMBLY then
+-- 	 printf(", fragment reassembly time exceeded")
+--       end
+--    elseif icmp:type() == ICMP6.TYPE_PARAM_PROB then
+--       if icmp:code() == ICMP6.CODE_PARAM_PROB_ERR_HDR_FIELD then
+-- 	 printf("erroneous header field")
+--       elseif icmp:code() == ICMP6.CODE_PARAM_PROB_UNREC_NXT_HDR then
+-- 	 printf("unrecognized Next Header type")
+--       elseif icmp:code() == ICMP6.CODE_PARAM_PROB_UNREC_OPT then
+-- 	 printf("unrecognized IPv6 option")
+--       end
+--    elseif icmp:type() == ICMP6.TYPE_PKT_TOO_BIG then
+--       printf("packet too big, mtu: %d", body.mtu)
+--    elseif icmp:type() == ICMP6.TYPE_ROUTER_SOL then
+--       printf("router solicitation")
+--    elseif icmp:type() == ICMP6.TYPE_ROUTER_ADV then
+--       printf("router advertisement")
+--    elseif icmp:type() == ICMP6.TYPE_NEIGH_SOL then
+--       printf("neighbor solicitation")
+--    elseif icmp:type() == ICMP6.TYPE_NEIGH_ADV then
+--       printf("neighbor advertisement")
+--    elseif icmp:type() == ICMP6.TYPE_REDIRECT then
+--       printf("redirect")
+--    elseif icmp:type() == ICMP6.TYPE_ROUTER_RENUMBERING then
+--       printf("router renumbering")
+--    end
+--    printf("\n")
+-- end
 
 -- function proc_pkt(p)
 --    if p:contains_header(Proto.ARP) then
