@@ -13,13 +13,11 @@ EXTRA_DIST =
 
 selibdir = $(pkgdatadir)/selib
 selib_DATA = 			\
-	selib/oui_db.txt 	\
 	selib/core.luadoc	\
 	selib/bit.luadoc	\
 	selib/script_engine.lua	\
 	selib/dump.lua		\
-	selib/netutil.luadoc	\
-	selib/ouidb.lua
+	selib/netutil.luadoc
 
 scriptsdir = $(pkgdatadir)/scripts
 scripts_DATA = 			\

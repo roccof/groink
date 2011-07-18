@@ -67,9 +67,6 @@ typedef struct _grk_pppoe
 #define PPPOE_TAG_TYPE_AC_SYS_ERR       0x0202
 #define PPPOE_TAG_TYPE_GEN_ERR          0x0203
 
-/* PPPoE decoding error */
-#define PPPOE_ERR_BAD_VERSION 0x80
-
 void register_pppoe();
 
 #endif /* GROINK_PPPOE_H */
