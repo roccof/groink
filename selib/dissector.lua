@@ -25,11 +25,14 @@ local pairs = pairs
 local string = require("string")
 local util = require("util")
 
+local print = print
+
 module("dissector")
 
-local usr_regex = {".*account.*", ".*acct.*", ".*domain.*", ".*login.*", 
+local usr_regex = {"u", ".*account.*", ".*acct.*", ".*domain.*", ".*login.*", 
 		   ".*member.*", ".*user.*", ".*name", ".*email", ".*_id", "id", 
 		   "uid", "mn", "mailaddress", ".*usr.*", ".*admin.*"}
+
 local pwd_regex = {".*password.*", ".*passwd.*", ".*pass.*", ".*pw", "pw.*", "additional_info", ".*pw.*"}
 
 local function get_uri_params(p)
@@ -57,33 +60,29 @@ local function list_match(str, regex_list)
 end
 
 local function check_login(params)
-   local continue, usr_find, pwd_find  = false, false, false
-   local usr, pwd = nil, nil
+   local user, passwd = nil, nil
 
+   -- check for username
    for k,v in pairs(params) do
-      if usr_find == false and list_match(k:lower(), usr_regex) ~= nil then
-	 usr = v
-	 continue = true
-	 usr_find = true
-      end
-      
-      if continue == false and pwd_find == false and list_match(k:lower(), pwd_regex) ~= nil then
-	 pwd = v
-	 pwd_find = true
-      end
-      
-      continue = false
-      
-      if usr_find == true and pwd_find == true then
+      if list_match(k:lower(), usr_regex) == true then
+	 user = v
 	 break
       end
    end
 
-   if usr == nil and pwd == nil then
+   -- check for password
+   for k,v in pairs(params) do
+      if list_match(k:lower(), pwd_regex) == true then
+	 passwd = v
+	 break
+      end
+   end
+
+   if user == nil and passwd == nil then
       return nil, nil
    end
 
-   return usr, pwd
+   return user, passwd
 end
 
 -- HTTP dissector
@@ -133,7 +132,7 @@ function dissect_http(data, len)
 	 local params = get_uri_params(urllib.url_decode(str_params))
 
 	 usr, pwd = check_login(params)
-	 info = "HTTP GET " .. http.headers["Host"] .. http.uri
+	 info = "HTTP GET " .. http.headers["Host"]
 
 	 if usr == nil or pwd == nil then
 	    return
@@ -146,7 +145,7 @@ function dissect_http(data, len)
 	 local params = get_uri_params(urllib.url_decode(http.body))
 
 	 usr, pwd = check_login(params)
-	 info = "HTTP POST " .. http.headers["Host"] .. http.uri
+	 info = "HTTP POST " .. http.headers["Host"]
 
 	 if usr == nil or pwd == nil then
 	    return
