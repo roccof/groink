@@ -21,7 +21,7 @@
 
 #include "base.h"
 
-/* Header structure */
+/* Header */
 typedef struct _grk_header {
   char *proto;                 /* Protocol */
   size_t len;                  /* Lenght */
@@ -30,6 +30,14 @@ typedef struct _grk_header {
   struct _grk_header *prev;    /* Previous header */
   struct _grk_packet *packet;  /* The packet that contains this header */
 } header_t;
+
+/* Payload */
+typedef struct _grk_payload {
+  char *proto;
+  size_t len;
+  _uchar *data;
+  struct _grk_packet *packet;
+} payload_t;
 
 #define PKT_ADD_FLAG(p, f) ((p)->flags |= (f))
 #define PKT_REMOVE_FLAG(p, f) ((p)->flags &= ~(f))
@@ -45,11 +53,12 @@ typedef struct _grk_header {
 
 #define PACKET_TOSTRING_MAXLEN 256
 
-/* Packet object structure */
+/* Packet object */
 typedef struct _grk_packet {
   _uchar *data;                           /* Packet data */
   size_t len;                             /* Packet length*/
   header_t *headers;                      /* Headers list */
+  payload_t *payload;                     /* Payload */
   int num_headers;                        /* Number of headers */
   _uint8 flags;                           /* Flags bit mask */
   _uint8 dec_err[MAX_ERR_LEN];            /* Decoding error */
@@ -57,7 +66,7 @@ typedef struct _grk_packet {
   char *hw_srcaddr;                       /* Source hw address */
   char *net_srcaddr;                      /* Source net address */
   char *net_dstaddr;                      /* Destination net address */
-  char tostring[PACKET_TOSTRING_MAXLEN];  /* Printable packet string. Is filled by decoder */
+  char tostring[PACKET_TOSTRING_MAXLEN];  /* Printable packet string. Filled by decoder */
 } packet_t;
 
 packet_t *packet_new(_uint8 *data, size_t len);
@@ -67,5 +76,6 @@ header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t le
 header_t *packet_get_header(packet_t *p, char *proto);
 int packet_contains_header(packet_t *p, char *proto);
 void packet_set_tostring(packet_t *p, char *format, ...);
+payload_t *packet_set_payload(packet_t *p, char *proto, _uint8 *data, size_t len);
 
 #endif /* GROINK_PACKET_H */

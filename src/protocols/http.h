@@ -16,19 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_PROTOS_NAMES_H
-#define GROINK_PROTOS_NAMES_H
+#ifndef GROINK_HTTP_H
+#define GROINK_HTTP_H
 
-#define PROTO_NAME_ETHER "ether"
-#define PROTO_NAME_ARP "arp"
-#define PROTO_NAME_PPPOE "pppoe"
-#define PROTO_NAME_RAW "raw"
-#define PROTO_NAME_IPV4 "ipv4"
-#define PROTO_NAME_IPV6 "ipv6"
-#define PROTO_NAME_TCP "tcp"
-#define PROTO_NAME_UDP "udp"
-#define PROTO_NAME_ICMP "icmp"
-#define PROTO_NAME_ICMP6 "icmp6"
-#define PROTO_NAME_HTTP "http"
+void register_http();
 
-#endif /* GROINK_PROTOS_NAMES_H */
+#endif

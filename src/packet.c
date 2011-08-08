@@ -23,6 +23,7 @@
 #include "packet.h"
 #include "globals.h"
 #include "utlist.h"
+#include "debug.h"
 
 static void merge_header_data(packet_t *p, header_t *h)
 {
@@ -70,6 +71,7 @@ header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t le
 static void packet_init(packet_t *p)
 {
   p->headers = NULL;
+  p->payload = NULL;
   p->num_headers = 0;
   p->flags = 0;
   p->hw_srcaddr = NULL;
@@ -140,6 +142,11 @@ void packet_free(packet_t *p)
     p->net_dstaddr = NULL;
   }
 
+  if (p->payload != NULL) {
+    free(p->payload);
+    p->payload = NULL;
+  }
+
   /* Fee packet memory */
   free(p);
 }
@@ -174,4 +181,20 @@ void packet_set_tostring(packet_t *p, char *format, ...)
   va_start(ap, format);
   vsnprintf(p->tostring, PACKET_TOSTRING_MAXLEN, format, ap);
   va_end(ap);
+}
+
+payload_t *packet_set_payload(packet_t *p, char *proto, _uint8 *data, size_t len)
+{
+  payload_t *payload = (payload_t *)safe_alloc(sizeof(payload_t));
+  payload->proto = proto;
+  payload->data = data;
+  payload->len = len;
+  payload->packet = p;
+
+  if (p->payload != NULL)
+    debug("the packet contains a payload");
+
+  p->payload = payload;
+
+  return payload;
 }

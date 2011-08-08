@@ -16,19 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GROINK_PROTOS_NAMES_H
-#define GROINK_PROTOS_NAMES_H
+#include "protos_name.h"
+#include "protos.h"
+#include "http.h"
 
-#define PROTO_NAME_ETHER "ether"
-#define PROTO_NAME_ARP "arp"
-#define PROTO_NAME_PPPOE "pppoe"
-#define PROTO_NAME_RAW "raw"
-#define PROTO_NAME_IPV4 "ipv4"
-#define PROTO_NAME_IPV6 "ipv6"
-#define PROTO_NAME_TCP "tcp"
-#define PROTO_NAME_UDP "udp"
-#define PROTO_NAME_ICMP "icmp"
-#define PROTO_NAME_ICMP6 "icmp6"
-#define PROTO_NAME_HTTP "http"
+static int decode_http(packet_t *p, const _uint8 *bytes, size_t len)
+{
+  packet_set_payload(p, PROTO_NAME_HTTP, (void *)bytes, len);
+  return DECODE_OK;
+}
 
-#endif /* GROINK_PROTOS_NAMES_H */
+void register_http()
+{
+  proto_t *p = (proto_t *)safe_alloc(sizeof(proto_t));
+  p->name = PROTO_NAME_HTTP;
+  p->longname = "HTTP";
+  p->layer = L5;
+  p->decoder = decode_http;
+  p->methods = NULL;
+  
+  proto_register_byname(PROTO_NAME_HTTP, p);
+  proto_register_byport(80, p);
+  proto_register_byport(8080, p);
+}

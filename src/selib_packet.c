@@ -24,7 +24,6 @@
 #include "selib.h"
 #include "packet.h"
 #include "protos.h"
-#include "debug.h"
 #include "utlist.h"
 
 static packet_t *check_packet(lua_State *L, int arg)
@@ -53,6 +52,34 @@ static int l_packet_headers(lua_State *L)
 
     lua_settable(L, -3);
   }
+
+  se_setro(L); /* Read-Only table */
+
+  return 1;
+}
+
+static int l_packet_payload(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+
+  if (p->payload == NULL) {
+    lua_pushnil(L);
+    return 1;
+  }
+
+  lua_newtable(L);
+
+  lua_pushstring(L, "proto");
+  lua_pushstring(L, p->payload->proto);
+  lua_settable(L, -3);
+  
+  lua_pushstring(L, "data");
+  lua_pushlstring(L, (const char *)p->payload->data, p->payload->len);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "len");
+  lua_pushnumber(L, p->payload->len);
+  lua_settable(L, -3);
 
   se_setro(L); /* Read-Only table */
 
@@ -225,6 +252,7 @@ static int l_packet_eq(lua_State *L)
 
 static const struct luaL_reg packet_methods[] = {
   {"headers", l_packet_headers},
+  {"payload", l_packet_payload},
   {"num_headers", l_packet_num_headers},
   {"get_header", l_packet_get_header},
   {"len", l_packet_len},

@@ -73,6 +73,7 @@ static void cleanup()
 
 static void signal_handler_cb(int signal)
 {
+  /* TODO: check for multiples CRTL-C */
   exit(EXIT_SUCCESS);
 }
 
