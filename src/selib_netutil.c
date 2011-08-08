@@ -54,12 +54,21 @@ static int l_netutil_is_ip_cidr_addr(lua_State *L)
   return 1;
 }
 
+static int l_netutil_is_ipv6_addr(lua_State *L)
+{
+  char *addr = (char *)luaL_checkstring(L, 1);
+  lua_pushboolean(L, is_ipv6_addr(addr));
+
+  return 1;
+}
+
 static const struct luaL_reg netutil_lib[] =
 {
   {"is_ip_addr", l_netutil_is_ip_addr},
   {"is_ether_addr", l_netutil_is_ether_addr},
   {"is_ip_range_addr", l_netutil_is_ip_range_addr},
   {"is_ip_cidr_addr", l_netutil_is_ip_cidr_addr},
+  {"is_ipv6_addr", l_netutil_is_ipv6_addr},
   {NULL, NULL}
 };
 
