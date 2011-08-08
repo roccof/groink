@@ -28,6 +28,7 @@ groink_SOURCES =				\
 		protocols/tcp.c			\
 		protocols/udp.c			\
 		protocols/http.c		\
+		protocols/ftp.c			\
 		selib.c				\
 		selib_bit.c			\
 		selib_constants.c		\
@@ -66,7 +67,8 @@ noinst_HEADERS =				\
 		protocols/raw.h			\
 		protocols/tcp.h			\
 		protocols/udp.h			\
-		protocols/http.h
+		protocols/http.h		\
+		protocols/ftp.h			\
 		selib.h				\
 		script_engine.h			\
 		threads.h			\

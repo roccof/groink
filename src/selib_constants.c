@@ -39,6 +39,7 @@ static const se_constant_t protos_const[] = {
   {"IPV6", { .str = PROTO_NAME_IPV6 }, SE_TSTRING},
   {"ICMP6", { .str = PROTO_NAME_ICMP6 }, SE_TSTRING},
   {"HTTP", { .str = PROTO_NAME_HTTP }, SE_TSTRING},
+  {"FTP", { .str = PROTO_NAME_FTP }, SE_TSTRING},
   {NULL, { .num = 0 }, SE_TNUMBER}
 };
 

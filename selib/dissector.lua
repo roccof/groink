@@ -84,7 +84,7 @@ local function check_login(params)
 end
 
 -- HTTP dissector
-function dissect_http(data, len)
+function dissect_http(data)
 
    local info, usr, pwd = nil, nil, nil
 
@@ -152,4 +152,8 @@ function dissect_http(data, len)
    end
    
    return info, usr, pwd
+end
+
+function dissect_ftp(data)
+   
 end
