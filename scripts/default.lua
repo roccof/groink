@@ -22,6 +22,7 @@
 local diss = require("dissector")
 local core = require("core")
 local printf = core.printf
+local netutil = require("netutil")
 
 function proc_pkt(p)
    local info, usr, pwd = nil, nil, nil
@@ -37,6 +38,24 @@ function proc_pkt(p)
    end
    
    if info ~= nil then
-      printf("\nIP >> %s\n|_user: %s\n|_passwd: %s\n", info, usr, pwd)
+      local dst, port = nil, ""
+
+      -- check dst addr
+      if netutil.is_ipv6_addr(p:net_dstaddr()) then
+      	 dst = "[".. p:net_dstaddr() .."]"
+      else
+      	 dst = p:net_dstaddr()
+      end
+
+      -- check port
+      if p:contains_header(Proto.TCP) then
+      	 local tcp = p:get_header(Proto.TCP)
+      	 port = ":" .. tcp:dst_port()
+      elseif p:contains_header(Proto.UDP) then
+      	 local udp = p:get_header(Proto.UDP)
+      	 port = ":" .. udp:dst_port()
+      end
+      
+      printf("\n%s%s >> %s\n|_user: %s\n|_passwd: %s\n", dst, port, info, usr, pwd)
    end
 end

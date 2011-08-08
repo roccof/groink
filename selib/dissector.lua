@@ -25,8 +25,6 @@ local pairs = pairs
 local string = require("string")
 local util = require("util")
 
-local print = print
-
 module("dissector")
 
 local usr_regex = {"u", ".*account.*", ".*acct.*", ".*domain.*", ".*login.*", 
@@ -64,7 +62,7 @@ local function check_login(params)
 
    -- check for username
    for k,v in pairs(params) do
-      if list_match(k:lower(), usr_regex) == true then
+      if list_match(k:lower(), usr_regex) then
 	 user = v
 	 break
       end
@@ -72,7 +70,7 @@ local function check_login(params)
 
    -- check for password
    for k,v in pairs(params) do
-      if list_match(k:lower(), pwd_regex) == true then
+      if list_match(k:lower(), pwd_regex) then
 	 passwd = v
 	 break
       end
@@ -141,7 +139,7 @@ function dissect_http(data, len)
    elseif http.method == "POST" then
       local ctype = http.headers["Content-Type"]
 
-      if ctype ~= nil and ctype == "application/x-www-form-urlencoded" then
+      if ctype ~= nil and ctype == "application/x-www-form-urlencoded" and http.body ~= nil then
 	 local params = get_uri_params(urllib.url_decode(http.body))
 
 	 usr, pwd = check_login(params)
