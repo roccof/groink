@@ -15,9 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
 
--- default.lua
--- Default script. This script is called by default if there isn't specified one.
--- This script dissect packet and show username and password.
+-- isolate.lua
+-- pinoevinrin
 
 local core = require("core")
 local printf = core.printf

@@ -17,11 +17,26 @@
 
 -- default.lua
 -- Default script. This script is called by default if there isn't specified one.
--- This script dissect packet and show username and password.
+-- This script dissect the payload and show username and password.
 
-local corelib = require("core")
-local printf = corelib.printf
+local diss = require("dissector")
+local core = require("core")
+local printf = core.printf
 
 function proc_pkt(p)
+   local info, usr, pwd = nil, nil, nil
+
+   local payload = p:payload()
+
+   if payload == nil then
+      return
+   end
+
+   if payload.proto == Proto.HTTP then
+      info, usr, pwd = diss.dissect_http(payload.data)
+   end
    
+   if info ~= nil then
+      printf("\nIP >> %s\n|_user: %s\n|_passwd: %s\n", info, usr, pwd)
+   end
 end
