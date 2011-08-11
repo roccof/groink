@@ -19,6 +19,8 @@
 #ifndef GROINK_SCRIPT_ENGINE_H
 #define GROINK_SCRIPT_ENGINE_H
 
+#include "packet.h"
+
 #define SCRIPT_DIR "scripts"
 #define SCRIPT_EXT ".lua"
 #define SCRIPT_DB "scripts.db"
@@ -29,5 +31,6 @@
 void se_open();
 void se_close();
 char *append_script_dir(char *script_name);
+void se_pass_packet(packet_t *p);
 
 #endif /* GROINK_SCRIPT_ENGINE_H */

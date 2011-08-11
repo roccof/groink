@@ -25,6 +25,8 @@ local pairs = pairs
 local string = require("string")
 local util = require("util")
 
+local print = print
+
 module("dissector")
 
 local usr_regex = {"u", ".*account.*", ".*acct.*", ".*domain.*", ".*login.*", 
@@ -155,5 +157,10 @@ function dissect_http(data)
 end
 
 function dissect_ftp(data)
-   
+   local info = nil
+   local usr, pwd = nil, nil
+
+   print(">>> " .. data .. "\n")
+
+   return info, usr, pwd
 end

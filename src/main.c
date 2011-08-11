@@ -112,7 +112,10 @@ static void process_packet(u_char *user, const struct pcap_pkthdr *header, const
   
   /* Raise event */
   hook_event(HOOK_RECEIVED, hookdata);
-  
+
+  /* Pass packet to script engine */
+  se_pass_packet(p);
+
   free(hookdata);
   
   /* If MiTM is active, do packet forwarding */

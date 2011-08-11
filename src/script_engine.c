@@ -171,10 +171,11 @@ static int se_init(lua_State *L)
   return 0;
 }
 
-static void proc_pkt_cb(hookdata_t *data)
+/* Send the received packet to script engine */
+void se_pass_packet(packet_t *p)
 {
   myassert(L != NULL);
-  myassert(data != NULL && data->type == HOOKDATA_PACKET);
+  myassert(p != NULL)
 
   /* Stack pos 1: traceback function */
   lua_getfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK);
@@ -182,8 +183,7 @@ static void proc_pkt_cb(hookdata_t *data)
   /* Stack pos 2: proc_pkt function in the script */
   lua_getfield(L, LUA_REGISTRYINDEX, SE_PROC_PKT);
 
-  se_pushobject(L, (packet_t *)data->data, SE_OBJ_TYPE_PACKET, 
-		SE_OBJ_NAME_PACKET);
+  se_pushobject(L, p, SE_OBJ_TYPE_PACKET, SE_OBJ_NAME_PACKET);
 
   if (lua_pcall(L, 1, 0, 1) != 0)
       lua_error(L);
@@ -206,9 +206,6 @@ static void se_run()
       lua_error(L);
   
   lua_settop(L, 0); /* Clear the stack */
-
-  /* Register hook for SE_PROC_PKT */
-  hook_register(HOOK_RECEIVED, proc_pkt_cb);
 }
 
 void se_open()
@@ -253,9 +250,6 @@ void se_close()
 {
   if(L == NULL)
     return;
-
-  /* Unregister hook for SE_PROC_PKT */
-  hook_unregister(HOOK_RECEIVED, proc_pkt_cb);
 
   lua_settop(L, 0); /* Clear the stack */
 
