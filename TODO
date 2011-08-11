@@ -68,5 +68,6 @@
 
 * porting on *BSD
 
-* TCP/IP session management
+* TCP/IP session tracking and injection
 
+* write documentation

@@ -24,13 +24,14 @@ local urllib = require("urllib")
 local pairs = pairs
 local string = require("string")
 local util = require("util")
+local table = require("table")
 
 local print = print
 
 module("dissector")
 
 -- Dissector sessions
-local d_sess = nil
+local d_sess = {}
 
 local usr_regex = {"u", ".*account.*", ".*acct.*", ".*domain.*", ".*login.*", 
 		   ".*member.*", ".*user.*", ".*name", ".*email", ".*_id", "id", 
@@ -47,33 +48,17 @@ end
 
 -- Insert a new session in the list
 local function set_session(s)
-   -- Insert in the head
-   d_sess = {next = d_sess, data = s}
+   table.insert(d_sess, s)
 end
 
 -- Remove and returna a session from the list
 local function get_session(src_addr, dst_addr, src_port, dst_port, proto)
-   local l = d_sess
-   local l_prev = nil
-
-   while l do
-      local d = l.data
-      if d.proto == proto and d.src == src_addr and d.dst == dst_addr and d.src_p == src_port and d.dst_p == dst_port then
-
-	 if l_prev == nil then
-	    if l.next == nil then
-	       d_sess = nil
-	    else
-	       d_sess = l.next
-	    end
-	 else
-	    l_prev.next = l.next
-	 end
-
-	 return l.data
+   for k,v in pairs(d_sess) do
+      if v.proto == proto and v.src == src_addr and v.dst == dst_addr and v.src_p == src_port and v.dst_p == dst_port then
+	 local s = v
+	 table.remove(d_sess, k)
+	 return s
       end
-      l_prev = l
-      l = l.next
    end
    return nil
 end

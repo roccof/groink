@@ -51,12 +51,8 @@ function proc_pkt(p)
       end
 
       -- check port
-      if p:contains_header(Proto.TCP) then
-      	 local tcp = p:get_header(Proto.TCP)
-      	 port = ":" .. tcp:dst_port()
-      elseif p:contains_header(Proto.UDP) then
-      	 local udp = p:get_header(Proto.UDP)
-      	 port = ":" .. udp:dst_port()
+      if p:dst_port() > 0 then
+	 port = ":" .. p:dst_port()
       end
       
       printf("\n%s%s >> %s\n|_user: %s\n|_passwd: %s\n", dst, port, info, usr, pwd)
