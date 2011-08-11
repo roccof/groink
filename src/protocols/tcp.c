@@ -46,6 +46,9 @@ static int decode_tcp(packet_t *p, const _uint8 *bytes, size_t len)
 
   packet_append_header(p, PROTO_NAME_TCP, (void *)tcp, totlen);
 
+  p->src_port = tcp->src_port;
+  p->dst_port = tcp->dest_port;
+
   /* If there is more data */
   if ((len - totlen) > 0) {
     status += call_decoder_byport(ntohs(tcp->src_port), p, (bytes + totlen), 

@@ -43,6 +43,9 @@ static int decode_udp(packet_t *p, const _uint8 *bytes, size_t len)
 
   packet_append_header(p, PROTO_NAME_UDP, (void *)udp, UDP_HDR_LEN);
 
+  p->src_port = udp->src_port;
+  p->dst_port = udp->dest_port;
+
   if ((len - UDP_HDR_LEN) > 0) {
     status += call_decoder_byport(ntohs(udp->src_port), p, (bytes + UDP_HDR_LEN), (len - UDP_HDR_LEN));
     

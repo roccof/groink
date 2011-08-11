@@ -78,6 +78,8 @@ static void packet_init(packet_t *p)
   p->hw_dstaddr = NULL;
   p->net_srcaddr = NULL;
   p->net_dstaddr = NULL;
+  p->src_port = 0;
+  p->dst_port = 0;
   bzero(p->dec_err, MAX_ERR_LEN);
   bzero(p->tostring, PACKET_TOSTRING_MAXLEN);
 }

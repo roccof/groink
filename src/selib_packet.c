@@ -166,6 +166,20 @@ static int l_packet_src_netaddr(lua_State *L)
   return 1;
 }
 
+static int l_packet_dst_port(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+  lua_pushnumber(L, p->dst_port);
+  return 1;
+}
+
+static int l_packet_src_port(lua_State *L)
+{
+  packet_t *p = check_packet(L, -1);
+  lua_pushnumber(L, p->src_port);
+  return 1;
+}
+
 static int l_packet_setdrop(lua_State *L)
 {
   packet_t *p = NULL;
@@ -262,6 +276,8 @@ static const struct luaL_reg packet_methods[] = {
   {"hw_dstaddr", l_packet_dst_hwaddr},
   {"net_srcaddr", l_packet_src_netaddr},
   {"net_dstaddr", l_packet_dst_netaddr},
+  {"src_port", l_packet_src_port},
+  {"dst_port", l_packet_dst_port},
   {"set_drop", l_packet_setdrop},
   {"is_drop", l_packet_isdrop},
   {"set_unmodificable", l_packet_setunmod},

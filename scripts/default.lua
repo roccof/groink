@@ -35,9 +35,9 @@ function proc_pkt(p)
 
    -- dissect the payload
    if payload.proto == Proto.HTTP then
-      info, usr, pwd = diss.dissect_http(payload.data)
+      info, usr, pwd = diss.dissect_http(p)
    elseif payload.proto == Proto.FTP then
-      info, usr, pwd = diss.dissect_ftp(payload.data)
+      info, usr, pwd = diss.dissect_ftp(p)
    end
    
    if info ~= nil then

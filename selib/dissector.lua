@@ -29,11 +29,54 @@ local print = print
 
 module("dissector")
 
+-- Dissector sessions
+local d_sess = nil
+
 local usr_regex = {"u", ".*account.*", ".*acct.*", ".*domain.*", ".*login.*", 
 		   ".*member.*", ".*user.*", ".*name", ".*email", ".*_id", "id", 
 		   "uid", "mn", "mailaddress", ".*usr.*", ".*admin.*"}
 
-local pwd_regex = {".*password.*", ".*passwd.*", ".*pass.*", ".*pw", "pw.*", "additional_info", ".*pw.*"}
+local pwd_regex = {".*password.*", ".*passwd.*", ".*pass.*", ".*pw", "pw.*", ".*pw.*", "additional_info"}
+
+local function new_session(src_addr, dst_addr, src_port, dst_port, proto, data)
+
+   -- return the session obj
+   return {src = src_addr, dst = dst_addr, src_p = src_port, 
+	   dst_p = dst_port, proto = proto, data = data }
+end
+
+-- Insert a new session in the list
+local function set_session(s)
+   -- Insert in the head
+   d_sess = {next = d_sess, data = s}
+end
+
+-- Remove and returna a session from the list
+local function get_session(src_addr, dst_addr, src_port, dst_port, proto)
+   local l = d_sess
+   local l_prev = nil
+
+   while l do
+      local d = l.data
+      if d.proto == proto and d.src == src_addr and d.dst == dst_addr and d.src_p == src_port and d.dst_p == dst_port then
+
+	 if l_prev == nil then
+	    if l.next == nil then
+	       d_sess = nil
+	    else
+	       d_sess = l.next
+	    end
+	 else
+	    l_prev.next = l.next
+	 end
+
+	 return l.data
+      end
+      l_prev = l
+      l = l.next
+   end
+   return nil
+end
 
 local function get_uri_params(p)
    local params = {}
@@ -86,11 +129,17 @@ local function check_login(params)
 end
 
 -- HTTP dissector
-function dissect_http(data)
+function dissect_http(packet)
 
    local info, usr, pwd = nil, nil, nil
 
-   local http = httplib.parse_http(data)
+   local p = packet:payload()
+   
+   if p == nil then
+      return nil
+   end
+
+   local http = httplib.parse_http(p.data)
 
    if http == nil then
       return nil
@@ -156,11 +205,47 @@ function dissect_http(data)
    return info, usr, pwd
 end
 
-function dissect_ftp(data)
-   local info = nil
-   local usr, pwd = nil, nil
+-- FTP dissector
+function dissect_ftp(packet)
+   local info = "FTP"
 
-   print(">>> " .. data .. "\n")
+   local p = packet:payload()
+   
+   if p == nil then
+      return nil
+   end
 
-   return info, usr, pwd
+   local data = p.data
+
+   local s,e = data:find("USER")
+
+   if s ~= nil then
+      -- save session info
+
+      local usr = data:sub(e+2, #data-1)
+
+      local s = new_session(packet:net_srcaddr(), packet:net_dstaddr(), 
+			    packet:src_port(), packet:dst_port(), 
+			    p.proto, usr)
+
+      set_session(s)
+      return nil
+   end
+
+   s,e = data:find("PASS")
+
+   if s ~= nil then
+
+      local pwd = data:sub(e+2, #data-1)
+
+      -- retrieve stored session info
+      local s = get_session(packet:net_srcaddr(), packet:net_dstaddr(), 
+			    packet:src_port(), packet:dst_port(), 
+			    p.proto)
+      if s ~= nil then
+	 return info, s.data, pwd
+      end
+   end
+
+   return nil
 end

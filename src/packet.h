@@ -66,6 +66,8 @@ typedef struct _grk_packet {
   char *hw_srcaddr;                       /* Source hw address */
   char *net_srcaddr;                      /* Source net address */
   char *net_dstaddr;                      /* Destination net address */
+  _uint16 src_port;                       /* Source port */
+  _uint16 dst_port;                       /* Destination port */
   char tostring[PACKET_TOSTRING_MAXLEN];  /* Printable packet string. Filled by decoder */
 } packet_t;
 
