@@ -35,7 +35,7 @@ void register_raw()
   p->longname = "Raw Header";
   p->layer = L5;
   p->decoder = decode_raw;
-  p->methods = NULL;
+  p->dissect = NULL;
   
   proto_register_byname(PROTO_NAME_RAW, p);
 }

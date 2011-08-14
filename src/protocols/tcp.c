@@ -69,7 +69,7 @@ static int decode_tcp(packet_t *p, const _uint8 *bytes, size_t len)
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 
-static int l_tcp_src_port(lua_State *L)
+static int l_dissect_tcp(lua_State *L)
 {
   header_t *header = NULL;
   tcp_t *tcp = NULL;
@@ -77,70 +77,29 @@ static int l_tcp_src_port(lua_State *L)
   header = check_header(L, 1);
   tcp = (tcp_t *)header->data;
 
+  lua_newtable(L);
+
+  lua_pushstring(L, "src_port");
   lua_pushnumber(L, ntohs(tcp->src_port));
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_tcp_dst_port(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
-
+  lua_pushstring(L, "dst_port");
   lua_pushnumber(L, ntohs(tcp->dest_port));
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_tcp_seq(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
-
+  lua_pushstring(L, "seq");
   lua_pushnumber(L, ntohl(tcp->seq));
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_tcp_ack(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
-
+  lua_pushstring(L, "ack");
   lua_pushnumber(L, ntohl(tcp->ack));
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_tcp_dataoffset(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
-
+  lua_pushstring(L, "offset");
   lua_pushnumber(L, tcp->offset);
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_tcp_flags(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
+  lua_pushstring(L, "flags");
 
   lua_newtable(L);
 
@@ -170,61 +129,24 @@ static int l_tcp_flags(lua_State *L)
 
   se_setro(L);
 
-  return 1;
-}
+  lua_settable(L, -3);
 
-static int l_tcp_cksum(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
-
+  lua_pushstring(L, "cksum");
   lua_pushnumber(L, ntohs(tcp->checksum));
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_tcp_window(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
-
+  lua_pushstring(L, "win");
   lua_pushnumber(L, ntohs(tcp->win));
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_tcp_urg_pointer(lua_State *L)
-{
-  header_t *header = NULL;
-  tcp_t *tcp = NULL;
-  
-  header = check_header(L, 1);
-  tcp = (tcp_t *)header->data;
-
+  lua_pushstring(L, "urg_pointer");
   lua_pushnumber(L, ntohs(tcp->urgp));
+  lua_settable(L, -3);
+
+  se_setro(L);
 
   return 1;
 }
-
-static const struct luaL_reg tcp_methods[] = {
-  {"src_port", l_tcp_src_port},
-  {"dst_port", l_tcp_dst_port},
-  {"seq", l_tcp_seq},
-  {"ack", l_tcp_ack},
-  {"data_offset", l_tcp_dataoffset},
-  {"flags", l_tcp_flags},
-  {"window", l_tcp_window},
-  {"cksum", l_tcp_cksum},
-  {"urg_pointer", l_tcp_urg_pointer},
-  /* {"options", l_tcp_options} */
-  {NULL, NULL}
-};
 
 void register_tcp()
 {
@@ -233,7 +155,7 @@ void register_tcp()
   p->longname = "Trasmission Control Protocol";
   p->layer = L4;
   p->decoder = decode_tcp;
-  p->methods = (luaL_reg *)tcp_methods;
+  p->dissect = l_dissect_tcp;
   
   proto_register_byname(PROTO_NAME_TCP, p);
 }

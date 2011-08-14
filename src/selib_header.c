@@ -52,6 +52,36 @@ static int l_header_proto(lua_State *L)
   return 1;
 }
 
+static int l_header_dissect(lua_State *L)
+{
+  proto_t * p = NULL;
+  header_t *h = check_header(L, -1);
+
+  p = proto_get_byname(h->proto);
+  myassert(p != NULL);
+
+  if (p->dissect == NULL) {
+    lua_pushnil(L);
+    return 1;
+  }
+
+  /* Stack pos 2: traceback function */
+  lua_getfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK);
+
+  /* Stack pos 3: dissect callback function */
+  lua_pushcfunction(L, p->dissect);
+
+  /* Stack pos 4: header userdata */
+  lua_pushvalue(L, 1);
+
+  if (lua_pcall(L, 1, 1, 2) != 0) {
+    lua_error(L);
+    return 0;
+  }
+
+  return 1;
+}
+
 static int l_header_tostring(lua_State *L)
 {
   header_t *h = check_header(L, -1);
@@ -77,54 +107,11 @@ static int l_header_eq(lua_State *L)
   return 0;
 }
 
-static int l_header_index(lua_State *L)
-{
-  luaL_Reg *m = NULL;
-  header_t *h = NULL;
-  proto_t *p = NULL;
-  char *name = NULL;
-
-  /* If the function is in the metatable return it */
-
-  lua_getmetatable(L, -2);
-  myassert(!lua_isnil(L, -1));
-
-  lua_pushvalue(L, -2);
-  lua_gettable(L, -2);
-
-  if (!lua_isnil(L, -1) && lua_type(L, -1) == LUA_TFUNCTION)
-    return 1; /* Return the function */
-
-  /* Restore the stack */
-  lua_settop(L, -3);
-
-  /* Search the function in the protocol methods */
-
-  name = (char *)luaL_checkstring(L, -1);
-  h = check_header(L, -2);
-
-  p = proto_get_byname(h->proto);
-  myassert(p != NULL);
-
-  if (p->methods == NULL)
-    goto end;
-
-  for (m=p->methods; m->name != NULL; m++) {
-    if (strncmp(name, m->name, strlen(name)) == 0) {
-      lua_pushcfunction(L, m->func);
-      return 1;
-    }
-  }
-
- end:
-  lua_pushnil(L);
-  return 1;
-}
-
 static const struct luaL_reg header_methods[] = {
   {"rawdata", l_header_rawdata},
   {"len", l_header_len},
   {"proto", l_header_proto},
+  {"dissect", l_header_dissect},
   {NULL, NULL}
 };
 
@@ -133,8 +120,8 @@ void se_open_header(lua_State *L)
   luaL_newmetatable(L, SE_OBJ_NAME_HEADER);
 
   lua_pushstring(L, "__index");
-  lua_pushcfunction(L, l_header_index);
-  lua_settable(L, -3); /* metatable.__index = cfunc */
+  lua_pushvalue(L, -2);
+  lua_settable(L, -3); /* metatable.__index = metatable */
 
   lua_pushstring(L, "__tostring");
   lua_pushcfunction(L, l_header_tostring);

@@ -33,7 +33,7 @@ void register_http()
   p->longname = "HTTP";
   p->layer = L5;
   p->decoder = decode_http;
-  p->methods = NULL;
+  p->dissect = NULL;
   
   proto_register_byname(PROTO_NAME_HTTP, p);
   proto_register_byport(80, p);

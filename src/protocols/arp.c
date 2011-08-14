@@ -188,72 +188,7 @@ static int decode_arp(packet_t *p, const _uint8 *bytes, size_t len)
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 
-static int l_arp_hrd(lua_State *L)
-{
-  header_t *header = NULL;
-  arp_t *arp = NULL;
-  
-  header = check_header(L, 1);
-  arp = (arp_t *)header->data;
-
-  lua_pushnumber(L, ntohs(arp->hrd));
-
-  return 1;
-}
-
-static int l_arp_pro(lua_State *L)
-{
-  header_t *header = NULL;
-  arp_t *arp = NULL;
-  
-  header = check_header(L, 1);
-  arp = (arp_t *)header->data;
-
-  lua_pushnumber(L, ntohs(arp->pro));
-
-  return 1;
-}
-
-static int l_arp_hln(lua_State *L)
-{
-  header_t *header = NULL;
-  arp_t *arp = NULL;
-  
-  header = check_header(L, 1);
-  arp = (arp_t *)header->data;
-
-  lua_pushnumber(L, arp->hln);
-
-  return 1;
-}
-
-static int l_arp_pln(lua_State *L)
-{
-  header_t *header = NULL;
-  arp_t *arp = NULL;
-  
-  header = check_header(L, 1);
-  arp = (arp_t *)header->data;
-
-  lua_pushnumber(L, arp->pln);
-
-  return 1;
-}
-
-static int l_arp_opcode(lua_State *L)
-{
-  header_t *header = NULL;
-  arp_t *arp = NULL;
-  
-  header = check_header(L, 1);
-  arp = (arp_t *)header->data;
-
-  lua_pushnumber(L, ntohs(arp->opcode));
-
-  return 1;
-}
-
-static int l_arp_ethip(lua_State *L)
+static int l_dissect_arp(lua_State *L)
 {
   header_t *header = NULL;
   arp_t *arp = NULL;
@@ -261,65 +196,82 @@ static int l_arp_ethip(lua_State *L)
   
   header = check_header(L, 1);
   arp = (arp_t *)header->data;
+  
+  lua_newtable(L);
+
+  lua_pushstring(L, "hrd");
+  lua_pushnumber(L, ntohs(arp->hrd));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "pro");
+  lua_pushnumber(L, ntohs(arp->pro));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "hln");
+  lua_pushnumber(L, arp->hln);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "pln");
+  lua_pushnumber(L, arp->pln);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "opcode");
+  lua_pushnumber(L, ntohs(arp->opcode));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "ethip");
 
   /* 
    * If there are arp ethernet additional info return a
    * table with those info, otherwise return nil
    */
-  if(ntohs(arp->hrd) == ARP_HRD_ETHER && ntohs(arp->pro) == ARP_PROTO_IPV4)
-    {
-      char *addr = NULL;
-      _uint32 *baddr = NULL;
-      
-      ether_arp = (arp_ethip_t *)(arp + 1);
+  if (ntohs(arp->hrd) == ARP_HRD_ETHER && ntohs(arp->pro) == ARP_PROTO_IPV4) {
+    char *addr = NULL;
+    _uint32 *baddr = NULL;
+    
+    ether_arp = (arp_ethip_t *)(arp + 1);
+    
+    /* Table with key-value pairs */
+    lua_newtable(L);
+    
+    lua_pushstring(L, "sha");
+    addr = ether_addr_ntoa(ether_arp->sha);
+    lua_pushstring(L, addr);
+    lua_settable(L, -3);
+    free(addr);
+    
+    lua_pushstring(L, "spa");
+    baddr = (_uint32 *)ether_arp->spa;
+    addr = ip_addr_ntoa(*baddr);
+    lua_pushstring(L, addr);
+    lua_settable(L, -3);
+    free(addr);
 
-      /* Table with key-value pairs */
-      lua_newtable(L);
+    lua_pushstring(L, "tha");
+    addr = ether_addr_ntoa(ether_arp->tha);
+    lua_pushstring(L, addr);
+    lua_settable(L, -3);
+    free(addr);
 
-      lua_pushstring(L, "sha");
-      addr = ether_addr_ntoa(ether_arp->sha);
-      lua_pushstring(L, addr);
-      lua_settable(L, -3);
-      free(addr);
-
-      lua_pushstring(L, "spa");
-      baddr = (_uint32 *)ether_arp->spa;
-      addr = ip_addr_ntoa(*baddr);
-      lua_pushstring(L, addr);
-      lua_settable(L, -3);
-      free(addr);
-
-      lua_pushstring(L, "tha");
-      addr = ether_addr_ntoa(ether_arp->tha);
-      lua_pushstring(L, addr);
-      lua_settable(L, -3);
-      free(addr);
-
-      lua_pushstring(L, "tpa");
-      baddr = (_uint32 *)ether_arp->tpa;
-      addr = ip_addr_ntoa(*baddr);
-      lua_pushstring(L, addr);
-      lua_settable(L, -3);
-      free(addr);
-
-      /* Read-Only table */
-      se_setro(L);
-    }
-  else
+    lua_pushstring(L, "tpa");
+    baddr = (_uint32 *)ether_arp->tpa;
+    addr = ip_addr_ntoa(*baddr);
+    lua_pushstring(L, addr);
+    lua_settable(L, -3);
+    free(addr);
+    
+    /* Read-Only table */
+    se_setro(L);
+  } else {
     lua_pushnil(L);
-  
+  }
+
+  lua_settable(L, -3);
+
+  se_setro(L);
+
   return 1;
 }
-
-static const struct luaL_reg arp_methods[] = {
-  {"hrd", l_arp_hrd},
-  {"pro", l_arp_pro},
-  {"hln", l_arp_hln},
-  {"pln", l_arp_pln},
-  {"opcode", l_arp_opcode},
-  {"arp_ethip", l_arp_ethip},
-  {NULL, NULL}
-};
 
 void register_arp()
 {
@@ -328,7 +280,7 @@ void register_arp()
   p->longname = "Address Resolution Protocol";
   p->layer = L3;
   p->decoder = decode_arp;
-  p->methods = (luaL_reg *)arp_methods;
+  p->dissect = l_dissect_arp;
   
   proto_register_byname(PROTO_NAME_ARP, p);
 }

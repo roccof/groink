@@ -114,79 +114,7 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
   return DECODE_OK;
 }
 
-static int l_ipv6_version(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv6_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv6_t *)header->data;
-
-  lua_pushnumber(L, IPV6_TRCLASS(ip));
-  return 1;
-}
-
-static int l_ipv6_tclass(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv6_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv6_t *)header->data;
-
-  lua_pushnumber(L, IPV6_FLOW(ip));
-  return 1;
-}
-
-static int l_ipv6_flow(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv6_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv6_t *)header->data;
-
-  lua_pushnumber(L, IPV6_VERSION(ip));
-  return 1;
-}
-
-static int l_ipv6_plen(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv6_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv6_t *)header->data;
-
-  lua_pushnumber(L, ntohs(ip->plen));
-  return 1;
-}
-
-static int l_ipv6_nexthdr(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv6_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv6_t *)header->data;
-
-  lua_pushnumber(L, ip->next_hdr);
-  return 1;
-}
-
-static int l_ipv6_hoplimit(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv6_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv6_t *)header->data;
-
-  lua_pushnumber(L, ip->hop_limit);
-  return 1;
-}
-
-static int l_ipv6_src_addr(lua_State *L)
+static int l_dissect_ipv6(lua_State *L)
 {
   header_t *header = NULL;
   ipv6_t *ip = NULL;
@@ -195,38 +123,48 @@ static int l_ipv6_src_addr(lua_State *L)
   header = check_header(L, 1);
   ip = (ipv6_t *)header->data;
 
+  lua_newtable(L);
+
+  lua_pushstring(L, "version");
+  lua_pushnumber(L, IPV6_VERSION(ip));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "trclass");
+  lua_pushnumber(L, IPV6_TRCLASS(ip));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "flow_label");
+  lua_pushnumber(L, IPV6_FLOW(ip));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "payload_length");
+  lua_pushnumber(L, ntohs(ip->plen));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "next_hdr");
+  lua_pushnumber(L, ip->next_hdr);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "hop_limit");
+  lua_pushnumber(L, ip->hop_limit);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "src_addr");
   addr = ipv6_addr_ntoa(ip->src_addr);
   lua_pushstring(L, addr);
   free(addr);
-  return 1;
-}
+  lua_settable(L, -3);
 
-static int l_ipv6_dst_addr(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv6_t *ip = NULL;
-  char *addr = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv6_t *)header->data;
-
+  lua_pushstring(L, "dst_addr");
   addr = ipv6_addr_ntoa(ip->dst_addr);
   lua_pushstring(L, addr);
   free(addr);
+  lua_settable(L, -3);
+
+  se_setro(L);
+
   return 1;
 }
-
-static const struct luaL_reg ip6_methods[] = {
-  {"version", l_ipv6_version},
-  {"traffic_class", l_ipv6_tclass},
-  {"flow_label", l_ipv6_flow},
-  {"payload_length", l_ipv6_plen},
-  {"next_hdr", l_ipv6_nexthdr},
-  {"hop_limit", l_ipv6_hoplimit},
-  {"src_addr", l_ipv6_src_addr},
-  {"dst_addr", l_ipv6_dst_addr},
-  {NULL, NULL}
-};
 
 void register_ipv6()
 {
@@ -235,7 +173,7 @@ void register_ipv6()
   p->longname = "Internet Protocol version 6";
   p->layer = L3;
   p->decoder = decode_ipv6;
-  p->methods = (luaL_reg *)ip6_methods;
+  p->dissect = l_dissect_ipv6;
   
   proto_register_byname(PROTO_NAME_IPV6, p);
 }

@@ -48,44 +48,6 @@ static int decode_icmp6(packet_t *p, const _uint8 *bytes, size_t len)
   return DECODE_OK;
 }
 
-static int l_icmp6_type(lua_State *L)
-{
-  header_t *header = NULL;
-  icmp6_t *icmp = NULL;  
-
-  header = check_header(L, 1);
-  icmp = (icmp6_t *)header->data;
-
-  lua_pushnumber(L, icmp->type);
-
-  return 1;
-}
-
-static int l_icmp6_code(lua_State *L)
-{
-  header_t *header = NULL;
-  icmp6_t *icmp = NULL;  
-
-  header = check_header(L, 1);
-  icmp = (icmp6_t *)header->data;
-
-  lua_pushnumber(L, icmp->code);
-  return 1;
-}
-
-static int l_icmp6_cksum(lua_State *L)
-{
-  header_t *header = NULL;
-  icmp6_t *icmp = NULL;  
-
-  header = check_header(L, 1);
-  icmp = (icmp6_t *)header->data;
-
-  lua_pushnumber(L, ntohs(icmp->cksum));
-
-  return 1;
-}
-
 static void process_echo(lua_State *L, icmp6_t *icmp, unsigned int len)
 {
   icmp6_echo_t *echo = NULL;
@@ -106,6 +68,8 @@ static void process_echo(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_pushstring(L, "seq");
   lua_pushnumber(L, htons(echo->seq));
   lua_settable(L, -3);
+
+  se_setro(L);
 }
 
 static void process_pkt_too_big(lua_State *L, icmp6_t *icmp, unsigned int len)
@@ -120,6 +84,8 @@ static void process_pkt_too_big(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_pushstring(L, "mtu");
   lua_pushnumber(L, htonl(*((_uint32 *)(icmp + 1))));
   lua_settable(L, -3);
+
+  se_setro(L);
 }
 
 static void process_param_problem(lua_State *L, icmp6_t *icmp, unsigned int len)
@@ -134,6 +100,8 @@ static void process_param_problem(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_pushstring(L, "pointer");
   lua_pushnumber(L, htonl(*((_uint32 *)(icmp + 1))));
   lua_settable(L, -3);
+
+  se_setro(L);
 }
 
 static void process_neigh_sol(lua_State *L, icmp6_t *icmp, unsigned int len)
@@ -154,6 +122,8 @@ static void process_neigh_sol(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_pushstring(L, "target_addr");
   lua_pushstring(L, addr);
   lua_settable(L, -3);
+
+  se_setro(L);
 
   free(addr);
 }
@@ -194,9 +164,11 @@ static void process_router_adv(lua_State *L, icmp6_t *icmp, unsigned int len)
   lua_pushstring(L, "retrans_timer");
   lua_pushnumber(L, htonl(b->retrans_timer));
   lua_settable(L, -3);
+
+  se_setro(L);
 }
 
-static int l_icmp6_body(lua_State *L)
+static int l_dissect_icmp6(lua_State *L)
 {
   header_t *header = NULL;
   icmp6_t *icmp = NULL;  
@@ -204,56 +176,70 @@ static int l_icmp6_body(lua_State *L)
   header = check_header(L, 1);
   icmp = (icmp6_t *)header->data;
 
+  lua_newtable(L);
+
+  lua_pushstring(L, "type");
+  lua_pushnumber(L, icmp->type);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "code");
+  lua_pushnumber(L, icmp->code);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "cksum");
+  lua_pushnumber(L, ntohs(icmp->cksum));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "body");
+
   switch (icmp->type) {
-  
+    
   case ICMP6_TYPE_ECHO_REQ:
   case ICMP6_TYPE_ECHO_REP:
     process_echo(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
-
+    
   case ICMP6_TYPE_PKT_TOO_BIG:
     process_pkt_too_big(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
-
+    
   case ICMP6_TYPE_PARAM_PROB:
     process_param_problem(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
-
+    
   case ICMP6_TYPE_NEIGH_SOL:
     process_neigh_sol(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
-
+    
   case ICMP6_TYPE_ROUTER_ADV:
     process_router_adv(L, icmp, (header->len - ICMP6_HDR_LEN));
     break;
-
-  case ICMP6_TYPE_NEIGH_ADV:
+    
+  case ICMP6_TYPE_NEIGH_ADV: /* TODO */
+    lua_pushnil(L);
     break;
-
-  case ICMP6_TYPE_REDIRECT:
+    
+  case ICMP6_TYPE_REDIRECT: /* TODO */
+    lua_pushnil(L);
     break;
-
-  case ICMP6_TYPE_ROUTER_RENUM:
+    
+  case ICMP6_TYPE_ROUTER_RENUM: /* TODO */
+    lua_pushnil(L);
     break;
-
+    
   case ICMP6_TYPE_ROUTER_SOL:
   case ICMP6_TYPE_DEST_UNREACH:
   case ICMP6_TYPE_TIME_EXCEEDED:
   default:
     lua_pushnil(L);
   }
-
+  
+  lua_settable(L, -3);
+  
+  se_setro(L);
+  
   return 1;
 }
-
-static const struct luaL_reg icmp6_methods[] = {
-  {"type", l_icmp6_type},
-  {"code", l_icmp6_code},
-  {"cksum", l_icmp6_cksum},
-  {"body", l_icmp6_body},
-  /* {"opt", l_icmp6_opt}, */
-  {NULL, NULL}
-};
 
 void register_icmp6()
 {
@@ -262,7 +248,7 @@ void register_icmp6()
   p->longname = "Internet Control Message Protocol version 6";
   p->layer = L4;
   p->decoder = decode_icmp6;
-  p->methods = (luaL_reg *)icmp6_methods;
+  p->dissect = l_dissect_icmp6;
   
   proto_register_byname(PROTO_NAME_ICMP6, p);
 }

@@ -75,167 +75,7 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
   }
 }
 
-static int l_ipv4_ihl(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, IPV4_IHL(ip));
-
-  return 1;
-}
-
-static int l_ipv4_version(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, IPV4_VERS(ip));
-
-  return 1;
-}
-
-static int l_ipv4_tos(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  /*
-   * TODO: return a table with all values...
-   */
-
-  lua_pushnumber(L, ip->tos);
-
-  return 1;
-}
-
-static int l_ipv4_totlen(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, ntohs(ip->len));
-
-  return 1;
-}
-
-static int l_ipv4_id(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, ntohs(ip->id));
-
-  return 1;
-}
-
-static int l_ipv4_frag_offset(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, (ntohs(ip->frag_offset) & IPV4_FRAG));
-
-  return 1;
-}
-
-static int l_ipv4_df(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushboolean(L, ((ntohs(ip->frag_offset) & IPV4_DF) == IPV4_DF));
-
-  return 1;
-}
-
-static int l_ipv4_mf(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushboolean(L, ((ntohs(ip->frag_offset) & IPV4_MF) == IPV4_MF));
-
-  return 1;
-}
-
-static int l_ipv4_rf(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushboolean(L, ((ntohs(ip->frag_offset) & IPV4_RF) == IPV4_RF));
-
-  return 1;
-}
-
-static int l_ipv4_ttl(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, ip->ttl);
-
-  return 1;
-}
-
-static int l_ipv4_protocol(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, ip->proto);
-
-  return 1;
-}
-
-static int l_ipv4_checksum(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
-  lua_pushnumber(L, ntohs(ip->checksum));
-
-  return 1;
-}
-
-static int l_ipv4_src_addr(lua_State *L)
+static int l_dissect_ipv4(lua_State *L)
 {
   header_t *header = NULL;
   ipv4_t *ip = NULL;
@@ -244,51 +84,72 @@ static int l_ipv4_src_addr(lua_State *L)
   header = check_header(L, 1);
   ip = (ipv4_t *)header->data;
 
+  lua_newtable(L);
+  
+  lua_pushstring(L, "ihl");
+  lua_pushnumber(L, IPV4_IHL(ip));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "version");
+  lua_pushnumber(L, IPV4_VERS(ip));
+  lua_settable(L, -3);
+  
+  lua_pushstring(L, "tos");
+  lua_pushnumber(L, ip->tos);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "totlen");
+  lua_pushnumber(L, ntohs(ip->len));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "id");
+  lua_pushnumber(L, ntohs(ip->id));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "frag_offset");
+  lua_pushnumber(L, ((ntohs(ip->frag_offset) & IPV4_FRAG) == IPV4_FRAG));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "df");
+  lua_pushboolean(L, ((ntohs(ip->frag_offset) & IPV4_DF) == IPV4_DF));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "mf");
+  lua_pushboolean(L, ((ntohs(ip->frag_offset) & IPV4_MF) == IPV4_MF));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "rf");
+  lua_pushboolean(L, ((ntohs(ip->frag_offset) & IPV4_RF) == IPV4_RF));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "ttl");
+  lua_pushnumber(L, ip->ttl);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "proto");
+  lua_pushnumber(L, ip->proto);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "cksum");
+  lua_pushnumber(L, ip->checksum);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "src_addr");
   addr = ip_addr_ntoa(ip->src_addr);
   lua_pushstring(L, addr);
   free(addr);
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_ipv4_dst_addr(lua_State *L)
-{
-  header_t *header = NULL;
-  ipv4_t *ip = NULL;
-  char *addr = NULL;
-  
-  header = check_header(L, 1);
-  ip = (ipv4_t *)header->data;
-
+  lua_pushstring(L, "dst_addr");
   addr = ip_addr_ntoa(ip->dest_addr);
   lua_pushstring(L, addr);
   free(addr);
+  lua_settable(L, -3);
+
+  se_setro(L);
 
   return 1;
 }
-
-static const struct luaL_reg ip_methods[] = {
-  {"ihl", l_ipv4_ihl},
-  {"version", l_ipv4_version},
-  {"tos", l_ipv4_tos},
-  /* {"tos_precedence", l_ipv4_tos_prec}, */
-  /* {"tos_delay", l_ipv4_tos_delay}, */
-  /* {"tos_throughput", l_ipv4_tos_through}, */
-  /* {"tos_relibility", l_ipv4_tos_rel}, */
-  {"totlen", l_ipv4_totlen},
-  {"id", l_ipv4_id},
-  {"frag_offset", l_ipv4_frag_offset},
-  {"df", l_ipv4_df},
-  {"mf", l_ipv4_mf},
-  {"rf", l_ipv4_rf},
-  {"ttl", l_ipv4_ttl},
-  {"protocol", l_ipv4_protocol},
-  {"checksum", l_ipv4_checksum},
-  {"src_addr", l_ipv4_src_addr},
-  {"dst_addr", l_ipv4_dst_addr},
-  /* {"options", l_ipv4_options}, */
-  {NULL, NULL}
-};
 
 void register_ipv4()
 {
@@ -297,7 +158,7 @@ void register_ipv4()
   p->longname = "Internet Protocol version 4";
   p->layer = L3;
   p->decoder = decode_ipv4;
-  p->methods = (luaL_reg *)ip_methods;
+  p->dissect = l_dissect_ipv4;
   
   proto_register_byname(PROTO_NAME_IPV4, p);
 }

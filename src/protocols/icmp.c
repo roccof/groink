@@ -44,121 +44,83 @@ static int decode_icmp(packet_t *p, const _uint8 *bytes, size_t len)
   return DECODE_OK;
 }
 
-static int l_icmp_type(lua_State *L)
+static int l_dissect_icmp(lua_State *L)
 {
   header_t *header = NULL;
-  icmp_t *icmp = NULL;  
-
-  header = check_header(L, 1);
-  icmp = (icmp_t *)header->data;
-
-  lua_pushnumber(L, icmp->type);
-
-  return 1;
-}
-
-static int l_icmp_code(lua_State *L)
-{
-  header_t *header = NULL;
-  icmp_t *icmp = NULL;  
-
-  header = check_header(L, 1);
-  icmp = (icmp_t *)header->data;
-
-  lua_pushnumber(L, icmp->code);
-  return 1;
-}
-
-static int l_icmp_cksum(lua_State *L)
-{
-  header_t *header = NULL;
-  icmp_t *icmp = NULL;  
-
-  header = check_header(L, 1);
-  icmp = (icmp_t *)header->data;
-
-  lua_pushnumber(L, ntohs(icmp->cksum));
-
-  return 1;
-}
-
-static void process_echo(lua_State *L, icmp_t *icmp, unsigned int len)
-{
+  icmp_t *icmp = NULL;
   icmp_body_t *body = NULL;
-
-  body = (icmp_body_t *)(icmp + 1);
-
-  lua_newtable(L);
-  
-  lua_pushstring(L, "id");
-  lua_pushnumber(L, htons(body->id));
-  lua_settable(L, -3);
-
-  lua_pushstring(L, "seq");
-  lua_pushnumber(L, htons(body->seq));
-  lua_settable(L, -3);
-}
-
-static void process_redirect(lua_State *L, icmp_t *icmp, unsigned int len)
-{
   struct in_addr gw;
 
-  if (len - ICMP_HDR_LEN < 4)
-    lua_pushnil(L);
-
-  lua_newtable(L);
-
-  gw = (*(struct in_addr *)(icmp + 1));
-
-  lua_pushstring(L, "gw_addr");
-  lua_pushstring(L, inet_ntoa(gw));
-  lua_settable(L, -3);
-}
-
-static int l_icmp_body(lua_State *L)
-{
-  header_t *header = NULL;
-  icmp_t *icmp = NULL;  
-
   header = check_header(L, 1);
   icmp = (icmp_t *)header->data;
 
+  lua_newtable(L);
+
+  lua_pushstring(L, "type");
+  lua_pushnumber(L, icmp->type);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "code");
+  lua_pushnumber(L, icmp->code);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "cksum");
+  lua_pushnumber(L, ntohs(icmp->cksum));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "body");
+  
   switch (icmp->type) {
   
   case ICMP_TYPE_ECHO:
-    process_echo(L, icmp, header->len);
-    break;
-    
   case ICMP_TYPE_ECHOREPLY:
-    process_echo(L, icmp, header->len);
-    break;
+    body = (icmp_body_t *)(icmp + 1);
     
-  case ICMP_TYPE_DEST_UNREACH:
-    lua_pushnil(L);
+    lua_newtable(L);
+    
+    lua_pushstring(L, "id");
+    lua_pushnumber(L, htons(body->id));
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "seq");
+    lua_pushnumber(L, htons(body->seq));
+    lua_settable(L, -3);
+    
+    se_setro(L);
+    
     break;
     
   case ICMP_TYPE_REDIRECT:
-    process_redirect(L, icmp, header->len);
+    
+    if (header->len - ICMP_HDR_LEN < 4) {
+      lua_pushnil(L);
+      break;
+    }
+    
+    lua_newtable(L);
+    
+    gw = (*(struct in_addr *)(icmp + 1));
+    
+    lua_pushstring(L, "gw_addr");
+    lua_pushstring(L, inet_ntoa(gw));
+    lua_settable(L, -3);
+
+    se_setro(L);
+
     break;
     
+  case ICMP_TYPE_DEST_UNREACH:
   case ICMP_TYPE_TIME_EXCEEDED:
-    lua_pushnil(L);
-    break;
-    
   default:
     lua_pushnil(L);
   }
 
+  lua_settable(L, -3);
+
+  se_setro(L);
+
   return 1;
 }
-
-static const struct luaL_reg icmp_methods[] = {
-  {"type", l_icmp_type},
-  {"code", l_icmp_code},
-  {"cksum", l_icmp_cksum},
-  {"body", l_icmp_body},
-  {NULL, NULL}
-};
 
 void register_icmp()
 {
@@ -167,7 +129,7 @@ void register_icmp()
   p->longname = "Internet Control Message Protocol";
   p->layer = L4;
   p->decoder = decode_icmp;
-  p->methods = (luaL_reg *)icmp_methods;
+  p->dissect = l_dissect_icmp;
   
   proto_register_byname(PROTO_NAME_ICMP, p);
 }

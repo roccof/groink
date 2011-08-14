@@ -33,7 +33,7 @@ void register_ftp()
   p->longname = "File Transfer Protocol";
   p->layer = L5;
   p->decoder = decode_ftp;
-  p->methods = NULL;
+  p->dissect = NULL;
   
   proto_register_byname(PROTO_NAME_FTP, p);
   proto_register_byport(21, p);

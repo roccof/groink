@@ -97,102 +97,8 @@ static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 
-static int l_pppoe_is_discovery(lua_State *L)
+static void push_pppoe_tags(lua_State *L, pppoe_t *pppoe)
 {
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
-
-  lua_pushboolean(L, (pppoe->code != PPPOE_CODE_SESSION));
-
-  return 1;
-}
-
-static int l_pppoe_is_session(lua_State *L)
-{
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
-
-  lua_pushboolean(L, (pppoe->code == PPPOE_CODE_SESSION));
-
-  return 1;
-}
-
-static int l_pppoe_version(lua_State *L)
-{
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
-
-  lua_pushnumber(L, PPPOE_VERSION(pppoe));
-
-  return 1;
-}
-
-static int l_pppoe_type(lua_State *L)
-{
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
-
-  lua_pushnumber(L, PPPOE_TYPE(pppoe));
-
-  return 1;
-}
-
-static int l_pppoe_code(lua_State *L)
-{
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
-
-  lua_pushnumber(L, pppoe->code);
-
-  return 1;
-}
-
-static int l_pppoe_session(lua_State *L)
-{
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
-
-  lua_pushnumber(L, ntohs(pppoe->session));
-
-  return 1;
-}
-
-static int l_pppoe_payload_len(lua_State *L)
-{
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
-
-  lua_pushnumber(L, ntohs(pppoe->length));
-
-  return 1;
-}
-
-static int l_pppoe_tags(lua_State *L)
-{
-  header_t *header = NULL;
-  pppoe_t *pppoe = NULL;
-  
   _uint8 *payload = NULL;
   _uint16 *tag_type = NULL;
   _uint16 *tag_len = NULL;
@@ -201,13 +107,10 @@ static int l_pppoe_tags(lua_State *L)
 
   int totlen = 0;
   int len = 0;
-  
-  header = check_header(L, 1);
-  pppoe = (pppoe_t *)header->data;
 
   if (pppoe->code == PPPOE_CODE_SESSION) {
     lua_pushnil(L);
-    return 1;
+    return;
   }
 
   /* PPPoE Discovery payload length */
@@ -281,21 +184,46 @@ static int l_pppoe_tags(lua_State *L)
 
   /* Make the table read-only */
   se_setro(L);
+}
+
+static int l_dissect_pppoe(lua_State *L)
+{
+  header_t *header = NULL;
+  pppoe_t *pppoe = NULL;
+  
+  header = check_header(L, 1);
+  pppoe = (pppoe_t *)header->data;
+
+  lua_newtable(L);
+
+  lua_pushstring(L, "version");
+  lua_pushnumber(L, PPPOE_VERSION(pppoe));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "type");
+  lua_pushnumber(L, PPPOE_TYPE(pppoe));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "code");
+  lua_pushnumber(L, pppoe->code);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "session");
+  lua_pushnumber(L, ntohs(pppoe->session));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "payload_length");
+  lua_pushnumber(L, ntohs(pppoe->length));
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "tags");
+  push_pppoe_tags(L, pppoe);
+  lua_settable(L, -3);
+
+  se_setro(L);
 
   return 1;
 }
-
-static const struct luaL_reg pppoe_methods[] = {
-  {"is_discovery_stage", l_pppoe_is_discovery},
-  {"is_session_stage", l_pppoe_is_session},
-  {"version", l_pppoe_version},
-  {"type", l_pppoe_type},
-  {"code", l_pppoe_code},
-  {"session", l_pppoe_session},
-  {"payload_length", l_pppoe_payload_len},
-  {"tags", l_pppoe_tags},
-  {NULL, NULL}
-};
 
 void register_pppoe()
 {
@@ -304,7 +232,7 @@ void register_pppoe()
   p->longname = "PPPoE";
   p->layer = L2;
   p->decoder = decode_pppoe;
-  p->methods = (luaL_reg *)pppoe_methods;
+  p->dissect = l_dissect_pppoe;
   
   proto_register_byname(PROTO_NAME_PPPOE, p);
 }

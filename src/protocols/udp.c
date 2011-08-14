@@ -59,7 +59,7 @@ static int decode_udp(packet_t *p, const _uint8 *bytes, size_t len)
   return status;
 }
 
-static int l_udp_dst_port(lua_State *L)
+static int l_dissect_udp(lua_State *L)
 {
   header_t *header = NULL;
   udp_t *udp = NULL;
@@ -67,66 +67,37 @@ static int l_udp_dst_port(lua_State *L)
   header = check_header(L, 1);
   udp = (udp_t *)header->data;
 
-  lua_pushnumber(L, ntohs(udp->dest_port));
+  lua_newtable(L);
 
-  return 1;
-}
-
-static int l_udp_src_port(lua_State *L)
-{
-  header_t *header = NULL;
-  udp_t *udp = NULL;
-  
-  header = check_header(L, 1);
-  udp = (udp_t *)header->data;
-
+  lua_pushstring(L, "src_port");
   lua_pushnumber(L, ntohs(udp->src_port));
+  lua_settable(L, -3);
 
-  return 1;
-}
+  lua_pushstring(L, "dst_port");
+  lua_pushnumber(L, ntohs(udp->dest_port));
+  lua_settable(L, -3);
 
-static int l_udp_payload_len(lua_State *L)
-{
-  header_t *header = NULL;
-  udp_t *udp = NULL;
-  
-  header = check_header(L, 1);
-  udp = (udp_t *)header->data;
-
+  lua_pushstring(L, "payload_len");
   lua_pushnumber(L, ntohs(udp->len));
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_udp_cksum(lua_State *L)
-{
-  header_t *header = NULL;
-  udp_t *udp = NULL;
-  
-  header = check_header(L, 1);
-  udp = (udp_t *)header->data;
-
+  lua_pushstring(L, "cksum");
   lua_pushnumber(L, ntohs(udp->checksum));
+  lua_settable(L, -3);
+
+  se_setro(L);
 
   return 1;
 }
-
-static const struct luaL_reg udp_methods[] = {
-  {"dst_port", l_udp_dst_port},
-  {"src_port", l_udp_src_port},
-  {"cksum", l_udp_cksum},
-  {"payload_len", l_udp_payload_len},
-  {NULL, NULL}
-};
 
 void register_udp()
 {
   proto_t *p = (proto_t *)safe_alloc(sizeof(proto_t));
   p->name = PROTO_NAME_UDP;
-  p->longname = "User Datagram  Protocol";
+  p->longname = "User Datagram Protocol";
   p->layer = L4;
   p->decoder = decode_udp;
-  p->methods = (luaL_reg *)udp_methods;
+  p->dissect = l_dissect_udp;
   
   proto_register_byname(PROTO_NAME_UDP, p);
 }

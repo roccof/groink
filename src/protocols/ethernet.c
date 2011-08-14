@@ -109,7 +109,7 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
   }
 }
 
-static int l_src_addr(lua_State *L)
+static int l_dissect_ether(lua_State *L)
 {
   header_t *h = NULL;
   ether_t *e = NULL;
@@ -118,48 +118,28 @@ static int l_src_addr(lua_State *L)
   h = check_header(L, 1);
   e = (ether_t *)h->data;
 
+  lua_newtable(L);
+
+  lua_pushstring(L, "src_addr");
   addr = ether_addr_ntoa(e->src_addr);
   lua_pushstring(L, addr);
   free(addr);
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_dst_addr(lua_State *L)
-{
-  header_t *h = NULL;
-  ether_t *e = NULL;
-  char *addr = NULL;
-  
-  h = check_header(L, 1);
-  e = (ether_t *)h->data;
-
+  lua_pushstring(L, "dst_addr");
   addr = ether_addr_ntoa(e->dest_addr);
   lua_pushstring(L, addr);
   free(addr);
+  lua_settable(L, -3);
 
-  return 1;
-}
-
-static int l_type(lua_State *L)
-{
-  header_t *h = NULL;
-  ether_t *e = NULL;
-  
-  h = check_header(L, 1);
-  e = (ether_t *)h->data;
-
+  lua_pushstring(L, "type");
   lua_pushnumber(L, ntohs(e->type));
+  lua_settable(L, -3);
+
+  se_setro(L);
 
   return 1;
 }
-
-static const struct luaL_reg ether_methods[] = {
-  {"src_addr", l_src_addr},
-  {"dst_addr", l_dst_addr},
-  {"type", l_type},
-  {NULL, NULL}
-};
 
 void register_ether()
 {
@@ -168,7 +148,7 @@ void register_ether()
   p->longname = "Ethernet";
   p->layer = L2;
   p->decoder = decode_ether;
-  p->methods = (luaL_reg *)ether_methods;
+  p->dissect = l_dissect_ether;
   
   proto_register_byname(PROTO_NAME_ETHER, p);
 }
