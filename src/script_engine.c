@@ -171,7 +171,7 @@ static int se_init(lua_State *L)
   return 0;
 }
 
-/* Send the received packet to script engine */
+/* Pass the received packet to script engine */
 void se_pass_packet(packet_t *p)
 {
   myassert(L != NULL);

@@ -28,7 +28,6 @@
 #include "packet.h"
 #include "arp.h"
 #include "netutil.h"
-#include "ouidb.h"
 
 /* Builder */
 arp_t *build_arp_ethip(_uint16 opcode, char *sha, char *spa, char *tha, char *tpa)
@@ -69,83 +68,6 @@ arp_t *build_arp_ethip(_uint16 opcode, char *sha, char *spa, char *tha, char *tp
   return arp;
 }
 
-static void arp_set_tostring(packet_t *p, arp_t *arp)
-{
-  arp_ethip_t *ethip = NULL;
-  char *sha = NULL, *tha = NULL, *spa = NULL, *tpa = NULL;
-  _uint32 *baddr = NULL;
-  char *sha_oui = NULL, *tha_oui = NULL;
-
-  if(ntohs(arp->hrd) == ARP_HRD_ETHER && ntohs(arp->pro) == ARP_PROTO_IPV4) {
-    ethip = (arp_ethip_t *)(arp + 1);
-
-    sha = ether_addr_ntoa(ethip->sha);
-    tha = ether_addr_ntoa(ethip->tha);
-
-    sha_oui = ouidb_find_company_by_addr(sha);
-    tha_oui = ouidb_find_company_by_addr(tha);
-
-    baddr = (_uint32 *)ethip->spa;
-    spa = ip_addr_ntoa(*baddr);
-
-    baddr = (_uint32 *)ethip->tpa;
-    tpa = ip_addr_ntoa(*baddr);
-  }
-
-  switch (ntohs(arp->opcode)) { /* TODO: add OUI*/
-  case ARP_OP_REQUEST:
-    if (ethip != NULL)
-      packet_set_tostring(p, "ARP Request who-as %s tell %s", tpa, spa);
-    else
-      packet_set_tostring(p, "ARP Request");
-    break;
-    
-  case ARP_OP_REPLY:
-    if (ethip != NULL)
-      packet_set_tostring(p, "ARP Reply %s is-at %s (%s)", spa, sha, sha_oui);
-    else
-      packet_set_tostring(p, "ARP Reply");
-    break;
-    
-  case ARP_OP_RREQUEST:
-    if (ethip != NULL)
-      packet_set_tostring(p, "ARP Reverse Request who-as %s tell %s", tha, sha);
-    else
-      packet_set_tostring(p, "ARP Reverse Request");
-    break;
-    
-  case ARP_OP_RREPLY:
-    if (ethip != NULL)
-      packet_set_tostring(p, "ARP Reverse Reply %s at %s", tha, tpa);
-    else
-      packet_set_tostring(p, "ARP Reverse Reply");
-    break;
-    
-  case ARP_OP_InREQUEST:
-    if (ethip != NULL)
-      packet_set_tostring(p, "ARP Inverse Request who-as %s tell %s", tha, sha);
-    else
-      packet_set_tostring(p, "ARP Inverse Request");
-    break;
-    
-  case ARP_OP_InREPLY:
-    if (ethip != NULL)
-      packet_set_tostring(p, "ARP Inverse Reply %s at %s", tha, tpa);
-    else
-      packet_set_tostring(p, "ARP Inverse Reply");
-    break;
-    
-  case ARP_OP_NAK:
-    packet_set_tostring(p, "ARP NACK Reply");
-    break;
-  }
-  
-  free(sha);
-  free(tha);
-  free(spa);
-  free(tpa);
-}
-
 /* Decoder */
 static int decode_arp(packet_t *p, const _uint8 *bytes, size_t len)
 {
@@ -169,7 +91,6 @@ static int decode_arp(packet_t *p, const _uint8 *bytes, size_t len)
   }
 
   packet_append_header(p, PROTO_NAME_ARP, (void *)arp, arplen);
-  arp_set_tostring(p, arp);
 
   hookdata = (hookdata_t *)safe_alloc(sizeof(hookdata_t));
   hookdata->type = HOOKDATA_PACKET;
@@ -184,7 +105,6 @@ static int decode_arp(packet_t *p, const _uint8 *bytes, size_t len)
 
  err:
   decoder_add_error(p, "invalid ARP header length");
-  packet_set_tostring(p, "ARP| invalid length %d", len);
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 

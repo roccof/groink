@@ -13,11 +13,15 @@ EXTRA_DIST =
 
 selibdir = $(pkgdatadir)/selib
 selib_DATA = 			\
-	selib/core.luadoc	\
-	selib/bit.luadoc	\
 	selib/script_engine.lua	\
 	selib/dump.lua		\
-	selib/netutil.luadoc
+	selib/oui_db.txt        \
+	selib/ouidb.lua         \
+	selib/util.lua          \
+	selib/base64.lua	\
+	selib/dissector.lua	\
+	selib/http.lua		\
+	selib/urllib.lua
 
 scriptsdir = $(pkgdatadir)/scripts
 scripts_DATA = 			\
@@ -26,9 +30,5 @@ scripts_DATA = 			\
 	scripts/show.lua	\
 	scripts/isolate.lua	\
 	scripts/scripts.db
-
-datadir = $(pkgdatadir)/data
-data_DATA =			\
-	data/oui_db.txt
 
 CLEANFILES = *.out *~

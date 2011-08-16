@@ -41,16 +41,9 @@ static int l_packet_headers(lua_State *L)
 
   DL_FOREACH (p->headers, h) {
     lua_pushnumber(L, i);
-
-    lua_newtable(L);
-
-    lua_pushstring(L, h->proto);
     se_pushobject(L, h, SE_OBJ_TYPE_HEADER, SE_OBJ_NAME_HEADER);
     lua_settable(L, -3);
-
-    se_setro(L); /* Read-Only table */
-
-    lua_settable(L, -3);
+    i++;
   }
 
   se_setro(L); /* Read-Only table */
@@ -228,13 +221,6 @@ static int l_packet_isunmod(lua_State *L)
   return 1;
 }
 
-static int l_packet_printable(lua_State *L)
-{
-  packet_t *p = check_packet(L, 1);
-  lua_pushstring(L, p->tostring);
-  return 1;
-}
-
 static int l_packet_tostring(lua_State *L)
 {
   lua_pushfstring(L, "Packet: %p", lua_touserdata(L, -1));
@@ -243,8 +229,8 @@ static int l_packet_tostring(lua_State *L)
 
 static int l_packet_gc(lua_State *L)
 {
-  /* packet_t *p = check_packet(L, -1); */
-  /* packet_free(p); */
+  packet_t *p = check_packet(L, -1);
+  packet_free(p);
   return 0;
 }
 
@@ -282,7 +268,6 @@ static const struct luaL_reg packet_methods[] = {
   {"is_drop", l_packet_isdrop},
   {"set_unmodificable", l_packet_setunmod},
   {"is_unmodificable", l_packet_isunmod},
-  {"tostring", l_packet_printable},
   {NULL, NULL}
 };
 

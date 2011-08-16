@@ -39,7 +39,6 @@
 #include "packet.h"
 #include "inject.h"
 #include "iface.h"
-#include "ouidb.h"
 
 static pcap_t *pcap = NULL;
 
@@ -63,7 +62,6 @@ static void cleanup()
   se_close();
   mitm_stop();
   inject_cleanup();
-  ouidb_free();
   protos_destroy();
   packet_forward_module_destroy();
   threads_manager_destroy();
@@ -121,8 +119,6 @@ static void process_packet(u_char *user, const struct pcap_pkthdr *header, const
   /* If MiTM is active, do packet forwarding */
   if(gbls->mitm_state == MITM_STATE_START)
     packet_forward(p);
-  
-  packet_free(p);
 }
 
 int main(int argc, char **argv)
@@ -142,7 +138,6 @@ int main(int argc, char **argv)
   threads_manager_init();
   load_iface_info();
   protos_init();
-  ouidb_load();
 
   /* Get iface name */
   if ((gbls->iface == NULL) && ((gbls->iface = pcap_lookupdev(errbuf)) == NULL)) {

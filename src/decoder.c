@@ -28,6 +28,8 @@ int start_decoding(packet_t *p)
 
   PKT_ADD_FLAG(p, PACKET_FLAG_DECODED);
 
+  debug("start packet decoding...");
+
   switch (gbls->dlt) {
 
       /* Raw IP */

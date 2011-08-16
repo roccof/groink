@@ -112,6 +112,8 @@ static void ip_forward(packet_t *p)
   }
   
   sendto(sockfd, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin, sizeof(struct sockaddr));
+
+  debug("forwarded IPv4 packet: %s > %s", p->net_srcaddr, p->net_dstaddr);
 }
 
 static void ip6_forward(packet_t *p)
@@ -149,6 +151,8 @@ static void ip6_forward(packet_t *p)
   }
   
   sendto(sockfd6, (void *)ip, pkt_len, 0, (struct sockaddr *)&sin6, sizeof(struct sockaddr));
+
+  debug("forwarded IPv6 packet: %s > %s", p->net_srcaddr, p->net_dstaddr);
 }
 
 void packet_forward(packet_t *p)

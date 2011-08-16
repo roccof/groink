@@ -51,8 +51,6 @@ typedef struct _grk_payload {
 #define PACKET_FLAG_DECODE_ERR 0x04      /* Indicates that there is an error 
 					    while packet decoding */
 
-#define PACKET_TOSTRING_MAXLEN 256
-
 /* Packet object */
 typedef struct _grk_packet {
   _uchar *data;                           /* Packet data */
@@ -68,8 +66,9 @@ typedef struct _grk_packet {
   char *net_dstaddr;                      /* Destination net address */
   _uint16 src_port;                       /* Source port */
   _uint16 dst_port;                       /* Destination port */
-  char tostring[PACKET_TOSTRING_MAXLEN];  /* Printable packet string. Filled by decoder */
 } packet_t;
+
+/* TODO: packet duplication method */
 
 packet_t *packet_new(_uint8 *data, size_t len);
 packet_t *packet_new_empty();
@@ -78,6 +77,5 @@ header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t le
 header_t *packet_get_header(packet_t *p, char *proto);
 int packet_contains_header(packet_t *p, char *proto);
 void packet_set_tostring(packet_t *p, char *format, ...);
-payload_t *packet_set_payload(packet_t *p, char *proto, _uint8 *data, size_t len);
 
 #endif /* GROINK_PACKET_H */

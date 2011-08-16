@@ -26,42 +26,6 @@
 #include "protos_name.h"
 #include "selib.h"
 
-static void pppoe_set_tostring(packet_t *p, pppoe_t *pppoe)
-{
-  char *prefix = NULL;
-
-  switch(pppoe->code) {
-  case PPPOE_CODE_SESSION:
-    prefix = "PPPoES";
-    break;
-
-  case PPPOE_CODE_DISCOVER_PADI:
-    prefix = "PPPoED PADI packet";
-    break;
-
-  case PPPOE_CODE_DISCOVER_PADO:
-    prefix = "PPPoED PADO packet";
-    break;
-
-  case PPPOE_CODE_DISCOVER_PADR:
-    prefix = "PPPoED PADR packet";
-    break;
-
-  case PPPOE_CODE_DISCOVER_PADT:
-    prefix = "PPPoED PADT packet";
-    break;
-    
-  default:
-    packet_set_tostring(p, "PPPoE| unknown code field value %d", pppoe->code); 
-    break;
-  }
-
-  if (prefix != NULL)
-    packet_set_tostring(p, "%s version %d, type %d, code 0x%02x, session id 0x%0002x, payload length %d", 
-			prefix, PPPOE_VERSION(pppoe), PPPOE_TYPE(pppoe), pppoe->code, 
-			ntohs(pppoe->session), ntohs(pppoe->length));
-}
-
 static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
 {
   int status = DECODE_OK;
@@ -83,7 +47,6 @@ static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
     hlen += htons(pppoe->length);
 
   packet_append_header(p, PROTO_NAME_PPPOE, (void *)pppoe, hlen);
-  pppoe_set_tostring(p, pppoe);
 
   /* The payload of PPPoE Discovery Stage contains PPP header */
   /* if (pppoe->code == PPPOE_CODE_SESSION) */
@@ -93,7 +56,6 @@ static int decode_pppoe(packet_t *p, const _uint8 *bytes, size_t len)
 
  err:
   decoder_add_error(p, "invalid PPPoE header length");
-  packet_set_tostring(p, "PPPoE| invalid length %d", len);
   return call_decoder(PROTO_NAME_RAW, p, bytes, len);
 }
 
