@@ -20,7 +20,7 @@
 
 local core = require("core")
 local printf = core.printf
-
+local urllib = require("urllib")
 local httplib = require("http")
 
 function proc_pkt(p)
@@ -39,7 +39,7 @@ function proc_pkt(p)
 	 return
       end
       
-      url = "http://" .. http.headers["Host"] .. http.uri
+      url = "http://" .. http.headers["Host"] .. urllib.url_decode(http.uri)
       
       -- check src addr
       if netutil.is_ipv6_addr(p:net_srcaddr()) then
@@ -48,6 +48,6 @@ function proc_pkt(p)
       	 src = p:net_srcaddr()
       end
       
-      printf("\n%s >>  %s\n", src, url)
+      printf("\n%s >> %s\n", src, url)
    end
 end
