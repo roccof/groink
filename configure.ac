@@ -112,5 +112,6 @@ echo -e "\t\t\tby DECrew"
 echo
 echo "====================================="
 echo
-echo ">> run 'make install' as r00t to compile"
+echo ">> run  'make' to compile"
+echo ">> then 'make install' as r00t to install"
 echo
