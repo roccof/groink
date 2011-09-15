@@ -77,5 +77,6 @@ header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t le
 header_t *packet_get_header(packet_t *p, char *proto);
 int packet_contains_header(packet_t *p, char *proto);
 void packet_set_tostring(packet_t *p, char *format, ...);
+payload_t *packet_set_payload(packet_t *p, char *proto, _uint8 *data, size_t len);
 
 #endif /* GROINK_PACKET_H */
