@@ -153,10 +153,6 @@ void parse_options(int argc, char **argv)
     }
   }
 
-  if (gbls->iface == NULL) {
-    fatal(__func__, "you must specify the interface (e.g. -i eth0)");
-  }
-
   /* Non option ARGV elements */
   if(optind < argc) {
     /* Get script */
