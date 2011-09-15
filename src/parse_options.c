@@ -162,26 +162,21 @@ void parse_options(int argc, char **argv)
     /* Get script */
     char *script = (char *)argv[optind++];
     
-    if(script[0] == '/') {
-      /* Absolute path */
-      gbls->script = strdup(script);
-    } else if (script[0] == '.' || index(script, '/') != NULL) {
-      /* Non-absolute path */
-      char *cwd = getcwd(NULL, 0);
-      
-      if (script[0] == '.' && script[1] == '/')
-  	gbls->script = str_concat(cwd, "/", (script + 2), NULL);
-      else
-  	gbls->script = str_concat(cwd, "/", script, NULL);
-      
-      free(cwd);
+    if(strstr(script, ".lua") != NULL) {
+      /* Manual path */
+      char *path = realpath (script, NULL);
+      if (path != NULL) {
+	gbls->script = path;
+      } else {
+	fatal(__func__, "invalid script: %s", script);
+      }
     } else {
       /* Only script name */
       gbls->script = append_script_dir(script);
     }
 
     if (strlen(gbls->script) > MAX_SCRIPT_NAME)
-      fatal(__func__, "the script name is too big, max %d character", MAX_SCRIPT_NAME);
+      fatal(__func__, "the script name is too long, max %d character", MAX_SCRIPT_NAME);
     
     opt_index = 0;
 
