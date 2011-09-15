@@ -32,7 +32,7 @@
 #include "selib.h"
 #include "packet.h"
 
-#define INIT_SCRIPT GROINK_DATADIR"/selib/script_engine.lua"
+#define INIT_SCRIPT "script_engine.lua"
 #define DEFAULT_SCRIPT "default"
 
 static lua_State *L = NULL;
@@ -93,6 +93,7 @@ static void se_pushargs(lua_State *L)
 
 static int se_init(lua_State *L)
 {
+  char *init_script = NULL;
   char *script = NULL;
 
   script = (char *)luaL_checkstring(L, 1);
@@ -116,15 +117,25 @@ static int se_init(lua_State *L)
   lua_setfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK);
 
   /* Stack pos 2: script_engine.lua code */
-  if (luaL_loadfile(L, INIT_SCRIPT) != 0) {
-    luaL_error(L, "could not load script_engine.lua: %s", lua_tostring(L, -1));
+  if (gbls->selib_dir != NULL) {
+    init_script = str_concat(gbls->selib_dir, INIT_SCRIPT, NULL);
+  } else {
+    init_script = strdup(GROINK_DATADIR"/selib/"INIT_SCRIPT);
   }
+  if (luaL_loadfile(L, init_script) != 0) {
+    luaL_error(L, "could not load "INIT_SCRIPT": %s", lua_tostring(L, -1));
+  }
+  free(init_script);
 
   /* Stack pos 3: script that will be executed */
   lua_pushstring(L, script);
 
   /* Stack pos 4: selib path */
-  lua_pushstring(L, GROINK_DATADIR"/selib/");
+  if (gbls->selib_dir != NULL) {
+    lua_pushstring(L, gbls->selib_dir);
+  } else {
+    lua_pushstring(L, GROINK_DATADIR"/selib/");
+  }
 
   /* 
    * Run main script that initialize the engine and 

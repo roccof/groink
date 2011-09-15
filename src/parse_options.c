@@ -39,6 +39,7 @@ static const struct option long_options[] = {
   {"rfmon", no_argument, NULL, 0},
   {"no-scan", no_argument, NULL, 0},
   {"show-scripts", no_argument, NULL, 0},
+  {"selib-dir", required_argument, NULL, 0},
   {"scripts-dir", required_argument, NULL, 0},
   {"debug-mode", no_argument, NULL, 0},
   {"cap-timeout", required_argument, NULL, 0},
@@ -60,6 +61,7 @@ static void print_usage(int status)
   printf("  --no-promisc                            don't set iface in promisc mode\n");
   printf("  --no-scan                               disable host scanning\n");
   printf("  --show-scripts                          show all scripts\n");
+  printf("  --selib-dir                             alternative selib directory\n");
   printf("  --scripts-dir                           alternative scripts directory\n");
   printf("  --debug-mode                            enable debug symbol in the script execution\n");
   printf("  --cap-timeout                           packet capture timeout, the default is 0 ms\n");
@@ -103,7 +105,13 @@ void parse_options(int argc, char **argv)
 	gbls->rfmon = 1;
       else if (strcmp(long_options[opt_index].name, "no-scan") == 0)
 	gbls->scan = 0;
-      else if (strcmp(long_options[opt_index].name, "scripts-dir") == 0) {
+      else if (strcmp(long_options[opt_index].name, "selib-dir") == 0) {
+	char *dir = realpath ((char *)optarg, NULL);
+	if (dir == NULL)
+	  warning("invalid selib directory: %s", optarg);
+	gbls->selib_dir = str_concat (dir, "/", NULL);
+	free (dir);
+      } else if (strcmp(long_options[opt_index].name, "scripts-dir") == 0) {
 	char *dir = realpath ((char *)optarg, NULL);
 	if (dir == NULL)
 	  warning("invalid scripts directory: %s", optarg);

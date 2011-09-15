@@ -51,6 +51,7 @@ struct _grk_globals {
   char *script_argv[MAX_SCRIPT_ARGS];     /* Arguments of script */
   int script_argc;                        /* Number of argument of script */
   int script_debug_mode;                  /* Script debug mode */
+  char *selib_dir;                        /* Selib directory */
   char *scripts_dir;                      /* Scripts directory */
 
   char *mitm;                             /* MiTM attack name */
