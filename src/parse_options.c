@@ -103,9 +103,13 @@ void parse_options(int argc, char **argv)
 	gbls->rfmon = 1;
       else if (strcmp(long_options[opt_index].name, "no-scan") == 0)
 	gbls->scan = 0;
-      else if (strcmp(long_options[opt_index].name, "scripts-dir") == 0)
-	gbls->scripts_dir = (char *)optarg;
-      else if (strcmp(long_options[opt_index].name, "cap-timeout") == 0)
+      else if (strcmp(long_options[opt_index].name, "scripts-dir") == 0) {
+	char *dir = realpath ((char *)optarg, NULL);
+	if (dir == NULL)
+	  warning("invalid scripts directory: %s", optarg);
+	gbls->scripts_dir = str_concat (dir, "/", NULL);
+	free (dir);
+      } else if (strcmp(long_options[opt_index].name, "cap-timeout") == 0)
 	gbls->cap_timeout = atoi(optarg);
       else if (strcmp(long_options[opt_index].name, "cap-snaplen") == 0)
 	gbls->snaplen = atoi(optarg);

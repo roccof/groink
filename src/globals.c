@@ -102,6 +102,9 @@ void globals_destroy()
   
   if (gbls->script != NULL)
     free(gbls->script);
+
+  if (gbls->scripts_dir != NULL)
+    free(gbls->scripts_dir);
   
   free(gbls);
   gbls = NULL;

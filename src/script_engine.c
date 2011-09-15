@@ -57,47 +57,12 @@ char *append_script_dir(char *script_name)
 {
   if (gbls->scripts_dir == NULL) {
     
-    return str_concat(GROINK_DATADIR"/"SCRIPT_DIR"/", script_name, SCRIPT_EXT, NULL);
+    return str_concat(GROINK_DATADIR"/"SCRIPT_DIR, script_name, SCRIPT_EXT, NULL);
     
   } else {
-    
-    if (gbls->scripts_dir[0] == '/') {
-      
-      if ((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
-	return str_concat(gbls->scripts_dir, script_name, SCRIPT_EXT, NULL);
-      else
-	return str_concat(gbls->scripts_dir, "/", script_name, SCRIPT_EXT, NULL);
-      
-    } else if (gbls->scripts_dir[0] == '.' && gbls->scripts_dir[1] == '/') {
-      
-      char *cwd = getcwd(NULL, 0);
-      char *path = NULL;
-      
-      if ((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
-	path = str_concat(cwd, "/", (gbls->scripts_dir + 2), script_name, 
-			  SCRIPT_EXT, NULL);
-      else
-	path = str_concat(cwd, "/", (gbls->scripts_dir + 2), "/", script_name, 
-			  SCRIPT_EXT, NULL);
-      
-      free(cwd);
-      return path;
-      
-    } else {
-      
-      char *cwd = getcwd(NULL, 0);
-      char *path = NULL;
-      
-      if ((gbls->scripts_dir)[strlen(gbls->scripts_dir) - 1] == '/')
-	path = str_concat(cwd, "/", gbls->scripts_dir, script_name, 
-			  SCRIPT_EXT, NULL);
-      else
-	path = str_concat(cwd, "/", gbls->scripts_dir, "/", script_name, 
-			  SCRIPT_EXT, NULL);
-      
-      free(cwd);
-      return path;
-    }
+
+    return str_concat(gbls->scripts_dir, script_name, SCRIPT_EXT, NULL);
+
   }
 }
 
