@@ -92,7 +92,7 @@ AC_ARG_ENABLE(debug,
 	[debug=$enableval],[])
 
 if test "$debug" = "yes"; then
-   CFLAGS="$CFLAGS -DGROINK_DEBUG -rdynamic "
+   CFLAGS="$CFLAGS -DGROINK_DEBUG -rdynamic -g3 -O0 "
 fi
 
 CFLAGS="$CFLAGS -Wall"
