@@ -71,13 +71,13 @@ static void parse_options()
   if (is_ip_addr(tok)) {
     h = find_host_byip(tok);
 
-    if (h == NULL) /* FIXME: mem leak */
+    if (h == NULL)
       fatal(__func__, "unable to find host with ip %s in the host list", tok);
 
     new = host_clone(h);
     LL_APPEND(t1, new);
     debug("target1: %s, %s", h->net_addr, h->hw_addr);
-  } else { /* FIXME: mem leak */
+  } else {
     fatal(__func__, "invalid ARP Poisoning target %s", tok);
   }
 
@@ -94,13 +94,13 @@ static void parse_options()
     if (is_ip_addr(tok)) {
       h = find_host_byip(tok);
       
-      if (h == NULL) /* FIXME: mem leak */
+      if (h == NULL)
   	fatal(__func__, "unable to find host with ip %s in the host list", tok);
       
       new = host_clone(h);
       LL_APPEND(t2, new);
       debug("target2: %s, %s", h->net_addr, h->hw_addr);
-    } else { /* FIXME: mem leak */
+    } else {
       fatal("invalid ARP Poisoning MiTM target %s", tok);
     }
   } else {
