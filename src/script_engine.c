@@ -57,7 +57,7 @@ char *append_script_dir(char *script_name)
 {
   if (gbls->scripts_dir == NULL) {
     
-    return str_concat(GROINK_DATADIR"/"SCRIPT_DIR, script_name, SCRIPT_EXT, NULL);
+    return str_concat(GROINK_DATADIR"/"SCRIPT_DIR"/", script_name, SCRIPT_EXT, NULL);
     
   } else {
 
