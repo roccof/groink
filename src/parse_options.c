@@ -39,6 +39,7 @@ static const struct option long_options[] = {
   {"rfmon", no_argument, NULL, 0},
   {"no-scan", no_argument, NULL, 0},
   {"show-scripts", no_argument, NULL, 0},
+  {"selib-dir", required_argument, NULL, 0},
   {"scripts-dir", required_argument, NULL, 0},
   {"debug-mode", no_argument, NULL, 0},
   {"cap-timeout", required_argument, NULL, 0},
@@ -60,6 +61,7 @@ static void print_usage(int status)
   printf("  --no-promisc                            don't set iface in promisc mode\n");
   printf("  --no-scan                               disable host scanning\n");
   printf("  --show-scripts                          show all scripts\n");
+  printf("  --selib-dir                             alternative selib directory\n");
   printf("  --scripts-dir                           alternative scripts directory\n");
   printf("  --debug-mode                            enable debug symbol in the script execution\n");
   printf("  --cap-timeout                           packet capture timeout, the default is 0 ms\n");
@@ -103,9 +105,19 @@ void parse_options(int argc, char **argv)
 	gbls->rfmon = 1;
       else if (strcmp(long_options[opt_index].name, "no-scan") == 0)
 	gbls->scan = 0;
-      else if (strcmp(long_options[opt_index].name, "scripts-dir") == 0)
-	gbls->scripts_dir = (char *)optarg;
-      else if (strcmp(long_options[opt_index].name, "cap-timeout") == 0)
+      else if (strcmp(long_options[opt_index].name, "selib-dir") == 0) {
+	char *dir = realpath ((char *)optarg, NULL);
+	if (dir == NULL)
+	  warning("invalid selib directory: %s", optarg);
+	gbls->selib_dir = str_concat (dir, "/", NULL);
+	free (dir);
+      } else if (strcmp(long_options[opt_index].name, "scripts-dir") == 0) {
+	char *dir = realpath ((char *)optarg, NULL);
+	if (dir == NULL)
+	  warning("invalid scripts directory: %s", optarg);
+	gbls->scripts_dir = str_concat (dir, "/", NULL);
+	free (dir);
+      } else if (strcmp(long_options[opt_index].name, "cap-timeout") == 0)
 	gbls->cap_timeout = atoi(optarg);
       else if (strcmp(long_options[opt_index].name, "cap-snaplen") == 0)
 	gbls->snaplen = atoi(optarg);
@@ -158,26 +170,21 @@ void parse_options(int argc, char **argv)
     /* Get script */
     char *script = (char *)argv[optind++];
     
-    if(script[0] == '/') {
-      /* Absolute path */
-      gbls->script = strdup(script);
-    } else if (script[0] == '.' || index(script, '/') != NULL) {
-      /* Non-absolute path */
-      char *cwd = getcwd(NULL, 0);
-      
-      if (script[0] == '.' && script[1] == '/')
-  	gbls->script = str_concat(cwd, "/", (script + 2), NULL);
-      else
-  	gbls->script = str_concat(cwd, "/", script, NULL);
-      
-      free(cwd);
+    if(strstr(script, ".lua") != NULL) {
+      /* Manual path */
+      char *path = realpath (script, NULL);
+      if (path != NULL) {
+	gbls->script = path;
+      } else {
+	fatal(__func__, "invalid script: %s", script);
+      }
     } else {
       /* Only script name */
       gbls->script = append_script_dir(script);
     }
 
     if (strlen(gbls->script) > MAX_SCRIPT_NAME)
-      fatal(__func__, "the script name is too big, max %d character", MAX_SCRIPT_NAME);
+      fatal(__func__, "the script name is too long, max %d character", MAX_SCRIPT_NAME);
     
     opt_index = 0;
 

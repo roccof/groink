@@ -30,7 +30,6 @@
 static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
 {
   ipv4_t *ip = NULL;
-  header_t *h = NULL;
 
   if (len < sizeof(ipv4_t)) {
     decoder_add_error(p, "invalid IPv4 header length");
@@ -45,7 +44,7 @@ static int decode_ipv4(packet_t *p, const _uint8 *bytes, size_t len)
     return call_decoder(PROTO_NAME_RAW, p, bytes, len);
   }
 
-  h = packet_append_header(p, PROTO_NAME_IPV4, (void *)ip, IPV4_HDR_LEN(ip));
+  packet_append_header(p, PROTO_NAME_IPV4, (void *)ip, IPV4_HDR_LEN(ip));
   
   p->net_srcaddr = ip_addr_ntoa(ip->src_addr);
   p->net_dstaddr = ip_addr_ntoa(ip->dest_addr);

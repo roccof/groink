@@ -134,16 +134,16 @@ int main(int argc, char **argv)
   signal(SIGTERM, &signal_handler_cb);
   
   parse_options(argc, argv);
-  
-  threads_manager_init();
-  load_iface_info();
-  protos_init();
 
   /* Get iface name */
   if ((gbls->iface == NULL) && ((gbls->iface = pcap_lookupdev(errbuf)) == NULL)) {
     fatal(__func__, errbuf);
     exit(-1);
   }
+
+  threads_manager_init();
+  load_iface_info();
+  protos_init();
 
   /* Initialize pcap handler */
   pcap = pcap_init(gbls->iface, gbls->snaplen, gbls->promisc, gbls->rfmon, 

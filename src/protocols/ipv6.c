@@ -31,7 +31,6 @@
 static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
 {
   ipv6_t *ip = NULL;
-  header_t *h = NULL;
   _uint8 nexth;
   _uint totlen = 0;
   ipv6_ext_opt_t *opt = NULL;
@@ -46,7 +45,7 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
   ip = (ipv6_t *)bytes;
   totlen += IPV6_HDR_LEN;
 
-  h = packet_append_header(p, PROTO_NAME_IPV6, (void *)ip, IPV6_HDR_LEN);
+  packet_append_header(p, PROTO_NAME_IPV6, (void *)ip, IPV6_HDR_LEN);
   
   p->net_srcaddr = ipv6_addr_ntoa(ip->src_addr);
   p->net_dstaddr = ipv6_addr_ntoa(ip->dst_addr);

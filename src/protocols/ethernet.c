@@ -54,7 +54,6 @@ ether_t *build_ethernet(char *src, char *dst, _uint16 type)
 static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 {
   ether_t *eth = NULL;
-  header_t *header = NULL;
 
   if (ETHER_HDR_LEN > len) {
     decoder_add_error(p, "invalid ETHERNET header length");
@@ -64,7 +63,7 @@ static int decode_ether(packet_t *p, const _uint8 *bytes, size_t len)
 
   eth = (ether_t *)bytes;
 
-  header = packet_append_header(p, PROTO_NAME_ETHER, (void *)eth, ETHER_HDR_LEN);
+  packet_append_header(p, PROTO_NAME_ETHER, (void *)eth, ETHER_HDR_LEN);
 
   p->hw_srcaddr = ether_addr_ntoa(eth->src_addr);
   p->hw_dstaddr = ether_addr_ntoa(eth->dest_addr);

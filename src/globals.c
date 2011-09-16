@@ -59,6 +59,7 @@ void globals_init()
   bzero(gbls->script_argv, MAX_SCRIPT_ARGS);
   gbls->script_argc = 0;
   gbls->script_debug_mode = 0;
+  gbls->selib_dir = NULL;
   gbls->scripts_dir = NULL;
 
   gbls->mitm = NULL;
@@ -102,6 +103,12 @@ void globals_destroy()
   
   if (gbls->script != NULL)
     free(gbls->script);
+
+  if (gbls->selib_dir != NULL)
+    free(gbls->selib_dir);
+
+  if (gbls->scripts_dir != NULL)
+    free(gbls->scripts_dir);
   
   free(gbls);
   gbls = NULL;
