@@ -108,10 +108,67 @@ static int decode_ipv6(packet_t *p, const _uint8 *bytes, size_t len)
       totlen += call_decoder(PROTO_NAME_RAW, p, (bytes + totlen), (len - totlen));
       return totlen;
     }
-    break;
+    /* break; */
   }
 
   return DECODE_OK;
+}
+
+static void push_exthdr(lua_State *L, ipv6_t *ip)
+{
+  _uint8 *bytes = NULL;
+  _uint8 nexth;
+  ipv6_ext_opt_t *opt = NULL;
+  ipv6_ext_routing_t *r = NULL;
+  ipv6_ext_frag_t *f = NULL;
+  _uint totlen = 0;
+
+  bytes = (_uint8 *)(ip + 1);
+  totlen = 0;
+  nexth = ip->next_hdr;
+
+  lua_newtable(L);
+
+  while (1) { /* TODO */
+    switch (nexth) {
+
+    case IPV6_EXTH_HBH:
+      opt = (ipv6_ext_opt_t *)(bytes + totlen);
+      totlen += sizeof(ipv6_ext_opt_t) + opt->len;
+      nexth = opt->next_hdr;
+      break;
+
+    case IPV6_EXTH_DST_OPT:
+      opt = (ipv6_ext_opt_t *)(bytes + totlen);
+      totlen += sizeof(ipv6_ext_opt_t) + opt->len;
+      nexth = opt->next_hdr;
+      break;
+
+    case IPV6_EXTH_ROUTING:
+      r = (ipv6_ext_routing_t *)(bytes + totlen);
+      totlen += sizeof(ipv6_ext_routing_t) + r->len;
+      nexth = r->next_hdr;
+      break;
+
+    case IPV6_EXTH_FRAG:
+      f = (ipv6_ext_frag_t *)(bytes + totlen);
+      totlen += sizeof(ipv6_ext_frag_t);
+      nexth = f->next_hdr;
+      break;
+
+      /* XXX: not implemented yet! */
+    case IPV6_EXTH_AH:
+    case IPV6_EXTH_ESP:
+      goto end;
+
+    case IPV6_NO_EXT_HDR: /* No extension header */
+    default:
+      goto end;
+    }
+  }
+
+ end:
+  se_setro(L);
 }
 
 static int l_dissect_ipv6(lua_State *L)
@@ -159,6 +216,10 @@ static int l_dissect_ipv6(lua_State *L)
   addr = ipv6_addr_ntoa(ip->dst_addr);
   lua_pushstring(L, addr);
   free(addr);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "ext_headers");
+  push_exthdr(L, ip);
   lua_settable(L, -3);
 
   se_setro(L);

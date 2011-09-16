@@ -43,8 +43,6 @@ static int decode_icmp6(packet_t *p, const _uint8 *bytes, size_t len)
 
   packet_append_header(p, PROTO_NAME_ICMP6, (void *)icmp, len);
 
-  /* TODO: control len of all bodies */
-  
   return DECODE_OK;
 }
 
@@ -114,6 +112,7 @@ static void process_neigh_sol(lua_State *L, icmp6_t *icmp, unsigned int len)
     lua_pushnil(L);
   }
 
+  /* TODO: fix invalid read of size 1 */
   b = (icmp6_neigh_sol_t *)icmp + 1;
   addr = ipv6_addr_ntoa(b->target_addr);
 

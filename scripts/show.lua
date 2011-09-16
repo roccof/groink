@@ -330,7 +330,6 @@ local ICMP_CODE = {
 local function print_icmp(p)
    local h = p:get_header(Proto.ICMP)
    local icmp = h:dissect()
-   local body = icmp.body
    
    printf("ICMP %s > %s ", p:net_srcaddr(), p:net_dstaddr())
    
@@ -340,13 +339,13 @@ local function print_icmp(p)
       printf("echo reply")
    elseif icmp.type == ICMP_TYPE.REDIRECT then
       printf("redirect ")
-      if body ~= nil then
+      if icmp.body ~= nil then
 	 if icmp.code == ICMP_CODE.REDIR_NET then
-	    printf("to net %s ", body.gw_addr)
+	    printf("to net %s ", icmp.body.gw_addr)
 	 elseif icmp.code == ICMP_CODE.REDIR_HOST then
-	    printf("to host %s ", body.gw_addr)
+	    printf("to host %s ", icmp.body.gw_addr)
 	 else
-	    printf("to %s ", body.gw_addr)
+	    printf("to %s ", icmp.body.gw_addr)
 	 end
       end
    elseif icmp.type == ICMP_TYPE.DEST_UNREACH then
@@ -398,8 +397,8 @@ local ICMP6_CODE = {
 
 -- Print icmp6 header
 local function print_icmp6(p)
-   local icmp = p:get_header(Proto.ICMP6)
-   local body = icmp:body()
+   local h = p:get_header(Proto.ICMP6)
+   local icmp = h:dissect()
    
    printf("ICMPv6 %s > %s ", p:net_srcaddr(), p:net_dstaddr())
    
@@ -420,20 +419,20 @@ local function print_icmp6(p)
    elseif icmp.type == ICMP6_TYPE.TIME_EXCEEDED then
       printf("time exceeded")
       if icmp.code == ICMP6_CODE.TEXC_HOP_LIMIT then
-	 printf(", hop limit exceeded in transit")
+   	 printf(", hop limit exceeded in transit")
       elseif icmp.code == ICMP6_CODE.TEXC_FRAG_REASSEMBLY then
-	 printf(", fragment reassembly time exceeded")
+   	 printf(", fragment reassembly time exceeded")
       end
    elseif icmp.type == ICMP6_TYPE.PARAM_PROB then
       if icmp.code == ICMP6_CODE.PARAM_PROB_ERR_HDR_FIELD then
-	 printf("erroneous header field")
+   	 printf("erroneous header field")
       elseif icmp.code == ICMP6_CODE.PARAM_PROB_UNREC_NXT_HDR then
-	 printf("unrecognized Next Header type")
+   	 printf("unrecognized Next Header type")
       elseif icmp.code == ICMP6_CODE.PARAM_PROB_UNREC_OPT then
-	 printf("unrecognized IPv6 option")
+   	 printf("unrecognized IPv6 option")
       end
    elseif icmp.type == ICMP6_TYPE.PKT_TOO_BIG then
-      printf("packet too big, mtu: %d", body.mtu)
+      printf("packet too big, mtu: %d", icmp.body.mtu)
    elseif icmp.type == ICMP6_TYPE.ROUTER_SOL then
       printf("router solicitation")
    elseif icmp.type == ICMP6_TYPE.ROUTER_ADV then
@@ -446,6 +445,8 @@ local function print_icmp6(p)
       printf("redirect")
    elseif icmp.type == ICMP6_TYPE.ROUTER_RENUMBERING then
       printf("router renumbering")
+   else
+      printf("%d", icmp.type)
    end
    printf("\n")
 end
