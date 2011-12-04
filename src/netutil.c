@@ -165,6 +165,9 @@ char *addr_stoa(struct sockaddr *addr)
   struct sockaddr_in *addr_in = NULL;
   struct sockaddr_in6 *addr_in6 = NULL;
 
+  if (addr == NULL)
+    return NULL;
+
   switch(addr->sa_family) {
   case AF_UNSPEC:
   case ETHER_ADDR:

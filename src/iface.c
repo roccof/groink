@@ -73,6 +73,7 @@ void load_iface_info()
 
       /* IPv4 address */
       if (ifa->ifa_addr->sa_family == AF_INET) {
+
 	char *addr = addr_stoa(ifa->ifa_addr);
 
 	if (addr == NULL) {

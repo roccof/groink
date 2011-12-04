@@ -112,7 +112,7 @@ static void process_packet(u_char *user, const struct pcap_pkthdr *header, const
   hook_event(HOOK_RECEIVED, hookdata);
 
   /* Pass packet to script engine */
-  se_pass_packet(p);
+  se_proc_packet(p);
 
   free(hookdata);
   

@@ -31,6 +31,6 @@
 void se_open();
 void se_close();
 char *append_script_dir(char *script_name);
-void se_pass_packet(packet_t *p);
+void se_proc_packet(packet_t *p);
 
 #endif /* GROINK_SCRIPT_ENGINE_H */

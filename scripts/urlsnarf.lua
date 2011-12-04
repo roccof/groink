@@ -16,7 +16,7 @@
 -- along with GroinK.  If not, see <http://www.gnu.org/licenses/>.
 
 -- urlsnarf.lua
--- Url sniffer
+-- HTTP url sniffer
 
 local core = require("core")
 local printf = core.printf
