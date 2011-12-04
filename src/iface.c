@@ -72,7 +72,7 @@ void load_iface_info()
     if (strncmp(gbls->iface, ifa->ifa_name, strlen(gbls->iface)) == 0) {
 
       /* IPv4 address */
-      if (ifa->ifa_addr->sa_family == AF_INET) {
+      if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET) {
 
 	char *addr = addr_stoa(ifa->ifa_addr);
 
@@ -92,7 +92,7 @@ void load_iface_info()
 	  debug("IPv4 NETMASK: %s", gbls->netmask);
 	}
       } /* IPv6 address */
-      else if (ifa->ifa_addr->sa_family == AF_INET6) {
+      else if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET6) {
 	char *addr = addr_stoa(ifa->ifa_addr);
 	
 	if (addr == NULL) {
