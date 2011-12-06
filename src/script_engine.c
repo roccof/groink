@@ -91,12 +91,79 @@ static void se_pushargs(lua_State *L)
   }
 }
 
-static int se_init(lua_State *L)
+/* static int se_init(lua_State *L) */
+/* { */
+/*   char *init_script = NULL; */
+/*   char *script = NULL; */
+
+/*   script = (char *)luaL_checkstring(L, 1); */
+
+/*   lua_settop(L, 0); /\* Clear the stack *\/ */
+
+/*   /\* Push the script args into the registry *\/ */
+/*   se_pushargs(L); */
+/*   lua_setfield(L, LUA_REGISTRYINDEX, SE_ARGV); */
+/*   lua_pushnumber(L, gbls->script_argc); */
+/*   lua_setfield(L, LUA_REGISTRYINDEX, SE_ARGC); */
+
+/*   lua_getglobal(L, "debug"); */
+/*   myassert(!lua_isnil(L, -1)); */
+/*   lua_getfield(L, -1, "traceback"); */
+/*   myassert(!lua_isnil(L, -1)); */
+/*   lua_replace(L, 1);  /\* Stack pos 1: traceback function *\/ */
+
+/*   /\* Save a copy of traceback function into the registry *\/ */
+/*   lua_pushvalue(L, 1); */
+/*   lua_setfield(L, LUA_REGISTRYINDEX, SE_TRACEBACK); */
+
+/*   debug("SCRIPT1: %s", script); */
+
+/*   /\* Stack pos 2: script_engine.lua code *\/ */
+/*   if (gbls->selib_dir != NULL) { */
+/*     init_script = str_concat(gbls->selib_dir, INIT_SCRIPT, NULL); */
+/*   } else { */
+/*     init_script = strdup(GROINK_DATADIR"/selib/"INIT_SCRIPT); */
+/*   } */
+
+/*   debug("SCRIPT2: %s", script); */
+
+/*   debug("INIT: %p ; SCRIPT: %p", init_script, script); */
+
+/*   if (luaL_loadfile(L, init_script) != 0) { */
+/*     luaL_error(L, "could not load "INIT_SCRIPT": %s", lua_tostring(L, -1)); */
+/*   } */
+
+/*   stackDump(L); */
+
+/*   debug("SCRIPT3: %s", script); */
+
+/*   /\* Stack pos 3: script that will be executed *\/ */
+/*   lua_pushstring(L, script); */
+
+/*   /\* Stack pos 4: selib path *\/ */
+/*   if (gbls->selib_dir != NULL) { */
+/*     lua_pushstring(L, gbls->selib_dir); */
+/*   } else { */
+/*     lua_pushstring(L, GROINK_DATADIR"/selib/"); */
+/*   } */
+
+/*   stackDump(L); */
+
+/*   /\*  */
+/*    * Run main script that initialize the engine and  */
+/*    * execute the selected script */
+/*    *\/ */
+/*   if(lua_pcall(L, 2, 0, 1) != 0) */
+/*     lua_error(L); */
+
+/*   free(init_script); */
+
+/*   return 0; */
+/* } */
+
+static void se_init(char *script)
 {
   char *init_script = NULL;
-  char *script = NULL;
-
-  script = (char *)luaL_checkstring(L, 1);
 
   lua_settop(L, 0); /* Clear the stack */
 
@@ -125,7 +192,6 @@ static int se_init(lua_State *L)
   if (luaL_loadfile(L, init_script) != 0) {
     luaL_error(L, "could not load "INIT_SCRIPT": %s", lua_tostring(L, -1));
   }
-  free(init_script);
 
   /* Stack pos 3: script that will be executed */
   lua_pushstring(L, script);
@@ -144,7 +210,7 @@ static int se_init(lua_State *L)
   if(lua_pcall(L, 2, 0, 1) != 0)
     lua_error(L);
 
-  return 0;
+  free(init_script);
 }
 
 /* Pass the received packet to script engine */
@@ -210,11 +276,7 @@ void se_open()
 
   /**** Start the engine ****/
 
-  lua_pushcfunction(L, &se_init);
-  lua_pushstring(L, gbls->script);
-
-  if(lua_pcall(L, 1, 0, 0) != 0)
-    se_fatal("%s", lua_tostring(L, -1));
+  se_init(gbls->script);
 
   lua_settop(L, 0); /* Clear the stack */
 

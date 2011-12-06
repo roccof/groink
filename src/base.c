@@ -121,8 +121,7 @@ char *str_concat(char *str, ...)
 {
   va_list ap, ap2;
   size_t totlen = 1;  /* Null byte */
-  char *result = NULL;
-  char *s = NULL;
+  char *result = NULL, *s = NULL;
 
   va_start(ap, str);
   va_copy(ap2, ap);
@@ -139,7 +138,7 @@ char *str_concat(char *str, ...)
 
   /* Copy the strings. */
   for (s=str; s!=NULL; s=va_arg(ap2, char *))
-    strcat(result, s);
+    strncat(result, s, strlen(s));
 
   va_end(ap2);
 

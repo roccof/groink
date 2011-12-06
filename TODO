@@ -56,6 +56,8 @@
 
 * DNS spoofing MiTM attack
 
+* DNS poisoning MiTM attack
+
 * IPv6 MiTM attacks
 
 * ssl SE library

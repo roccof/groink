@@ -185,7 +185,7 @@ void parse_options(int argc, char **argv)
 
     if (strlen(gbls->script) > MAX_SCRIPT_NAME)
       fatal(__func__, "the script name is too long, max %d character", MAX_SCRIPT_NAME);
-    
+
     opt_index = 0;
 
     /* Get possible script args */
