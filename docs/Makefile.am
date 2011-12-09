@@ -1,2 +1,2 @@
 
-man1_MANS = groink.8
+man1_MANS = groink.1
