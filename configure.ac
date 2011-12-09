@@ -97,7 +97,7 @@ fi
 
 CFLAGS="$CFLAGS -Wall"
 
-AC_OUTPUT(Makefile src/Makefile docs/Makefile tests/Makefile)
+AC_OUTPUT(Makefile src/Makefile docs/Makefile)
 
 echo
 echo "====================================="
