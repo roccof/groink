@@ -56,7 +56,7 @@ typedef struct _grk_packet {
   _uchar *data;                           /* Packet data */
   size_t len;                             /* Packet length*/
   header_t *headers;                      /* Headers list */
-  payload_t *payload;                     /* Payload */
+  header_t *payload;                      /* Payload */
   int num_headers;                        /* Number of headers */
   _uint8 flags;                           /* Flags bit mask */
   _uint8 dec_err[MAX_ERR_LEN];            /* Decoding error */
@@ -77,6 +77,7 @@ header_t *packet_append_header(packet_t *p, char *proto, _uint8 *data, size_t le
 header_t *packet_get_header(packet_t *p, char *proto);
 int packet_contains_header(packet_t *p, char *proto);
 void packet_set_tostring(packet_t *p, char *format, ...);
-payload_t *packet_set_payload(packet_t *p, char *proto, _uint8 *data, size_t len);
+
+void packet_set_payload(packet_t *p, header_t *h);
 
 #endif /* GROINK_PACKET_H */

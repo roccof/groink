@@ -55,26 +55,10 @@ static int l_packet_payload(lua_State *L)
 {
   packet_t *p = check_packet(L, -1);
 
-  if (p->payload == NULL) {
+  if (p->payload == NULL) 
     lua_pushnil(L);
-    return 1;
-  }
-
-  lua_newtable(L);
-
-  lua_pushstring(L, "proto");
-  lua_pushstring(L, p->payload->proto);
-  lua_settable(L, -3);
-  
-  lua_pushstring(L, "data");
-  lua_pushlstring(L, (const char *)p->payload->data, p->payload->len);
-  lua_settable(L, -3);
-
-  lua_pushstring(L, "len");
-  lua_pushnumber(L, p->payload->len);
-  lua_settable(L, -3);
-
-  se_setro(L); /* Read-Only table */
+  else
+    se_pushobject(L, p->payload, SE_OBJ_TYPE_HEADER, SE_OBJ_NAME_HEADER);
 
   return 1;
 }

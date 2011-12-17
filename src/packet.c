@@ -175,18 +175,10 @@ header_t *packet_get_header(packet_t *p, char *proto)
   return NULL;
 }
 
-payload_t *packet_set_payload(packet_t *p, char *proto, _uint8 *data, size_t len)
+void packet_set_payload(packet_t *p, header_t *h)
 {
-  payload_t *payload = (payload_t *)safe_alloc(sizeof(payload_t));
-  payload->proto = proto;
-  payload->data = data;
-  payload->len = len;
-  payload->packet = p;
+  if (h == NULL)
+    return;
 
-  if (p->payload != NULL)
-    debug("the packet contains a payload");
-
-  p->payload = payload;
-
-  return payload;
+  p->payload = h;
 }

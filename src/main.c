@@ -52,18 +52,19 @@ static void cleanup()
     pcap_breakloop(pcap);
     debug("sniffing stopped");
 
+#ifdef GROINK_DEBUG
     if (pcap_stats(pcap, &ps) != -1)
       debug("cap/recv/drop packet: %d/%d/%d", 
 	    gbls->cap_packets, ps.ps_recv, ps.ps_drop);
-    
+#endif
     pcap_close(pcap);
   }
 
-  se_close();
-  mitm_stop();
-  inject_cleanup();
+  /* se_close(); */
+  /* mitm_stop(); */
+  /* inject_cleanup(); */
   protos_destroy();
-  packet_forward_module_destroy();
+  /* packet_forward_module_destroy(); */
   threads_manager_destroy();
   hook_cleanup();
   globals_destroy();
@@ -152,25 +153,26 @@ int main(int argc, char **argv)
   /* Get the device type */
   gbls->dlt = pcap_datalink(pcap);
 
-  inject_initialize();
+  /* inject_initialize(); */
 
   /* Build the list with all hosts present in the same network */
-  if(gbls->scan)
-    build_hosts_list(pcap);
+  /* if(gbls->scan) */
+  /*   build_hosts_list(pcap); */
   
   /* TODO: possibility to read the hosts from a file */
   
   /* Start MiTM attack if required */
-  mitm_start();
+  /* mitm_start(); */
 
-  if(gbls->mitm_state == MITM_STATE_START)
-    packet_forward_module_init();
+  /* if(gbls->mitm_state == MITM_STATE_START) */
+  /*   packet_forward_module_init(); */
 
   message(COLOR_BOLD"%s %s"COLOR_NORMAL" started", PACKAGE_NAME, VERSION);
 
   /* Start script engine and run the script */
   se_open();
 
+#ifdef GROINK_DEBUG
   if (gbls->promisc)
     debug("start sniffing on '%s' in promisc mode, datalink: %s (%s), snaplen %d", 
 	  gbls->iface, pcap_datalink_val_to_name(gbls->dlt), 
@@ -179,11 +181,10 @@ int main(int argc, char **argv)
     debug("start sniffing on '%s', datalink: %s (%s), snaplen %d", gbls->iface, 
 	  pcap_datalink_val_to_name(gbls->dlt), 
 	  pcap_datalink_val_to_description(gbls->dlt), gbls->snaplen);
+#endif
 
   /* Start sniffing */
   pcap_loop(pcap, 0, &process_packet, NULL);
-
-  cleanup();
 
   return EXIT_SUCCESS;
 }

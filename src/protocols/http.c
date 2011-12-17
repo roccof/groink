@@ -19,21 +19,43 @@
 #include "protos_name.h"
 #include "protos.h"
 #include "http.h"
+#include "selib.h"
 
 static int decode_http(packet_t *p, const _uint8 *bytes, size_t len)
 {
-  packet_set_payload(p, PROTO_NAME_HTTP, (void *)bytes, len);
+  header_t *h = packet_append_header(p, PROTO_NAME_HTTP, (void *)bytes, len);
+  packet_set_payload(p, h);
+
   return DECODE_OK;
+}
+
+static int l_dissect_http(lua_State *L)
+{
+  header_t *h = check_header(L, 1);
+
+  lua_newtable(L);
+
+  lua_pushstring(L, "data");
+  lua_pushlstring(L, (const char *)h->data, h->len);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "len");
+  lua_pushnumber(L, h->len);
+  lua_settable(L, -3);
+
+  se_setro(L);
+
+  return 1;
 }
 
 void register_http()
 {
   proto_t *p = (proto_t *)safe_alloc(sizeof(proto_t));
   p->name = PROTO_NAME_HTTP;
-  p->longname = "HTTP";
+  p->longname = "Hypertext Transfer Protocol";
   p->layer = L5;
   p->decoder = decode_http;
-  p->dissect = NULL;
+  p->dissect = l_dissect_http;
   
   proto_register_byname(PROTO_NAME_HTTP, p);
   proto_register_byport(80, p);
