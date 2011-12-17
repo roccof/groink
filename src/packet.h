@@ -31,14 +31,6 @@ typedef struct _grk_header {
   struct _grk_packet *packet;  /* The packet that contains this header */
 } header_t;
 
-/* Payload */
-typedef struct _grk_payload {
-  char *proto;
-  size_t len;
-  _uchar *data;
-  struct _grk_packet *packet;
-} payload_t;
-
 #define PKT_ADD_FLAG(p, f) ((p)->flags |= (f))
 #define PKT_REMOVE_FLAG(p, f) ((p)->flags &= ~(f))
 #define PKT_HAS_FLAG(p, f) (((p)->flags & (f)) == (f))
