@@ -143,7 +143,6 @@ int main(int argc, char **argv)
   }
 
   threads_manager_init();
-  load_iface_info();
   protos_init();
 
   /* Initialize pcap handler */
@@ -152,6 +151,8 @@ int main(int argc, char **argv)
 
   /* Get the device type */
   gbls->dlt = pcap_datalink(pcap);
+
+  load_iface_info();
 
   /* inject_initialize(); */
 
