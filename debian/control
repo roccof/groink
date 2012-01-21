@@ -2,13 +2,14 @@ Source: groink
 Section: net
 Priority: extra
 Maintainer: Rocco Folino <lordzen@autistici.org>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev
-Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
 Homepage: http://decrew.indivia.net/groink/index.html
 
 Package: groink
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, liblua5.1-0, libpcap0.8 (>= 0.9.8)
-Description: Advanced sniffer that supports protocol decoding and MiTM 
+Description: Advanced sniffer
+ Groink is an advance sniffer that supports protocol decoding and MiTM 
  attacks. Unlike other sniffers, Groink has integrated lua scripting 
  language that allows you to extend it easily.
