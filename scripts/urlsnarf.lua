@@ -30,8 +30,9 @@ function proc_pkt(p)
       return
    end
 
-   if payload.proto == Proto.HTTP then
-      local http = httplib.parse_http(payload.data)
+   if payload:proto() == Proto.HTTP then
+      local diss = payload:dissect()
+      local http = httplib.parse_http(diss.data)
       local src url = nil, nil
       
       if http == nil or http.type == httplib.HTTP_TYPE_RESPONSE or

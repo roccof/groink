@@ -51,7 +51,7 @@ local function set_session(s)
    table.insert(d_sess, s)
 end
 
--- Remove and returna a session from the list
+-- Remove and return a session from the list
 local function get_session(src_addr, dst_addr, src_port, dst_port, proto)
    for k,v in pairs(d_sess) do
       if v.proto == proto and v.src == src_addr and v.dst == dst_addr and v.src_p == src_port and v.dst_p == dst_port then
@@ -124,7 +124,7 @@ function dissect_http(packet)
       return nil
    end
 
-   local http = httplib.parse_http(p.data)
+   local http = httplib.parse_http(p:dissect().data)
 
    if http == nil then
       return nil
@@ -200,7 +200,7 @@ function dissect_ftp(packet)
       return nil
    end
 
-   local data = p.data
+   local data = p:dissect().data
 
    local s,e = data:find("USER")
 

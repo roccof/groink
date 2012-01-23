@@ -60,7 +60,7 @@ static void cleanup()
     pcap_close(pcap);
   }
 
-  /* se_close(); */
+  se_close();
   /* mitm_stop(); */
   /* inject_cleanup(); */
   protos_destroy();
@@ -82,13 +82,13 @@ static void process_packet(u_char *user, const struct pcap_pkthdr *header, const
   hookdata_t *hookdata = NULL;
 
   if (header->len == 0 || bytes == NULL) {
-      /*
-       * XXX:
-       *     If header->len is 0, header->caplen is
-       *     greater than zero. Why???? oO
-       */
-      return;
-    }
+    /*
+     * XXX:
+     *     If header->len is 0, header->caplen is
+     *     greater than zero. Why???? oO
+     */
+    return;
+  }
 
   /* Skip truncated packets */
   if (header->len > gbls->snaplen) {
