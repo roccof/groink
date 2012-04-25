@@ -29,6 +29,17 @@ static int decode_http(packet_t *p, const _uint8 *bytes, size_t len)
   return DECODE_OK;
 }
 
+static void find_auth_info(lua_State *L, header_t *h)
+{
+  /* _uchar *data = h->data; */
+  
+  /* if (strncmp("GET", data, 3) == 0) { */
+  /*   /\* Process GET *\/ */
+  /* } else if (strncmp("POST", data, 4) == 0) { */
+  /*   /\* Process POST *\/ */
+  /* } */
+}
+
 static int l_dissect_http(lua_State *L)
 {
   header_t *h = check_header(L, 1);
@@ -42,6 +53,8 @@ static int l_dissect_http(lua_State *L)
   lua_pushstring(L, "len");
   lua_pushnumber(L, h->len);
   lua_settable(L, -3);
+
+  find_auth_info(L, h);
 
   se_setro(L);
 

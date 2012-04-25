@@ -112,12 +112,12 @@ static void process_packet(u_char *user, const struct pcap_pkthdr *header, const
   /* Raise event */
   hook_event(HOOK_RECEIVED, hookdata);
 
+  free(hookdata);
+
   /* Pass packet to script engine */
   se_proc_packet(p);
-
-  free(hookdata);
   
-  /* If MiTM is active, do packet forwarding */
+  /* If MiTM is active, forward the packet to the real destination */
   if(gbls->mitm_state == MITM_STATE_START)
     packet_forward(p);
 }

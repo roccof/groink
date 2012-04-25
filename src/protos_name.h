@@ -31,5 +31,6 @@
 #define PROTO_NAME_ICMP6 "icmp6"
 #define PROTO_NAME_HTTP "http"
 #define PROTO_NAME_FTP "ftp"
+#define PROTO_NAME_SLL "sll"
 
 #endif /* GROINK_PROTOS_NAMES_H */

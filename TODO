@@ -1,31 +1,6 @@
 
 * write man page
 
-* Linux "cooked" capture encapsulation
-   the link-layer header contains, in order:
- 
-     a 2-byte "packet type", in network byte order, which is one of:
-       0    packet was sent to us by somebody else
-       1    packet was broadcast by somebody else
-       2    packet was multicast, but not broadcast, by somebody else
-       3    packet was sent by somebody else to somebody else
-       4    packet was sent by us
-
-   a 2-byte field, in network byte order, containing a Linux ARPHRD_
-   value for the link-layer device type;
-
-   a 2-byte field, in network byte order, containing the length of the
-   link-layer address of the sender of the packet (which could be 0);
-
-   an 8-byte field containing that number of bytes of the link-layer
-   address of the sender (if there are more than 8 bytes, only the
-   first 8 are present,  and if there are fewer than 8 bytes, there
-   are padding bytes after the address to pad the field to 8 bytes);
-
-   a  2-byte  field  containing an Ethernet protocol type, in network
-   byte order, or containing 1 for Novell 802.3 frames without an
-   802.2 LLC header or 4 for frames beginning with an 802.2 LLC header.
-
 * OpenBSD loopback encapsulation protocol
    the link-layer header is a 4-byte field, in network byte order,
    containing a PF_ value from OpenBSD's socket.h for the

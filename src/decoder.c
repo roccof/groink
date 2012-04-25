@@ -31,33 +31,37 @@ int start_decoding(packet_t *p)
   debug("start packet decoding...");
 
   switch (gbls->dlt) {
-
-      /* Raw IP */
-    case DLT_RAW:
-      status = call_decoder(PROTO_NAME_IPV4, p, p->data, p->len);
-      break;
-
-      /* Ethernet 10/100/1000 header */
-    case DLT_EN10MB:
-      status = call_decoder(PROTO_NAME_ETHER, p, p->data, p->len);
-      break;
-
-      /* IEEE 802.11 wireless lan header */
+    
+    /* Raw IP */
+  case DLT_RAW:
+    status = call_decoder(PROTO_NAME_IPV4, p, p->data, p->len);
+    break;
+    
+    /* Ethernet 10/100/1000 header */
+  case DLT_EN10MB:
+    status = call_decoder(PROTO_NAME_ETHER, p, p->data, p->len);
+    break;
+    
+    /* IEEE 802.11 wireless lan header */
     /* case DLT_IEEE802_11: */
     /*   status = call_decoder("asd", p, p->data, p->len); */
     /*   break; */
-
-      /* IEEE 802.11 radiotap header */
+    
+    /* IEEE 802.11 radiotap header */
     /* case DLT_IEEE802_11_RADIO: */
     /*   status = call_decoder("asd", p, p->data, p->len); */
     /*   break; */
-      
-    default:
-      debug("data link protocol '%s' not supported", 
-	    pcap_datalink_val_to_name(gbls->dlt));
-      status = call_decoder(PROTO_NAME_RAW, p, p->data, p->len);
-    }
-
+    
+  case DLT_LINUX_SLL:
+    status = call_decoder(PROTO_NAME_SLL, p, p->data, p->len);
+    break;
+    
+  default:
+    debug("data link protocol '%s' not supported", 
+	  pcap_datalink_val_to_name(gbls->dlt));
+    status = call_decoder(PROTO_NAME_RAW, p, p->data, p->len);
+  }
+  
   return status;
 }
 

@@ -30,6 +30,7 @@
 #include "protocols/icmp6.h"
 #include "protocols/http.h"
 #include "protocols/ftp.h"
+#include "protocols/sll.h"
 #include "debug.h"
 #include "base.h"
 #include "hashtable.h"
@@ -50,6 +51,7 @@ static const proto_cb protos[] = {
   register_icmp6,
   register_http,
   register_ftp,
+  register_sll,
   NULL
 };
 
