@@ -57,8 +57,8 @@ typedef struct _arp_ethip
 #define	ARP_OP_NAK          10	 /* (ATM)ARP NAK */
 
 /* ARP protocol HARDWARE identifiers */
-#define ARP_HRD_ETHER 1	         /* Ethernet 10/100Mbps */
-#define ARP_HRD_PPP 512           /* PPP */
+#define ARP_HRD_ETHER 1	         /* Ethernet 10/100 Mbps */
+#define ARP_HRD_PPP 512          /* PPP */
 
 /* ARP protocol PROTOCOL indentifiers */
 #define ARP_PROTO_IPV4 ETHER_TYPE_IP

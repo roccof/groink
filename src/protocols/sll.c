@@ -21,13 +21,31 @@
 #include "protos_name.h"
 #include "protos.h"
 #include "sll.h"
+#include "arp.h"
+#include "ethernet.h"
 #include "selib.h"
 
 static int decode_sll(packet_t *p, const _uint8 *bytes, size_t len)
 {
   sll_t *sll = (sll_t *)bytes;
 
+  debug("SLL ARPHDR: 0x%x", ntohs(sll->arp_hdr));
+
   packet_append_header(p, PROTO_NAME_SLL, (void *)sll, SLL_HDR_LEN);
+
+  switch (ntohs(sll->proto)) {
+
+  /* case ARP_HRD_PPP: */
+  case ETHER_TYPE_IP:
+    return call_decoder(PROTO_NAME_IPV4, p, (bytes + SLL_HDR_LEN), (len - SLL_HDR_LEN));
+
+  case ETHER_TYPE_PPP:
+    return call_decoder(PROTO_NAME_PPP, p, (bytes + SLL_HDR_LEN), (len - SLL_HDR_LEN));
+
+  default:
+    debug("UNKNOWN: 0x%x", ntohs(sll->proto));
+
+  }
 
   return DECODE_OK;
 }

@@ -32,5 +32,6 @@
 #define PROTO_NAME_HTTP "http"
 #define PROTO_NAME_FTP "ftp"
 #define PROTO_NAME_SLL "sll"
+#define PROTO_NAME_PPP "ppp"
 
 #endif /* GROINK_PROTOS_NAMES_H */

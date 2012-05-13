@@ -31,6 +31,7 @@
 #include "protocols/http.h"
 #include "protocols/ftp.h"
 #include "protocols/sll.h"
+#include "protocols/ppp.h"
 #include "debug.h"
 #include "base.h"
 #include "hashtable.h"
@@ -52,6 +53,7 @@ static const proto_cb protos[] = {
   register_http,
   register_ftp,
   register_sll,
+  register_ppp,
   NULL
 };
 

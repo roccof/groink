@@ -58,4 +58,4 @@ typedef struct _grk_sll {
 
 void register_sll();
 
-#endif
+#endif /* GROINK_SLL_H */
