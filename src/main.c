@@ -22,23 +22,11 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <pcap.h>
 
 #include "config.h"
-#include "base.h"
-#include "debug.h"
-#include "globals.h"
 #include "threads.h"
-#include "parse_options.h"
-#include "hook.h"
-#include "protos.h"
-#include "script_engine.h"
-#include "pcap_util.h"
-#include "forward.h"
-#include "decoder.h"
-#include "packet.h"
-#include "inject.h"
-#include "iface.h"
 
 static pcap_t *pcap = NULL;
 
