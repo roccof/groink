@@ -1,0 +1,6 @@
+
+GROINK
+======
+
+GroinK is an advanced sniffer that supports protocol decoding and MiTM attacks. 
+Unlike other sniffers, Groink has integrated lua scripting language that allows you to extend it easily.
